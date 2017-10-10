@@ -17,8 +17,6 @@
 package com.android.mms.service_alt;
 
 import android.app.PendingIntent;
-import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -26,7 +24,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 import android.os.Binder;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.Telephony;
 
@@ -111,7 +108,7 @@ public class DownloadRequest extends MmsRequest {
     @Override
     protected Uri persistIfRequired(Context context, int result, byte[] response) {
         if (!mRequestManager.getAutoPersistingPref()) {
-            notifyOfDownload(context);
+            notifyOfDownload(context, null);
             return null;
         }
 
@@ -120,9 +117,6 @@ public class DownloadRequest extends MmsRequest {
 
     public static Uri persist(Context context, byte[] response, MmsConfig.Overridden mmsConfig,
                               String locationUrl, int subId, String creator) {
-        // Let any mms apps running as secondary user know that a new mms has been downloaded.
-        notifyOfDownload(context);
-
         Log.d(TAG, "DownloadRequest.persistIfRequired");
         if (response == null || response.length < 1) {
             Log.e(TAG, "DownloadRequest.persistIfRequired: empty response");
@@ -183,6 +177,9 @@ public class DownloadRequest extends MmsRequest {
             if (messageUri == null) {
                 Log.e(TAG, "DownloadRequest.persistIfRequired: can not persist message");
                 return null;
+            } else {
+                // Let any mms apps running as secondary user know that a new mms has been downloaded.
+                notifyOfDownload(context, messageUri);
             }
             // Update some of the properties of the message
             final ContentValues values = new ContentValues();
@@ -229,8 +226,12 @@ public class DownloadRequest extends MmsRequest {
         return null;
     }
 
-    private static void notifyOfDownload(Context context) {
-        BroadcastUtils.sendExplicitBroadcast(context, new Intent(), Transaction.NOTIFY_OF_MMS);
+    private static void notifyOfDownload(Context context, Uri messageUri) {
+        Intent intent = new Intent();
+        if(messageUri != null) {
+            intent.putExtra("messageUri", messageUri.toString());
+        }
+        BroadcastUtils.sendExplicitBroadcast(context, intent, Transaction.NOTIFY_OF_MMS);
 
         // TODO, not sure what this is doing... sending a broadcast that
         // the download has finished from a specific user account I believe.
