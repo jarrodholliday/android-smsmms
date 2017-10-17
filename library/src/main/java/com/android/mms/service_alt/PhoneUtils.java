@@ -25,6 +25,7 @@ import com.android.i18n.phonenumbers.Phonenumber;
 
 import java.lang.reflect.Method;
 import java.util.Locale;
+import timber.log.Timber;
 
 /**
  * Utility to handle phone numbers.
@@ -63,12 +64,12 @@ public class PhoneUtils {
             if (phoneNumberUtil.isValidNumber(phoneNumber)) {
                 return phoneNumber;
             } else {
-                Log.e(TAG, "getParsedNumber: not a valid phone number"
+                Timber.e("getParsedNumber: not a valid phone number"
                         + " for country " + country);
                 return null;
             }
         } catch (final NumberParseException e) {
-            Log.e(TAG, "getParsedNumber: Not able to parse phone number");
+            Timber.e("getParsedNumber: Not able to parse phone number");
             return null;
         }
     }

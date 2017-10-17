@@ -20,7 +20,7 @@ import android.app.PendingIntent;
 import android.net.NetworkInfo;
 import android.os.Parcel;
 import android.os.Parcelable;
-import com.klinker.android.logger.Log;
+import timber.log.Timber;
 
 /**
  * A simple container used to carry information of the ongoing legacy VPN.
@@ -86,7 +86,7 @@ public class LegacyVpnInfo implements Parcelable {
             case FAILED:
                 return STATE_FAILED;
             default:
-                Log.w(TAG, "Unhandled state " + info.getDetailedState()
+                Timber.w("Unhandled state " + info.getDetailedState()
                         + " ; treating as disconnected");
                 return STATE_DISCONNECTED;
         }

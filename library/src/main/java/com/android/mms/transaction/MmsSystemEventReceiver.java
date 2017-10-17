@@ -24,7 +24,8 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.Telephony.Mms;
-import com.klinker.android.logger.Log;
+import android.util.Log;
+import timber.log.Timber;
 
 import com.android.mms.logs.LogTag;
 import com.klinker.android.send_message.Utils;
@@ -59,7 +60,7 @@ public class MmsSystemEventReceiver extends BroadcastReceiver {
         }
 
         if (!Utils.isDefaultSmsApp(context)) {
-            Log.v(TAG, "not default sms app, cancelling");
+            Timber.v("not default sms app, cancelling");
             return;
         }
 
@@ -75,13 +76,13 @@ public class MmsSystemEventReceiver extends BroadcastReceiver {
             if (Utils.isMmsOverWifiEnabled(context)) {
                 NetworkInfo niWF = mConnMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
                 if ((niWF != null) && (niWF.isConnected())) {
-                    Log.v(TAG, "TYPE_WIFI connected");
+                    Timber.v("TYPE_WIFI connected");
                     wakeUpService(context);
                 }
             } else {
                 boolean mobileDataEnabled = Utils.isMobileDataEnabled(context);
                 if (!mobileDataEnabled) {
-                    Log.v(TAG, "mobile data turned off, bailing");
+                    Timber.v("mobile data turned off, bailing");
                     //Utils.setMobileDataEnabled(context, true);
                     return;
                 }

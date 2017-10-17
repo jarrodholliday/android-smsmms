@@ -47,7 +47,7 @@ import com.google.android.mms.pdu_alt.PduHeaders;
 import com.google.android.mms.pdu_alt.PduParser;
 import com.google.android.mms.pdu_alt.PduPersister;
 import com.google.android.mms.pdu_alt.ReadOrigInd;
-import com.klinker.android.logger.Log;
+import timber.log.Timber;
 import com.klinker.android.send_message.BroadcastUtils;
 import com.klinker.android.send_message.Utils;
 
@@ -89,7 +89,7 @@ public class PushReceiver extends BroadcastReceiver {
 
         @Override
         protected Void doInBackground(Intent... intents) {
-            Log.v(TAG, "receiving a new mms message");
+            Timber.v("receiving a new mms message");
             Intent intent = intents[0];
 
             // Get raw PDU push-data from the message and parse it
@@ -98,7 +98,7 @@ public class PushReceiver extends BroadcastReceiver {
             GenericPdu pdu = parser.parse();
 
             if (null == pdu) {
-                Log.e(TAG, "Invalid PUSH data");
+                Timber.e("Invalid PUSH data");
                 return null;
             }
 
@@ -170,14 +170,14 @@ public class PushReceiver extends BroadcastReceiver {
 
                             String location = getContentLocation(mContext, uri);
                             if (downloadedUrls.contains(location)) {
-                                Log.v(TAG, "already added this download, don't download again");
+                                Timber.v("already added this download, don't download again");
                                 return null;
                             } else {
                                 downloadedUrls.add(location);
                             }
 
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                Log.v(TAG, "receiving on a lollipop+ device");
+                                Timber.v("receiving on a lollipop+ device");
                                 boolean useSystem = true;
 
                                 if (com.klinker.android.send_message.Transaction.settings != null) {
@@ -191,7 +191,7 @@ public class PushReceiver extends BroadcastReceiver {
                                 if (useSystem) {
                                     DownloadManager.getInstance().downloadMultimediaMessage(mContext, location, uri, true);
                                 } else {
-                                    Log.v(TAG, "receiving with lollipop method");
+                                    Timber.v("receiving with lollipop method");
                                     MmsRequestManager requestManager = new MmsRequestManager(mContext);
                                     DownloadRequest request = new DownloadRequest(requestManager,
                                             Utils.getDefaultSubscriptionId(),
@@ -220,22 +220,22 @@ public class PushReceiver extends BroadcastReceiver {
                                 }
                             }
                         } else if (LOCAL_LOGV) {
-                            Log.v(TAG, "Skip downloading duplicate message: "
+                            Timber.v("Skip downloading duplicate message: "
                                     + new String(nInd.getContentLocation()));
                         }
                         break;
                     }
                     default:
-                        Log.e(TAG, "Received unrecognized PDU.");
+                        Timber.e("Received unrecognized PDU.");
                 }
             } catch (MmsException e) {
-                Log.e(TAG, "Failed to save the data from PUSH: type=" + type, e);
+                Timber.e("Failed to save the data from PUSH: type=" + type, e);
             } catch (RuntimeException e) {
-                Log.e(TAG, "Unexpected RuntimeException.", e);
+                Timber.e("Unexpected RuntimeException.", e);
             }
 
             if (LOCAL_LOGV) {
-                Log.v(TAG, "PUSH Intent processed.");
+                Timber.v("PUSH Intent processed.");
             }
 
             return null;
@@ -244,11 +244,11 @@ public class PushReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.v(TAG, intent.getAction() + " " + intent.getType());
+        Timber.v(intent.getAction() + " " + intent.getType());
         if ((intent.getAction().equals(WAP_PUSH_DELIVER_ACTION) || intent.getAction().equals(WAP_PUSH_RECEIVED_ACTION))
                 && ContentType.MMS_MESSAGE.equals(intent.getType())) {
             if (LOCAL_LOGV) {
-                Log.v(TAG, "Received PUSH Intent: " + intent);
+                Timber.v("Received PUSH Intent: " + intent);
             }
 
             SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -263,7 +263,7 @@ public class PushReceiver extends BroadcastReceiver {
                 MmsConfig.init(context);
                 new ReceivePushTask(context).executeOnExecutor(PUSH_RECEIVER_EXECUTOR, intent);
 
-                Log.v("mms_receiver", context.getPackageName() + " received and aborted");
+                Timber.v("mms_receiver", context.getPackageName() + " received and aborted");
 
                 abortBroadcast();
             } else {
@@ -275,7 +275,7 @@ public class PushReceiver extends BroadcastReceiver {
                         notificationBroadcast,
                         com.klinker.android.send_message.Transaction.NOTIFY_OF_MMS);
 
-                Log.v("mms_receiver", context.getPackageName() + " received and not aborted");
+                Timber.v("mms_receiver", context.getPackageName() + " received and not aborted");
             }
         }
     }

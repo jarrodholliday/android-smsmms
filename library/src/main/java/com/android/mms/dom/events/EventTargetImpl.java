@@ -25,7 +25,7 @@ import org.w3c.dom.events.EventException;
 import org.w3c.dom.events.EventListener;
 import org.w3c.dom.events.EventTarget;
 
-import com.klinker.android.logger.Log;
+import timber.log.Timber;
 
 public class EventTargetImpl implements EventTarget {
     private static final String TAG = LogTag.TAG;
@@ -100,7 +100,7 @@ public class EventTargetImpl implements EventTarget {
                     catch (Exception e) {
                         // Any exceptions thrown inside an EventListener will
                         // not stop propagation of the event
-                        Log.w(TAG, "Catched EventListener exception", e);
+                        Timber.w("Catched EventListener exception", e);
                     }
                 }
             }

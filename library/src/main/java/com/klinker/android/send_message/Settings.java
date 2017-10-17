@@ -19,7 +19,7 @@ package com.klinker.android.send_message;
 import android.net.wifi.WifiInfo;
 import android.os.Build;
 
-import com.klinker.android.logger.Log;
+import timber.log.Timber;
 
 /**
  * Class to house all of the settings that can be used to send a message
@@ -258,7 +258,7 @@ public class Settings {
             this.useSystemSending = useSystemSending;
         } else {
             this.useSystemSending = false;
-            Log.e("Settings", "System sending only available on Lollipop+ devices");
+            Timber.e("Settings", "System sending only available on Lollipop+ devices");
         }
     }
 
@@ -398,7 +398,7 @@ public class Settings {
      * @param path the external path on the sd card to write the log to
      */
     public static void setDebugLogging(boolean debugLogging, String path) {
-        Log.setDebug(debugLogging);
-        Log.setPath(path);
+//        Log.setDebug(debugLogging);
+//        Log.setPath(path);
     }
 }

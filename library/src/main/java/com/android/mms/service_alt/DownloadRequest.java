@@ -41,6 +41,7 @@ import com.google.android.mms.pdu_alt.RetrieveConf;
 import com.google.android.mms.util_alt.SqliteWrapper;
 import com.klinker.android.send_message.BroadcastUtils;
 import com.klinker.android.send_message.Transaction;
+import timber.log.Timber;
 
 /**
  * Request to download an MMS
@@ -82,7 +83,7 @@ public class DownloadRequest extends MmsRequest {
             throws MmsHttpException {
         final MmsHttpClient mmsHttpClient = netMgr.getOrCreateHttpClient();
         if (mmsHttpClient == null) {
-            Log.e(TAG, "MMS network is not ready!");
+            Timber.e("MMS network is not ready!");
             throw new MmsHttpException(0/*statusCode*/, "MMS network is not ready");
         }
         return mmsHttpClient.execute(
@@ -117,9 +118,9 @@ public class DownloadRequest extends MmsRequest {
 
     public static Uri persist(Context context, byte[] response, MmsConfig.Overridden mmsConfig,
                               String locationUrl, int subId, String creator) {
-        Log.d(TAG, "DownloadRequest.persistIfRequired");
+        Timber.d("DownloadRequest.persistIfRequired");
         if (response == null || response.length < 1) {
-            Log.e(TAG, "DownloadRequest.persistIfRequired: empty response");
+            Timber.e("DownloadRequest.persistIfRequired: empty response");
             // Update the retrieve status of the NotificationInd
             final ContentValues values = new ContentValues(1);
             values.put(Telephony.Mms.RETRIEVE_STATUS, PduHeaders.RETRIEVE_STATUS_ERROR_END);
@@ -140,7 +141,7 @@ public class DownloadRequest extends MmsRequest {
             final GenericPdu pdu =
                     (new PduParser(response, mmsConfig.getSupportMmsContentDisposition())).parse();
             if (pdu == null || !(pdu instanceof RetrieveConf)) {
-                Log.e(TAG, "DownloadRequest.persistIfRequired: invalid parsed PDU");
+                Timber.e("DownloadRequest.persistIfRequired: invalid parsed PDU");
 
                 // Update the error type of the NotificationInd
                 setErrorType(context, locationUrl, Telephony.MmsSms.ERR_TYPE_MMS_PROTO_PERMANENT);
@@ -149,7 +150,7 @@ public class DownloadRequest extends MmsRequest {
             final RetrieveConf retrieveConf = (RetrieveConf) pdu;
             final int status = retrieveConf.getRetrieveStatus();
 //            if (status != PduHeaders.RETRIEVE_STATUS_OK) {
-//                Log.e(TAG, "DownloadRequest.persistIfRequired: retrieve failed "
+//                Timber.e("DownloadRequest.persistIfRequired: retrieve failed "
 //                        + status);
 //                // Update the retrieve status of the NotificationInd
 //                final ContentValues values = new ContentValues(1);
@@ -175,7 +176,7 @@ public class DownloadRequest extends MmsRequest {
                     true/*groupMmsEnabled*/,
                     null/*preOpenedFiles*/);
             if (messageUri == null) {
-                Log.e(TAG, "DownloadRequest.persistIfRequired: can not persist message");
+                Timber.e("DownloadRequest.persistIfRequired: can not persist message");
                 return null;
             } else {
                 // Let any mms apps running as secondary user know that a new mms has been downloaded.
@@ -201,7 +202,7 @@ public class DownloadRequest extends MmsRequest {
                     values,
                     null/*where*/,
                     null/*selectionArg*/) != 1) {
-                Log.e(TAG, "DownloadRequest.persistIfRequired: can not update message");
+                Timber.e("DownloadRequest.persistIfRequired: can not update message");
             }
             // Delete the corresponding NotificationInd
             SqliteWrapper.delete(context,
@@ -215,11 +216,11 @@ public class DownloadRequest extends MmsRequest {
 
             return messageUri;
         } catch (MmsException e) {
-            Log.e(TAG, "DownloadRequest.persistIfRequired: can not persist message", e);
+            Timber.e("DownloadRequest.persistIfRequired: can not persist message", e);
         } catch (SQLiteException e) {
-            Log.e(TAG, "DownloadRequest.persistIfRequired: can not update message", e);
+            Timber.e("DownloadRequest.persistIfRequired: can not update message", e);
         } catch (RuntimeException e) {
-            Log.e(TAG, "DownloadRequest.persistIfRequired: can not parse response", e);
+            Timber.e("DownloadRequest.persistIfRequired: can not parse response", e);
         } finally {
             Binder.restoreCallingIdentity(identity);
         }

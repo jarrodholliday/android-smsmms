@@ -56,6 +56,7 @@ import java.util.regex.Pattern;
 import javax.net.SocketFactory;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
+import timber.log.Timber;
 
 /**
  * MMS HTTP client for sending and downloading MMS messages
@@ -118,7 +119,7 @@ public class MmsHttpClient {
     public byte[] execute(String urlString, byte[] pdu, String method, boolean isProxySet,
             String proxyHost, int proxyPort, MmsConfig.Overridden mmsConfig)
             throws MmsHttpException {
-        Log.d(TAG, "HTTP: " + method + " " + redactUrlForNonVerbose(urlString)
+        Timber.d("HTTP: " + method + " " + redactUrlForNonVerbose(urlString)
                 + (isProxySet ? (", proxy=" + proxyHost + ":" + proxyPort) : "")
                 + ", PDU size=" + (pdu != null ? pdu.length : 0));
         checkMethod(method);
@@ -141,13 +142,13 @@ public class MmsHttpClient {
                     HEADER_ACCEPT_LANGUAGE, getCurrentAcceptLanguage(Locale.getDefault()));
             // Header: User-Agent
             final String userAgent = mmsConfig.getUserAgent();
-            Log.i(TAG, "HTTP: User-Agent=" + userAgent);
+            Timber.i("HTTP: User-Agent=" + userAgent);
             connection.setRequestProperty(HEADER_USER_AGENT, userAgent);
             // Header: x-wap-profile
             final String uaProfUrlTagName = mmsConfig.getUaProfTagName();
             final String uaProfUrl = mmsConfig.getUaProfUrl();
             if (uaProfUrl != null) {
-                Log.i(TAG, "HTTP: UaProfUrl=" + uaProfUrl);
+                Timber.i("HTTP: UaProfUrl=" + uaProfUrl);
                 connection.setRequestProperty(uaProfUrlTagName, uaProfUrl);
             }
             // Add extra headers specified by mms_config.xml's httpparams
@@ -155,7 +156,7 @@ public class MmsHttpClient {
             // Different stuff for GET and POST
             if (METHOD_POST.equals(method)) {
                 if (pdu == null || pdu.length < 1) {
-                    Log.e(TAG, "HTTP: empty pdu");
+                    Timber.e("HTTP: empty pdu");
                     throw new MmsHttpException(0/*statusCode*/, "Sending empty PDU");
                 }
                 connection.setDoOutput(true);
@@ -202,19 +203,19 @@ public class MmsHttpClient {
             }
             in.close();
             final byte[] responseBody = byteOut.toByteArray();
-            Log.d(TAG, "HTTP: response size="
+            Timber.d("HTTP: response size="
                     + (responseBody != null ? responseBody.length : 0));
             return responseBody;
         } catch (MalformedURLException e) {
             final String redactedUrl = redactUrlForNonVerbose(urlString);
-            Log.e(TAG, "HTTP: invalid URL " + redactedUrl, e);
+            Timber.e("HTTP: invalid URL " + redactedUrl, e);
             throw new MmsHttpException(0/*statusCode*/, "Invalid URL " + redactedUrl, e);
         } catch (ProtocolException e) {
             final String redactedUrl = redactUrlForNonVerbose(urlString);
-            Log.e(TAG, "HTTP: invalid URL protocol " + redactedUrl, e);
+            Timber.e("HTTP: invalid URL protocol " + redactedUrl, e);
             throw new MmsHttpException(0/*statusCode*/, "Invalid URL protocol " + redactedUrl, e);
         } catch (IOException e) {
-            Log.e(TAG, "HTTP: IO failure", e);
+            Timber.e("HTTP: IO failure", e);
             throw new MmsHttpException(0/*statusCode*/, e);
         } finally {
             if (connection != null) {
@@ -329,7 +330,7 @@ public class MmsHttpClient {
                     }
                 }
             }
-            Log.v(TAG, "HTTP: headers\n" + sb.toString());
+            Timber.v("HTTP: headers\n" + sb.toString());
         }
     }
 
@@ -424,7 +425,7 @@ public class MmsHttpClient {
             if (macroValue != null) {
                 replaced.append(macroValue);
             } else {
-                Log.w(TAG, "HTTP: invalid macro " + macro);
+                Timber.w("HTTP: invalid macro " + macro);
             }
             nextStart = matcher.end();
         }

@@ -27,9 +27,9 @@ import android.net.Uri;
 import android.provider.Telephony.Sms;
 import android.provider.Telephony.Sms.Inbox;
 import android.telephony.SmsMessage;
-import com.klinker.android.logger.Log;
-
+import android.util.Log;
 import com.android.mms.logs.LogTag;
+import timber.log.Timber;
 
 /**
  * Service that gets started by the MessageStatusReceiver when a message status report is
@@ -108,10 +108,10 @@ public class MessageStatusService extends IntentService {
     }
 
     private void error(String message) {
-        Log.e(LOG_TAG, "[MessageStatusReceiver] " + message);
+        Timber.e("[MessageStatusReceiver] " + message);
     }
 
     private void log(String message) {
-        Log.d(LOG_TAG, "[MessageStatusReceiver] " + message);
+        Timber.d("[MessageStatusReceiver] " + message);
     }
 }

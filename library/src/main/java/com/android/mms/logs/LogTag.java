@@ -16,7 +16,7 @@
 
 package com.android.mms.logs;
 
-import com.klinker.android.logger.Log;
+import timber.log.Timber;
 
 public class LogTag {
     public static final String TAG = "Mms";
@@ -30,7 +30,7 @@ public class LogTag {
     public static final String CONTACT = TAG;
 
     /**
-     * Log tag for enabling/disabling StrictMode violation log.
+     * Timber.tag for enabling/disabling StrictMode violation log.
      * To enable: adb shell setprop log.tag.Mms:strictmode DEBUG
      */
     public static final String STRICT_MODE_TAG = TAG;
@@ -70,15 +70,15 @@ public class LogTag {
     }
 
     public static void debug(String format, Object... args) {
-        Log.d(TAG, logFormat(format, args));
+        Timber.d(logFormat(format, args));
     }
 
     public static void warn(String format, Object... args) {
-        Log.w(TAG, logFormat(format, args));
+        Timber.w(logFormat(format, args));
     }
 
     public static void error(String format, Object... args) {
-        Log.e(TAG, logFormat(format, args));
+        Timber.e(logFormat(format, args));
     }
 
 }

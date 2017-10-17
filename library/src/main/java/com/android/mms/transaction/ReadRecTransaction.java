@@ -21,7 +21,7 @@ import java.io.IOException;
 import android.content.Context;
 import android.net.Uri;
 import android.provider.Telephony.Mms.Sent;
-import com.klinker.android.logger.Log;
+import timber.log.Timber;
 
 import com.android.mms.logs.LogTag;
 import com.google.android.mms.MmsException;
@@ -92,15 +92,15 @@ public class ReadRecTransaction extends Transaction implements Runnable{
             mTransactionState.setContentUri(uri);
         } catch (IOException e) {
             if (LOCAL_LOGV) {
-                Log.v(TAG, "Failed to send M-Read-Rec.Ind.", e);
+                Timber.v("Failed to send M-Read-Rec.Ind.", e);
             }
         } catch (MmsException e) {
             if (LOCAL_LOGV) {
-                Log.v(TAG, "Failed to load message from Outbox.", e);
+                Timber.v("Failed to load message from Outbox.", e);
             }
         } catch (RuntimeException e) {
             if (LOCAL_LOGV) {
-                Log.e(TAG, "Unexpected RuntimeException.", e);
+                Timber.e("Unexpected RuntimeException.", e);
             }
         } finally {
             if (mTransactionState.getState() != TransactionState.SUCCESS) {

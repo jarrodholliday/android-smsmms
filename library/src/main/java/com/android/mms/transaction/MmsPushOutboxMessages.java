@@ -15,12 +15,13 @@
  */
 package com.android.mms.transaction;
 
+import android.util.Log;
 import com.android.mms.logs.LogTag;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import com.klinker.android.logger.Log;
+import timber.log.Timber;
 
 /**
  * MmsPushOutboxMessages listens for MMS_SEND_OUTBOX_MSG intent .
@@ -31,16 +32,16 @@ import com.klinker.android.logger.Log;
  */
 public class MmsPushOutboxMessages extends BroadcastReceiver {
     private static final String INTENT_MMS_SEND_OUTBOX_MSG = "android.intent.action.MMS_SEND_OUTBOX_MSG";
-    private static final String TAG = LogTag.TAG;
+    private static final String TAG = LogTag.TRANSACTION;
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (Log.isLoggable(LogTag.TRANSACTION, Log.VERBOSE)) {
+        if (Log.isLoggable(TAG, Log.VERBOSE)) {
             Log.v(TAG, "Received the MMS_SEND_OUTBOX_MSG intent: " + intent);
         }
         String action = intent.getAction();
         if(action.equalsIgnoreCase(INTENT_MMS_SEND_OUTBOX_MSG)){
-            Log.d(TAG,"Now waking up the MMS service");
+            Timber.d(TAG,"Now waking up the MMS service");
             context.startService(new Intent(context, TransactionService.class));
         }
     }

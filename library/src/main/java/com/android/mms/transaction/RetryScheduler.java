@@ -32,11 +32,12 @@ import android.provider.Telephony.Mms;
 import android.provider.Telephony.MmsSms;
 import android.provider.Telephony.MmsSms.PendingMessages;
 
+import android.util.Log;
 import com.android.mms.logs.LogTag;
 import com.android.mms.util.DownloadManager;
 import com.google.android.mms.pdu_alt.PduHeaders;
 import com.google.android.mms.pdu_alt.PduPersister;
-import com.klinker.android.logger.Log;
+import timber.log.Timber;
 import com.klinker.android.send_message.BroadcastUtils;
 import com.klinker.android.send_message.R;
 
@@ -232,7 +233,7 @@ public class RetryScheduler implements Observer {
                             PendingMessages.CONTENT_URI,
                             values, PendingMessages._ID + "=" + id, null);
                 } else if (LOCAL_LOGV) {
-                    Log.v(TAG, "Cannot found correct pending status for: " + msgId);
+                    Timber.v("Cannot found correct pending status for: " + msgId);
                 }
             } finally {
                 cursor.close();
@@ -280,7 +281,7 @@ public class RetryScheduler implements Observer {
             cursor.close();
         }
         if (respStatus != 0) {
-            Log.e(TAG, "Response status is: " + respStatus);
+            Timber.e("Response status is: " + respStatus);
         }
         return respStatus;
     }

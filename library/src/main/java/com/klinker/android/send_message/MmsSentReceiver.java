@@ -24,7 +24,7 @@ import android.net.Uri;
 import android.provider.Telephony;
 
 import com.google.android.mms.util_alt.SqliteWrapper;
-import com.klinker.android.logger.Log;
+import timber.log.Timber;
 
 import java.io.File;
 
@@ -38,10 +38,10 @@ public class MmsSentReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.v(TAG, "MMS has finished sending, marking it as so in the database");
+        Timber.v("MMS has finished sending, marking it as so in the database");
 
         Uri uri = Uri.parse(intent.getStringExtra(EXTRA_CONTENT_URI));
-        Log.v(TAG, uri.toString());
+        Timber.v(uri.toString());
 
         ContentValues values = new ContentValues(1);
         values.put(Telephony.Mms.MESSAGE_BOX, Telephony.Mms.MESSAGE_BOX_SENT);
@@ -49,7 +49,7 @@ public class MmsSentReceiver extends BroadcastReceiver {
                 null, null);
 
         String filePath = intent.getStringExtra(EXTRA_FILE_PATH);
-        Log.v(TAG, filePath);
+        Timber.v(filePath);
         new File(filePath).delete();
     }
 

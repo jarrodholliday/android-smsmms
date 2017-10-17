@@ -18,9 +18,8 @@ package com.android.internal.net;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import com.klinker.android.logger.Log;
-
 import java.nio.charset.Charset;
+import timber.log.Timber;
 
 /**
  * Parcel-like entity class for VPN profiles. To keep things simple, all
@@ -178,7 +177,7 @@ public class VpnProfile implements Cloneable, Parcelable {
             return true;
 
         } catch (IllegalArgumentException e) {
-            Log.w(TAG, "Invalid address", e);
+            Timber.w(e);
             return false;
         }
     }

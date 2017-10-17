@@ -28,7 +28,7 @@ import android.os.Bundle;
 import android.provider.Telephony;
 import android.telephony.SmsManager;
 import android.text.TextUtils;
-import com.klinker.android.logger.Log;
+import timber.log.Timber;
 
 import com.android.mms.service_alt.exception.MmsHttpException;
 
@@ -66,7 +66,7 @@ public class SendRequest extends MmsRequest {
             throws MmsHttpException {
         final MmsHttpClient mmsHttpClient = netMgr.getOrCreateHttpClient();
         if (mmsHttpClient == null) {
-            Log.e(TAG, "MMS network is not ready!");
+            Timber.e("MMS network is not ready!");
             throw new MmsHttpException(0/*statusCode*/, "MMS network is not ready");
         }
         return mmsHttpClient.execute(
@@ -91,9 +91,9 @@ public class SendRequest extends MmsRequest {
 
     @Override
     protected Uri persistIfRequired(Context context, int result, byte[] response) {
-        Log.d(TAG, "SendRequest.persistIfRequired");
+        Timber.d("SendRequest.persistIfRequired");
         if (mPduData == null) {
-            Log.e(TAG, "SendRequest.persistIfRequired: empty PDU");
+            Timber.e("SendRequest.persistIfRequired: empty PDU");
             return null;
         }
         final long identity = Binder.clearCallingIdentity();
@@ -102,11 +102,11 @@ public class SendRequest extends MmsRequest {
             // Persist the request PDU first
             GenericPdu pdu = (new PduParser(mPduData, supportContentDisposition)).parse();
             if (pdu == null) {
-                Log.e(TAG, "SendRequest.persistIfRequired: can't parse input PDU");
+                Timber.e("SendRequest.persistIfRequired: can't parse input PDU");
                 return null;
             }
             if (!(pdu instanceof SendReq)) {
-                Log.d(TAG, "SendRequest.persistIfRequired: not SendReq");
+                Timber.d("SendRequest.persistIfRequired: not SendReq");
                 return null;
             }
 //            final PduPersister persister = PduPersister.getPduPersister(context);
@@ -117,7 +117,7 @@ public class SendRequest extends MmsRequest {
 //                    true/*groupMmsEnabled*/,
 //                    null/*preOpenedFiles*/);
 //            if (messageUri == null) {
-//                Log.e(TAG, "SendRequest.persistIfRequired: can not persist message");
+//                Timber.e("SendRequest.persistIfRequired: can not persist message");
 //                return null;
 //            }
             // Update the additional columns based on the send result
@@ -143,7 +143,7 @@ public class SendRequest extends MmsRequest {
             }
             if (sendConf != null) {
                 values.put(Telephony.Mms.RESPONSE_STATUS, sendConf.getResponseStatus());
-                Log.v(TAG, "response status: " + sendConf.getResponseStatus());
+                Timber.v("response status: " + sendConf.getResponseStatus());
                 values.put(Telephony.Mms.MESSAGE_ID,
                         PduPersister.toIsoString(sendConf.getMessageId()));
             }
@@ -158,13 +158,13 @@ public class SendRequest extends MmsRequest {
             }
             if (SqliteWrapper.update(context, context.getContentResolver(), mPduUri, values,
                     null/*where*/, null/*selectionArg*/) != 1) {
-                Log.e(TAG, "SendRequest.persistIfRequired: failed to update message");
+                Timber.e("SendRequest.persistIfRequired: failed to update message");
             }
             return mPduUri;
 //        } catch (MmsException e) {
-//            Log.e(TAG, "SendRequest.persistIfRequired: can not persist message", e);
+//            Timber.e("SendRequest.persistIfRequired: can not persist message", e);
         } catch (RuntimeException e) {
-            Log.e(TAG, "SendRequest.persistIfRequired: unexpected parsing failure", e);
+            Timber.e("SendRequest.persistIfRequired: unexpected parsing failure", e);
         } finally {
             Binder.restoreCallingIdentity(identity);
         }
@@ -227,7 +227,7 @@ public class SendRequest extends MmsRequest {
         try {
             context.revokeUriPermission(mPduUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
         } catch (NullPointerException e) {
-            Log.e(TAG, "error revoking permissions", e);
+            Timber.e("error revoking permissions", e);
         }
     }
 }

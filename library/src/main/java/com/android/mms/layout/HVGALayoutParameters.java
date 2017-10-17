@@ -19,7 +19,7 @@ package com.android.mms.layout;
 import com.android.mms.logs.LogTag;
 
 import android.content.Context;
-import com.klinker.android.logger.Log;
+import timber.log.Timber;
 
 public class HVGALayoutParameters implements LayoutParameters {
     private static final String TAG = LogTag.TAG;
@@ -42,7 +42,7 @@ public class HVGALayoutParameters implements LayoutParameters {
         }
 
         if (LOCAL_LOGV) {
-            Log.v(TAG, "HVGALayoutParameters.<init>(" + type + ").");
+            Timber.v("HVGALayoutParameters.<init>(" + type + ").");
         }
         mType = type;
 
@@ -57,7 +57,7 @@ public class HVGALayoutParameters implements LayoutParameters {
         mTextHeightPortrait = (int) (mMaxWidth * .10f);
 
         if (LOCAL_LOGV) {
-            Log.v(TAG, "HVGALayoutParameters mMaxWidth: " + mMaxWidth +
+            Timber.v("HVGALayoutParameters mMaxWidth: " + mMaxWidth +
                     " mMaxHeight: " + mMaxHeight +
                     " mImageHeightLandscape: " + mImageHeightLandscape +
                     " mTextHeightLandscape: " + mTextHeightLandscape +

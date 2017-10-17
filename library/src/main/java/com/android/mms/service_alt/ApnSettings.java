@@ -25,7 +25,7 @@ import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.provider.Telephony;
 import android.text.TextUtils;
-import com.klinker.android.logger.Log;
+import timber.log.Timber;
 
 import com.android.mms.service_alt.exception.ApnException;
 
@@ -101,7 +101,7 @@ public class ApnSettings {
             return new ApnSettings(mmsc, mmsProxy, parsePort(mmsPort), "Default from settings");
         }
 
-        Log.v(TAG, "ApnSettings: apnName " + apnName);
+        Timber.v("ApnSettings: apnName " + apnName);
         // TODO: CURRENT semantics is currently broken in telephony. Revive this when it is fixed.
         //String selection = Telephony.Carriers.CURRENT + " IS NOT NULL";
         String selection = null;
@@ -149,7 +149,7 @@ public class ApnSettings {
                                 try {
                                     proxyPort = Integer.parseInt(portString);
                                 } catch (NumberFormatException e) {
-                                    Log.e(TAG, "Invalid port " + portString);
+                                    Timber.e("Invalid port " + portString);
                                     throw new ApnException("Invalid port " + portString);
                                 }
                             }

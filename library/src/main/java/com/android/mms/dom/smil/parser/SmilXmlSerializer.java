@@ -23,12 +23,12 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 
-import com.klinker.android.logger.Log;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.smil.SMILDocument;
 import org.w3c.dom.smil.SMILElement;
+import timber.log.Timber;
 
 public class SmilXmlSerializer {
     private static final String TAG = "SmilXmlSerializer";
@@ -39,10 +39,8 @@ public class SmilXmlSerializer {
 
             writeElement(writer, smilDoc.getDocumentElement());
             writer.flush();
-        } catch (UnsupportedEncodingException e) {
-            Log.e(TAG, "exception thrown", e);
         } catch (IOException e) {
-            Log.e(TAG, "exception thrown", e);
+            Timber.e(e);
         }
     }
 

@@ -52,6 +52,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import timber.log.Timber;
 
 import static com.google.android.mms.pdu_alt.PduHeaders.STATUS_RETRIEVED;
 
@@ -81,10 +82,10 @@ public class MmsReceivedReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.v(TAG, "MMS has finished downloading, persisting it to the database");
+        Timber.v("MMS has finished downloading, persisting it to the database");
 
         String path = intent.getStringExtra(EXTRA_FILE_PATH);
-        Log.v(TAG, path);
+        Timber.v(path);
 
         FileInputStream reader = null;
         try {
@@ -101,25 +102,25 @@ public class MmsReceivedReceiver extends BroadcastReceiver {
                     intent.getStringExtra(EXTRA_LOCATION_URL),
                     Utils.getDefaultSubscriptionId(), null);
 
-            Log.v(TAG, "response saved successfully");
-            Log.v(TAG, "response length: " + response.length);
+            Timber.v("response saved successfully");
+            Timber.v("response length: " + response.length);
             mDownloadFile.delete();
 
             if (tasks != null) {
-                Log.v(TAG, "running the common async notifier for download");
+                Timber.v("running the common async notifier for download");
                 for (CommonAsyncTask task : tasks)
                     task.executeOnExecutor(RECEIVE_NOTIFICATION_EXECUTOR);
             }
         } catch (FileNotFoundException e) {
-            Log.e(TAG, "MMS received, file not found exception", e);
+            Timber.e("MMS received, file not found exception", e);
         } catch (IOException e) {
-            Log.e(TAG, "MMS received, io exception", e);
+            Timber.e("MMS received, io exception", e);
         } finally {
             if (reader != null) {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    Log.e(TAG, "MMS received, io exception", e);
+                    Timber.e("MMS received, io exception", e);
                 }
             }
         }
@@ -254,9 +255,9 @@ public class MmsReceivedReceiver extends BroadcastReceiver {
                     sendPdu(new PduComposer(mContext, notifyRespInd).make());
                 }
             } catch (MmsException e) {
-                Log.e(TAG, "error", e);
+                Timber.e("error", e);
             } catch (IOException e) {
-                Log.e(TAG, "error", e);
+                Timber.e("error", e);
             }
             return null;
         }
@@ -277,7 +278,7 @@ public class MmsReceivedReceiver extends BroadcastReceiver {
             // the MMS proxy-relay doesn't require an ACK.
             byte[] tranId = mRetrieveConf.getTransactionId();
             if (tranId != null) {
-                Log.v(TAG, "sending ACK to MMSC: " + mTransactionSettings.getMmscUrl());
+                Timber.v("sending ACK to MMSC: " + mTransactionSettings.getMmscUrl());
                 // Create M-Acknowledge.ind
                 com.google.android.mms.pdu_alt.AcknowledgeInd acknowledgeInd = null;
 
@@ -296,11 +297,11 @@ public class MmsReceivedReceiver extends BroadcastReceiver {
                         sendPdu(new PduComposer(mContext, acknowledgeInd).make());
                     }
                 } catch (InvalidHeaderValueException e) {
-                    Log.e(TAG, "error", e);
+                    Timber.e("error", e);
                 } catch (MmsException e) {
-                    Log.e(TAG, "error", e);
+                    Timber.e("error", e);
                 } catch (IOException e) {
-                    Log.e(TAG, "error", e);
+                    Timber.e("error", e);
                 }
             }
             return null;
@@ -309,12 +310,12 @@ public class MmsReceivedReceiver extends BroadcastReceiver {
 
     private List<CommonAsyncTask> getNotificationTask(Context context, Intent intent, byte[] response) {
         if (response.length == 0) {
-            Log.v(TAG, "MmsReceivedReceiver.sendNotification blank response");
+            Timber.v("MmsReceivedReceiver.sendNotification blank response");
             return null;
         }
 
         if (getMmscInfoForReceptionAck() == null) {
-            Log.v(TAG, "No MMSC information set, so no notification tasks will be able to complete");
+            Timber.v("No MMSC information set, so no notification tasks will be able to complete");
             return null;
         }
 
@@ -322,7 +323,7 @@ public class MmsReceivedReceiver extends BroadcastReceiver {
                 (new PduParser(response, new MmsConfig.Overridden(new MmsConfig(context), null).
                         getSupportMmsContentDisposition())).parse();
         if (pdu == null || !(pdu instanceof RetrieveConf)) {
-            android.util.Log.e(TAG, "MmsReceivedReceiver.sendNotification failed to parse pdu");
+            Timber.e("MmsReceivedReceiver.sendNotification failed to parse pdu");
             return null;
         }
 
@@ -337,7 +338,7 @@ public class MmsReceivedReceiver extends BroadcastReceiver {
 
             return responseTasks;
         } catch (MmsException e) {
-            Log.e(TAG, "error", e);
+            Timber.e("error", e);
             return null;
         }
     }

@@ -16,9 +16,10 @@
 
 package com.google.android.mms.util_alt;
 
-import com.klinker.android.logger.Log;
+import timber.log.Timber;
 
 import java.util.HashMap;
+import timber.log.Timber;
 
 public abstract class AbstractCache<K, V> {
     private static final String TAG = "AbstractCache";
@@ -35,14 +36,14 @@ public abstract class AbstractCache<K, V> {
 
     public boolean put(K key, V value) {
         if (LOCAL_LOGV) {
-            Log.v(TAG, "Trying to put " + key + " into cache.");
+            Timber.v("Trying to put " + key + " into cache.");
         }
 
         if (mCacheMap.size() >= MAX_CACHED_ITEMS) {
             // TODO Should remove the oldest or least hit cached entry
             // and then cache the new one.
             if (LOCAL_LOGV) {
-                Log.v(TAG, "Failed! size limitation reached.");
+                Timber.v("Failed! size limitation reached.");
             }
             return false;
         }
@@ -53,7 +54,7 @@ public abstract class AbstractCache<K, V> {
             mCacheMap.put(key, cacheEntry);
 
             if (LOCAL_LOGV) {
-                Log.v(TAG, key + " cached, " + mCacheMap.size() + " items total.");
+                Timber.v(key + " cached, " + mCacheMap.size() + " items total.");
             }
             return true;
         }
@@ -62,7 +63,7 @@ public abstract class AbstractCache<K, V> {
 
     public V get(K key) {
         if (LOCAL_LOGV) {
-            Log.v(TAG, "Trying to get " + key + " from cache.");
+            Timber.v("Trying to get " + key + " from cache.");
         }
 
         if (key != null) {
@@ -70,7 +71,7 @@ public abstract class AbstractCache<K, V> {
             if (cacheEntry != null) {
                 cacheEntry.hit++;
                 if (LOCAL_LOGV) {
-                    Log.v(TAG, key + " hit " + cacheEntry.hit + " times.");
+                    Timber.v(key + " hit " + cacheEntry.hit + " times.");
                 }
                 return cacheEntry.value;
             }
@@ -80,13 +81,13 @@ public abstract class AbstractCache<K, V> {
 
     public V purge(K key) {
         if (LOCAL_LOGV) {
-            Log.v(TAG, "Trying to purge " + key);
+            Timber.v("Trying to purge " + key);
         }
 
         CacheEntry<V> v = mCacheMap.remove(key);
 
         if (LOCAL_LOGV) {
-            Log.v(TAG, mCacheMap.size() + " items cached.");
+            Timber.v(mCacheMap.size() + " items cached.");
         }
 
         return v != null ? v.value : null;
@@ -94,7 +95,7 @@ public abstract class AbstractCache<K, V> {
 
     public void purgeAll() {
         if (LOCAL_LOGV) {
-            Log.v(TAG, "Purging cache, " + mCacheMap.size()
+            Timber.v("Purging cache, " + mCacheMap.size()
                     + " items dropped.");
         }
         mCacheMap.clear();

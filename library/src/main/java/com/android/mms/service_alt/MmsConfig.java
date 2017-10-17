@@ -24,7 +24,8 @@ import android.telephony.SubscriptionManager;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Base64;
-import com.klinker.android.logger.Log;
+import android.util.Log;
+import timber.log.Timber;
 
 import com.klinker.android.send_message.R;
 
@@ -199,10 +200,10 @@ public class MmsConfig {
         mKeyValues.putAll(DEFAULTS);
         // Load User-Agent and UA profile URL settings
         loadDeviceUaSettings(context);
-        Log.v(TAG, "MmsConfig: mUserAgent=" + mUserAgent + ", mUaProfUrl=" + mUaProfUrl);
+        Timber.v("MmsConfig: mUserAgent=" + mUserAgent + ", mUaProfUrl=" + mUaProfUrl);
         // Load mms_config.xml resource overlays
         loadFromResources(context);
-        Log.v(TAG, "MmsConfig: all settings -- " + mKeyValues);
+        Timber.v("MmsConfig: all settings -- " + mKeyValues);
     }
 
     /**
@@ -219,10 +220,10 @@ public class MmsConfig {
         mKeyValues.putAll(DEFAULTS);
         // Load User-Agent and UA profile URL settings
         loadDeviceUaSettings(context);
-        Log.v(TAG, "MmsConfig: mUserAgent=" + mUserAgent + ", mUaProfUrl=" + mUaProfUrl);
+        Timber.v("MmsConfig: mUserAgent=" + mUserAgent + ", mUaProfUrl=" + mUaProfUrl);
         // Load mms_config.xml resource overlays
         loadFromResources(context);
-        Log.v(TAG, "MmsConfig: all settings -- " + mKeyValues);
+        Timber.v("MmsConfig: all settings -- " + mKeyValues);
     }
 
     /**
@@ -329,7 +330,7 @@ public class MmsConfig {
                 mKeyValues.put(key, value);
             }
         } catch (NumberFormatException e) {
-            Log.e(TAG, "MmsConfig.update: invalid " + key + "," + value + "," + type);
+            Timber.e("MmsConfig.update: invalid " + key + "," + value + "," + type);
         }
     }
 
@@ -351,7 +352,7 @@ public class MmsConfig {
     }
 
     private void loadFromResources(Context context) {
-        Log.d(TAG, "MmsConfig.loadFromResources");
+        Timber.d("MmsConfig.loadFromResources");
         final XmlResourceParser parser = context.getResources().getXml(R.xml.mms_config);
         final MmsConfigXmlProcessor processor = MmsConfigXmlProcessor.get(parser);
         processor.setMmsConfigHandler(new MmsConfigXmlProcessor.MmsConfigHandler() {

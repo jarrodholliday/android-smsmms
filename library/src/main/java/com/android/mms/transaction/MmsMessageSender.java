@@ -26,7 +26,8 @@ import android.preference.PreferenceManager;
 import android.provider.Telephony.Mms;
 import android.provider.Telephony.MmsSms;
 import android.provider.Telephony.MmsSms.PendingMessages;
-import com.klinker.android.logger.Log;
+import android.util.Log;
+import timber.log.Timber;
 
 import com.android.mms.logs.LogTag;
 import com.android.mms.util.SendingProgressTokenManager;
@@ -178,9 +179,9 @@ public class MmsMessageSender implements MessageSender {
                     group, null);
             context.startService(new Intent(context, TransactionService.class));
         } catch (InvalidHeaderValueException e) {
-            Log.e(TAG, "Invalide header value", e);
+            Timber.e("Invalide header value", e);
         } catch (MmsException e) {
-            Log.e(TAG, "Persist message failed", e);
+            Timber.e("Persist message failed", e);
         }
     }
 }

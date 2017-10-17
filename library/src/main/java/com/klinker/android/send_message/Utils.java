@@ -18,7 +18,7 @@ import android.text.TextUtils;
 import com.android.mms.service_alt.MmsNetworkManager;
 import com.android.mms.service_alt.exception.MmsNetworkException;
 import com.google.android.mms.util_alt.SqliteWrapper;
-import com.klinker.android.logger.Log;
+import timber.log.Timber;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -135,7 +135,7 @@ public class Utils {
                     throw new IOException("Cannot establish route to proxy " + inetAddr);
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Cannot establishh route to proxy " + inetAddr, e);
+                Timber.e("Cannot establishh route to proxy " + inetAddr, e);
             }
         } else {
             Uri uri = Uri.parse(url);
@@ -150,7 +150,7 @@ public class Utils {
                     throw new IOException("Cannot establish route to proxy " + inetAddr);
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Cannot establishh route to proxy " + inetAddr + " for " + url, e);
+                Timber.e("Cannot establishh route to proxy " + inetAddr + " for " + url, e);
             }
         }
     }
@@ -170,7 +170,7 @@ public class Utils {
             m.setAccessible(true);
             return (Boolean) m.invoke(cm);
         } catch (Exception e) {
-            Log.e(TAG, "exception thrown", e);
+            Timber.e("exception thrown", e);
             return null;
         }
     }
@@ -186,7 +186,7 @@ public class Utils {
             Method m = c.getMethod("getDataEnabled");
             return (boolean) m.invoke(telephonyManager);
         } catch (Exception e) {
-            Log.e(TAG, "exception thrown", e);
+            Timber.e("exception thrown", e);
             return true;
         }
     }
@@ -203,7 +203,7 @@ public class Utils {
             Method m = c.getMethod("getDataEnabled", int.class);
             return (boolean) m.invoke(telephonyManager, subId);
         } catch (Exception e) {
-            Log.e(TAG, "exception thrown", e);
+            Timber.e("exception thrown", e);
             return isDataEnabled(telephonyManager);
         }
     }
@@ -229,7 +229,7 @@ public class Utils {
 
                 setMobileDataEnabledMethod.invoke(iConnectivityManager, enabled);
             } catch (Exception e) {
-                Log.e(TAG, "exception thrown", e);
+                Timber.e("exception thrown", e);
             }
         } else {
             // TODO find a better way to do this on lollipop!
@@ -247,7 +247,7 @@ public class Utils {
                 m.setAccessible(true);
                 m.invoke(telephonyService, enabled);
             } catch (Exception e) {
-                Log.e(TAG, "error enabling data on lollipop", e);
+                Timber.e("error enabling data on lollipop", e);
             }
         }
 

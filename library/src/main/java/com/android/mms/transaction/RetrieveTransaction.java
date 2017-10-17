@@ -27,7 +27,7 @@ import android.preference.PreferenceManager;
 import android.provider.Telephony.Mms;
 import android.provider.Telephony.Mms.Inbox;
 import android.text.TextUtils;
-import com.klinker.android.logger.Log;
+import timber.log.Timber;
 
 import com.android.mms.logs.LogTag;
 import com.android.mms.MmsConfig;
@@ -82,7 +82,7 @@ public class RetrieveTransaction extends Transaction implements Runnable {
             mUri = Uri.parse(uri); // The Uri of the M-Notification.ind
             mId = mContentLocation = getContentLocation(context, mUri);
             if (LOCAL_LOGV) {
-                Log.v(TAG, "X-Mms-Content-Location: " + mContentLocation);
+                Timber.v("X-Mms-Content-Location: " + mContentLocation);
             }
         } else {
             throw new IllegalArgumentException(
@@ -193,7 +193,7 @@ public class RetrieveTransaction extends Transaction implements Runnable {
                 // Don't mark the transaction as failed if we failed to send it.
                 sendAcknowledgeInd(retrieveConf);
             } catch (Throwable t) {
-                Log.e(TAG, "error", t);
+                Timber.e("error", t);
                 if ("HTTP error: Not Found".equals(t.getMessage())) {
                     // Delete the expired M-Notification.ind.
                     SqliteWrapper.delete(mContext, mContext.getContentResolver(),
@@ -203,7 +203,7 @@ public class RetrieveTransaction extends Transaction implements Runnable {
                 if (mTransactionState.getState() != TransactionState.SUCCESS) {
                     mTransactionState.setState(TransactionState.FAILED);
                     mTransactionState.setContentUri(mUri);
-                    Log.e(TAG, "Retrieval failed.");
+                    Timber.e("Retrieval failed.");
                 }
                 notifyObservers();
             }

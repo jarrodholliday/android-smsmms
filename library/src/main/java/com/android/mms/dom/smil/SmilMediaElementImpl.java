@@ -23,10 +23,9 @@ import org.w3c.dom.smil.ElementTime;
 import org.w3c.dom.smil.SMILMediaElement;
 import org.w3c.dom.smil.TimeList;
 
-import com.klinker.android.logger.Log;
-
 import com.android.mms.logs.LogTag;
 import com.android.mms.dom.events.EventImpl;
+import timber.log.Timber;
 
 public class SmilMediaElementImpl extends SmilElementImpl implements
         SMILMediaElement {
@@ -45,7 +44,7 @@ public class SmilMediaElementImpl extends SmilElementImpl implements
                 Event event = doc.createEvent("Event");
                 event.initEvent(eventType, false, false);
                 if (LOCAL_LOGV) {
-                    Log.v(TAG, "Dispatching 'begin' event to "
+                    Timber.v("Dispatching 'begin' event to "
                             + SmilMediaElementImpl.this.getTagName() + " "
                             + SmilMediaElementImpl.this.getSrc() + " at "
                             + System.currentTimeMillis());
@@ -59,7 +58,7 @@ public class SmilMediaElementImpl extends SmilElementImpl implements
                 EventImpl event = (EventImpl) doc.createEvent("Event");
                 event.initEvent(eventType, false, false, seekTo);
                 if (LOCAL_LOGV) {
-                    Log.v(TAG, "Dispatching 'begin' event to "
+                    Timber.v("Dispatching 'begin' event to "
                             + SmilMediaElementImpl.this.getTagName() + " "
                             + SmilMediaElementImpl.this.getSrc() + " at "
                             + System.currentTimeMillis());
@@ -108,7 +107,7 @@ public class SmilMediaElementImpl extends SmilElementImpl implements
                         // Discrete media
                         dur = 0;
                     } else {
-                        Log.w(TAG, "Unknown media type");
+                        Timber.w("Unknown media type");
                     }
                 }
                 return dur;

@@ -23,7 +23,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
 import android.net.Uri;
-import com.klinker.android.logger.Log;
+import timber.log.Timber;
 import android.widget.Toast;
 
 public final class SqliteWrapper {
@@ -69,7 +69,7 @@ public final class SqliteWrapper {
         try {
             return resolver.query(uri, projection, selection, selectionArgs, sortOrder);
         } catch (SQLiteException e) {
-            Log.e(TAG, "Catch a SQLiteException when query: ", e);
+            Timber.e("Catch a SQLiteException when query: ", e);
             checkSQLiteException(context, e);
             return null;
         }
@@ -79,7 +79,7 @@ public final class SqliteWrapper {
         try {
             return cursor.requery();
         } catch (SQLiteException e) {
-            Log.e(TAG, "Catch a SQLiteException when requery: ", e);
+            Timber.e("Catch a SQLiteException when requery: ", e);
             checkSQLiteException(context, e);
             return false;
         }
@@ -89,7 +89,7 @@ public final class SqliteWrapper {
         try {
             return resolver.update(uri, values, where, selectionArgs);
         } catch (SQLiteException e) {
-            Log.e(TAG, "Catch a SQLiteException when update: ", e);
+            Timber.e("Catch a SQLiteException when update: ", e);
             checkSQLiteException(context, e);
             return -1;
         }
@@ -100,7 +100,7 @@ public final class SqliteWrapper {
         try {
             return resolver.delete(uri, where, selectionArgs);
         } catch (SQLiteException e) {
-            Log.e(TAG, "Catch a SQLiteException when delete: ", e);
+            Timber.e("Catch a SQLiteException when delete: ", e);
             checkSQLiteException(context, e);
             return -1;
         }
@@ -111,7 +111,7 @@ public final class SqliteWrapper {
         try {
             return resolver.insert(uri, values);
         } catch (SQLiteException e) {
-            Log.e(TAG, "Catch a SQLiteException when insert: ", e);
+            Timber.e("Catch a SQLiteException when insert: ", e);
             checkSQLiteException(context, e);
             return null;
         }

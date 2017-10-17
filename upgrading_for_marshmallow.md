@@ -40,7 +40,7 @@ if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.System.canWrite(
                     try {
                         startActivity(intent);
                     } catch (Exception e) {
-                        Log.e("MainActivity", "error starting permission intent", e);
+                        Timber.e("MainActivity", "error starting permission intent", e);
                     }
                 }
             })

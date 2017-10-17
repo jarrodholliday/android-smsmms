@@ -20,7 +20,7 @@ import com.android.mms.logs.LogTag;
 
 import android.content.Context;
 import android.util.Config;
-import com.klinker.android.logger.Log;
+import timber.log.Timber;
 
 /**
  * Default retry scheme, based on specs.
@@ -51,7 +51,7 @@ public class DefaultRetryScheme extends AbstractRetryScheme {
     @Override
     public long getWaitingInterval() {
         if (LOCAL_LOGV) {
-            Log.v(TAG, "Next int: " + sDefaultRetryScheme[mRetriedTimes]);
+            Timber.v("Next int: " + sDefaultRetryScheme[mRetriedTimes]);
         }
         return sDefaultRetryScheme[mRetriedTimes];
     }

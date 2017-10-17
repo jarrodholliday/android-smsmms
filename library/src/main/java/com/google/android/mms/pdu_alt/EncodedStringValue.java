@@ -16,7 +16,7 @@
 
 package com.google.android.mms.pdu_alt;
 
-import com.klinker.android.logger.Log;
+import timber.log.Timber;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -74,7 +74,7 @@ public class EncodedStringValue implements Cloneable {
             mData = data.getBytes(CharacterSets.DEFAULT_CHARSET_NAME);
             mCharacterSet = CharacterSets.DEFAULT_CHARSET;
         } catch (UnsupportedEncodingException e) {
-            Log.e(TAG, "Default encoding must be supported.", e);
+            Timber.e("Default encoding must be supported.", e);
         }
     }
 
@@ -140,7 +140,7 @@ public class EncodedStringValue implements Cloneable {
                 return new String(mData, name);
             } catch (UnsupportedEncodingException e) {
             	if (LOCAL_LOGV) {
-            		Log.v(TAG, e.getMessage(), e);
+            		Timber.v(e.getMessage(), e);
             	}
             	try {
                     return new String(mData, CharacterSets.MIMENAME_ISO_8859_1);
@@ -172,7 +172,7 @@ public class EncodedStringValue implements Cloneable {
                 newTextString.write(mData);
                 newTextString.write(textString);
             } catch (IOException e) {
-                Log.e(TAG, "logging error", e);
+                Timber.e("logging error", e);
                 e.printStackTrace();
                 throw new NullPointerException(
                         "appendTextString: failed when write a new Text-string");
@@ -196,7 +196,7 @@ public class EncodedStringValue implements Cloneable {
         try {
             return new EncodedStringValue(mCharacterSet, dstBytes);
         } catch (Exception e) {
-            Log.e(TAG, "logging error", e);
+            Timber.e("logging error", e);
             e.printStackTrace();
             throw new CloneNotSupportedException(e.getMessage());
         }

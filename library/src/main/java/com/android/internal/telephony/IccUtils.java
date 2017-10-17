@@ -19,7 +19,7 @@ package com.android.internal.telephony;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import com.klinker.android.logger.Log;
+import timber.log.Timber;
 
 import java.io.UnsupportedEncodingException;
 
@@ -182,8 +182,7 @@ public class IccUtils {
                 try {
                     ret = new String(data, offset + 1, ucslen * 2, "utf-16be");
                 } catch (UnsupportedEncodingException ex) {
-                    Log.e(LOG_TAG, "implausible UnsupportedEncodingException",
-                            ex);
+                    Timber.e(ex);
                 }
 
                 if (ret != null) {
@@ -346,7 +345,7 @@ public class IccUtils {
                             offset + 1, length - 1, "utf-16");
                 } catch (UnsupportedEncodingException ex) {
                     ret = "";
-                    Log.e(LOG_TAG, "implausible UnsupportedEncodingException", ex);
+                    Timber.e(ex);
                 }
                 break;
 
@@ -397,7 +396,7 @@ public class IccUtils {
         ;
 
         if (pixelIndex != numOfPixels) {
-            Log.e(LOG_TAG, "parse end and size error");
+            Timber.e("parse end and size error");
         }
         return Bitmap.createBitmap(pixels, width, height, Bitmap.Config.ARGB_8888);
     }
@@ -449,7 +448,7 @@ public class IccUtils {
     private static int[] mapTo2OrderBitColor(byte[] data, int valueIndex,
                                              int length, int[] colorArray, int bits) {
         if (0 != (8 % bits)) {
-            Log.e(LOG_TAG, "not event number of color");
+            Timber.e("not event number of color");
             return mapToNon2OrderBitColor(data, valueIndex, length, colorArray,
                     bits);
         }
@@ -487,7 +486,7 @@ public class IccUtils {
     private static int[] mapToNon2OrderBitColor(byte[] data, int valueIndex,
                                                 int length, int[] colorArray, int bits) {
         if (0 == (8 % bits)) {
-            Log.e(LOG_TAG, "not odd number of color");
+            Timber.e("not odd number of color");
             return mapTo2OrderBitColor(data, valueIndex, length, colorArray,
                     bits);
         }

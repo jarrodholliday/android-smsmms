@@ -30,16 +30,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-
-import com.klinker.android.logger.Log;
-import com.klinker.android.logger.OnLogListener;
 import com.klinker.android.send_message.ApnUtils;
 import com.klinker.android.send_message.BroadcastUtils;
 import com.klinker.android.send_message.Message;
 import com.klinker.android.send_message.Transaction;
 import com.klinker.android.send_message.Utils;
-
 import java.util.ArrayList;
+import timber.log.Timber;
+import timber.log.Timber.DebugTree;
 
 public class MainActivity extends Activity {
 
@@ -150,14 +148,7 @@ public class MainActivity extends Activity {
     }
 
     private void initLogging() {
-        Log.setDebug(true);
-        Log.setPath("messenger_log.txt");
-        Log.setLogListener(new OnLogListener() {
-            @Override
-            public void onLogged(String tag, String message) {
-                //logAdapter.addItem(tag + ": " + message);
-            }
-        });
+        Timber.plant(new DebugTree());
     }
 
     private void setDefaultSmsApp() {

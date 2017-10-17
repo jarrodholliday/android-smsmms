@@ -151,7 +151,7 @@ public final class Downloads {
          * the downloaded file. When this flag is set, the download manager
          * performs downloads and reports success even in some situations where
          * it can't guarantee that the download has completed (e.g. when doing
-         * a byte-range request without an ETag, or when it can't determine
+         * a byte-range request without an Eor when it can't determine
          * whether a download fully completed).
          * <P>Type: BOOLEAN</P>
          * <P>Owner can Init</P>

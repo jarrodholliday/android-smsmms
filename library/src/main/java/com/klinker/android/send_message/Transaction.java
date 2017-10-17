@@ -33,7 +33,7 @@ import com.android.mms.MmsConfig;
 import com.android.mms.service_alt.MmsNetworkManager;
 import com.android.mms.service_alt.MmsRequestManager;
 import com.android.mms.service_alt.SendRequest;
-import com.klinker.android.logger.Log;
+import timber.log.Timber;
 import android.widget.Toast;
 import com.android.mms.dom.smil.parser.SmilXmlSerializer;
 import com.android.mms.transaction.MmsMessageSender;
@@ -180,11 +180,11 @@ public class Transaction {
     }
 
     private void sendSmsMessage(String text, String[] addresses, long threadId, int delay) {
-        Log.v("send_transaction", "message text: " + text);
+        Timber.v("send_transaction", "message text: " + text);
         Uri messageUri = null;
         int messageId = 0;
         if (saveMessage) {
-            Log.v("send_transaction", "saving message");
+            Timber.v("send_transaction", "saving message");
             // add signature to original text to be saved in database (does not strip unicode for saving though)
             if (!settings.getSignature().equals("")) {
                 text += "\n" + settings.getSignature();
@@ -205,12 +205,12 @@ public class Transaction {
                     threadId = Utils.getOrCreateThreadId(context, addresses[i]);
                 }
 
-                Log.v("send_transaction", "saving message with thread id: " + threadId);
+                Timber.v("send_transaction", "saving message with thread id: " + threadId);
 
                 values.put("thread_id", threadId);
                 messageUri = context.getContentResolver().insert(Uri.parse("content://sms/"), values);
 
-                Log.v("send_transaction", "inserted to uri: " + messageUri);
+                Timber.v("send_transaction", "inserted to uri: " + messageUri);
 
                 Cursor query = context.getContentResolver().query(messageUri, new String[] {"_id"}, null, null, null);
                 if (query != null && query.moveToFirst()) {
@@ -218,7 +218,7 @@ public class Transaction {
                     query.close();
                 }
 
-                Log.v("send_transaction", "message id: " + messageId);
+                Timber.v("send_transaction", "message id: " + messageId);
 
                 // set up sent and delivered pending intents to be used with message request
                 Intent sentIntent;
@@ -260,10 +260,10 @@ public class Transaction {
                 }
 
                 SmsManager smsManager = SmsManagerFactory.createSmsManager(settings);
-                Log.v("send_transaction", "found sms manager");
+                Timber.v("send_transaction", "found sms manager");
 
                 if (settings.getSplit()) {
-                    Log.v("send_transaction", "splitting message");
+                    Timber.v("send_transaction", "splitting message");
                     // figure out the length of supported message
                     int[] splitData = SmsMessage.calculateLength(body, false);
 
@@ -271,7 +271,7 @@ public class Transaction {
                     // that message set can support, and then divide by the number of message that will require
                     // to get the length supported by a single message
                     int length = (body.length() + splitData[2]) / splitData[0];
-                    Log.v("send_transaction", "length: " + length);
+                    Timber.v("send_transaction", "length: " + length);
 
                     boolean counter = false;
                     if (settings.getSplitCounter() && body.length() > length) {
@@ -291,11 +291,11 @@ public class Transaction {
                             dPI.add(settings.getDeliveryReports() && saveMessage ? deliveredPI : null);
                         }
 
-                        Log.v("send_transaction", "sending split message");
+                        Timber.v("send_transaction", "sending split message");
                         sendDelayedSms(smsManager, addresses[i], parts, sPI, dPI, delay, messageUri);
                     }
                 } else {
-                    Log.v("send_transaction", "sending without splitting");
+                    Timber.v("send_transaction", "sending without splitting");
                     // send the message normally without forcing anything to be split
                     ArrayList<String> parts = smsManager.divideMessage(body);
 
@@ -306,12 +306,12 @@ public class Transaction {
 
                     if (Utils.isDefaultSmsApp(context)) {
                         try {
-                            Log.v("send_transaction", "sent message");
+                            Timber.v("send_transaction", "sent message");
                             sendDelayedSms(smsManager, addresses[i], parts, sPI, dPI, delay, messageUri);
                         } catch (Exception e) {
                             // whoops...
-                            Log.v("send_transaction", "error sending message");
-                            Log.e(TAG, "exception thrown", e);
+                            Timber.v("send_transaction", "error sending message");
+                            Timber.e("exception thrown", e);
 
                             try {
                                 ((Activity) context).getWindow().getDecorView().findViewById(android.R.id.content).post(new Runnable() {
@@ -343,14 +343,14 @@ public class Transaction {
                 } catch (Exception e) { }
 
                 if (checkIfMessageExistsAfterDelay(messageUri)) {
-                    Log.v("send_transaction", "message sent after delay");
+                    Timber.v("send_transaction", "message sent after delay");
                     try {
                         smsManager.sendMultipartTextMessage(address, null, parts, sPI, dPI);
                     } catch (Exception e) {
-                        Log.e(TAG, "exception thrown", e);
+                        Timber.e("exception thrown", e);
                     }
                 } else {
-                    Log.v("send_transaction", "message not sent after delay, no longer exists");
+                    Timber.v("send_transaction", "message not sent after delay, no longer exists");
                 }
             }
         }).start();
@@ -431,7 +431,7 @@ public class Transaction {
                     @Override
                     public void onReceive(Context context, Intent intent) {
                         int progress = intent.getIntExtra("progress", -3);
-                        Log.v("sending_mms_library", "progress: " + progress);
+                        Timber.v("sending_mms_library", "progress: " + progress);
 
                         // send progress broadcast to update ui if desired...
                         Intent progressIntent = new Intent(MMS_PROGRESS);
@@ -451,7 +451,7 @@ public class Transaction {
                             // This seems to get called only after the progress has reached 100 and
                             // then something else goes wrong, so here we will try and send again
                             // and see if it works
-                            Log.v("sending_mms_library", "sending aborted for some reason...");
+                            Timber.v("sending_mms_library", "sending aborted for some reason...");
                         }
                     }
 
@@ -459,13 +459,13 @@ public class Transaction {
 
                 context.registerReceiver(receiver, filter);
             } catch (Throwable e) {
-                Log.e(TAG, "exception thrown", e);
+                Timber.e("exception thrown", e);
             }
         } else {
-            Log.v(TAG, "using lollipop method for sending sms");
+            Timber.v("using lollipop method for sending sms");
 
             if (settings.getUseSystemSending()) {
-                Log.v(TAG, "using system method for sending");
+                Timber.v("using system method for sending");
                 sendMmsThroughSystem(context, subject, data, addresses, explicitSentMmsReceiver);
             } else {
                 try {
@@ -477,7 +477,7 @@ public class Transaction {
                     MmsNetworkManager manager = new MmsNetworkManager(context, Utils.getDefaultSubscriptionId());
                     request.execute(context, manager);
                 } catch (Exception e) {
-                    Log.e(TAG, "error sending mms", e);
+                    Timber.e("error sending mms", e);
                 }
             }
         }
@@ -506,7 +506,7 @@ public class Transaction {
         try {
             sendRequest.setFrom(new EncodedStringValue(Utils.getMyPhoneNumber(context)));
         } catch (Exception e) {
-            Log.e(TAG, "error getting from address", e);
+            Timber.e("error getting from address", e);
         }
 
         final PduBody pduBody = new PduBody();
@@ -552,7 +552,7 @@ public class Transaction {
 
         sendRequest.setBody(pduBody);
 
-        Log.v(TAG, "setting message size to " + size + " bytes");
+        Timber.v("setting message size to " + size + " bytes");
         sendRequest.setMessageSize(size);
 
         // add everything else that could be set
@@ -580,8 +580,8 @@ public class Transaction {
                 PduPersister persister = PduPersister.getPduPersister(context);
                 info.location = persister.persist(sendRequest, Uri.parse("content://mms/outbox"), true, settings.getGroup(), null);
             } catch (Exception e) {
-                Log.v("sending_mms_library", "error saving mms message");
-                Log.e(TAG, "exception thrown", e);
+                Timber.v("sending_mms_library", "error saving mms message");
+                Timber.e("exception thrown", e);
 
                 // use the old way if something goes wrong with the persister
                 insert(context, recipients, parts, subject);
@@ -598,7 +598,7 @@ public class Transaction {
                 info.token = 4444L;
             }
         } catch (Exception e) {
-            Log.e(TAG, "exception thrown", e);
+            Timber.e("exception thrown", e);
             info.token = 4444L;
         }
 
@@ -644,7 +644,7 @@ public class Transaction {
                 writer.write(new PduComposer(context, sendReq).make());
                 contentUri = writerUri;
             } catch (final IOException e) {
-                Log.e(TAG, "Error writing send file", e);
+                Timber.e("Error writing send file", e);
             } finally {
                 if (writer != null) {
                     try {
@@ -666,15 +666,15 @@ public class Transaction {
                 SmsManagerFactory.createSmsManager(settings).sendMultimediaMessage(context,
                         contentUri, null, configOverrides, pendingIntent);
             } else {
-                Log.e(TAG, "Error writing sending Mms");
+                Timber.e("Error writing sending Mms");
                 try {
                     pendingIntent.send(SmsManager.MMS_ERROR_IO_ERROR);
                 } catch (PendingIntent.CanceledException ex) {
-                    Log.e(TAG, "Mms pending intent cancelled?", ex);
+                    Timber.e("Mms pending intent cancelled?", ex);
                 }
             }
         } catch (Exception e) {
-            Log.e(TAG, "error using system sending method", e);
+            Timber.e("error using system sending method", e);
         }
     }
 
@@ -852,8 +852,8 @@ public class Transaction {
 
             return res;
         } catch (Exception e) {
-            Log.v("sending_mms_library", "still an error saving... :(");
-            Log.e(TAG, "exception thrown", e);
+            Timber.v("sending_mms_library", "still an error saving... :(");
+            Timber.e("exception thrown", e);
         }
 
         return null;

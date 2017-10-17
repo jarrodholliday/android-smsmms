@@ -22,7 +22,7 @@ import org.w3c.dom.smil.SMILDocument;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
 
-import com.klinker.android.logger.Log;
+import timber.log.Timber;
 
 import com.android.mms.logs.LogTag;
 import com.android.mms.dom.smil.SmilDocumentImpl;
@@ -55,13 +55,13 @@ public class SmilContentHandler extends DefaultHandler {
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) {
         if (LOCAL_LOGV) {
-            Log.v(TAG, "SmilContentHandler.startElement. Creating element " + localName);
+            Timber.v("SmilContentHandler.startElement. Creating element " + localName);
         }
         Element element = mSmilDocument.createElement(localName);
         if (attributes != null) {
             for (int i = 0; i < attributes.getLength(); i++) {
                 if (LOCAL_LOGV) {
-                    Log.v(TAG, "Attribute " + i +
+                    Timber.v("Attribute " + i +
                         " lname = " + attributes.getLocalName(i) +
                         " value = " + attributes.getValue(i));
                 }
@@ -70,7 +70,7 @@ public class SmilContentHandler extends DefaultHandler {
             }
         }
         if (LOCAL_LOGV) {
-            Log.v(TAG, "Appending " + localName + " to " + mCurrentNode.getNodeName());
+            Timber.v("Appending " + localName + " to " + mCurrentNode.getNodeName());
         }
         mCurrentNode.appendChild(element);
 
@@ -80,7 +80,7 @@ public class SmilContentHandler extends DefaultHandler {
     @Override
     public void endElement(String uri, String localName, String qName) {
         if (LOCAL_LOGV) {
-            Log.v(TAG, "SmilContentHandler.endElement. localName " + localName);
+            Timber.v("SmilContentHandler.endElement. localName " + localName);
         }
         mCurrentNode = mCurrentNode.getParentNode();
     }
@@ -88,7 +88,7 @@ public class SmilContentHandler extends DefaultHandler {
     @Override
     public void characters(char[] ch, int start, int length) {
         if (LOCAL_LOGV) {
-            Log.v(TAG, "SmilContentHandler.characters. ch = " + new String(ch, start, length));
+            Timber.v("SmilContentHandler.characters. ch = " + new String(ch, start, length));
         }
     }
 }

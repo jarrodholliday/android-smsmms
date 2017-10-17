@@ -32,8 +32,8 @@ import org.w3c.dom.smil.ElementSequentialTimeContainer;
 import org.w3c.dom.smil.ElementTime;
 import org.w3c.dom.smil.Time;
 import org.w3c.dom.smil.TimeList;
+import timber.log.Timber;
 
-import com.klinker.android.logger.Log;
 
 /**
  * The SmilPlayer is responsible for playing, stopping, pausing and resuming a SMIL tree.
@@ -313,7 +313,7 @@ public class SmilPlayer implements Runnable {
             mState = SmilPlayerState.PLAYING;
             mPlayerThread.start();
         } else {
-            Log.w(TAG, "Error State: Playback is playing!");
+            Timber.w("Error State: Playback is playing!");
         }
     }
 
@@ -322,7 +322,7 @@ public class SmilPlayer implements Runnable {
             mAction = SmilPlayerAction.PAUSE;
             notifyAll();
         } else {
-            Log.w(TAG, "Error State: Playback is not playing!");
+            Timber.w("Error State: Playback is not playing!");
         }
     }
 
@@ -334,7 +334,7 @@ public class SmilPlayer implements Runnable {
         } else if (isPlayedState()) {
             play();
         } else {
-            Log.w(TAG, "Error State: Playback can not be started!");
+            Timber.w("Error State: Playback can not be started!");
         }
     }
 
@@ -414,7 +414,7 @@ public class SmilPlayer implements Runnable {
             double offset = getOffsetTime(element);
             if ((offset >= 0) && (offset <= mCurrentTime)) {
                 if (LOCAL_LOGV) {
-                    Log.v(TAG, "[SEEK]  " + " at " + mCurrentTime
+                    Timber.v("[SEEK]  " + " at " + mCurrentTime
                             + " " + element);
                 }
                 element.seekElement( (float) (mCurrentTime - offset) );
@@ -425,7 +425,7 @@ public class SmilPlayer implements Runnable {
     private synchronized void waitForEntry(long interval)
             throws InterruptedException {
         if (LOCAL_LOGV) {
-            Log.v(TAG, "Waiting for " + interval + "ms.");
+            Timber.v("Waiting for " + interval + "ms.");
         }
 
         long overhead = 0;
@@ -468,7 +468,7 @@ public class SmilPlayer implements Runnable {
         for (int i = mActiveElements.size() - 1; i >= 0; i--) {
             ElementTime element = mActiveElements.get(i);
             if (LOCAL_LOGV) {
-                Log.v(TAG, "[STOP]  " + " at " + mCurrentTime
+                Timber.v("[STOP]  " + " at " + mCurrentTime
                         + " " + element);
             }
             element.endElement();
@@ -479,7 +479,7 @@ public class SmilPlayer implements Runnable {
         for (int i = mActiveElements.size() - 1; i >= 0; i--) {
             ElementTime element = mActiveElements.get(i);
             if (LOCAL_LOGV) {
-                Log.v(TAG, "[PAUSE]  " + " at " + mCurrentTime
+                Timber.v("[PAUSE]  " + " at " + mCurrentTime
                         + " " + element);
             }
             element.pauseElement();
@@ -491,7 +491,7 @@ public class SmilPlayer implements Runnable {
         for (int i = 0; i < size; i++) {
             ElementTime element = mActiveElements.get(i);
             if (LOCAL_LOGV) {
-                Log.v(TAG, "[RESUME]  " + " at " + mCurrentTime
+                Timber.v("[RESUME]  " + " at " + mCurrentTime
                         + " " + element);
             }
             element.resumeElement();
@@ -509,7 +509,7 @@ public class SmilPlayer implements Runnable {
                 mState = SmilPlayerState.PLAYING;
             }
         } catch (InterruptedException e) {
-            Log.e(TAG, "Unexpected InterruptedException.", e);
+            Timber.e(e);
         }
     }
 
@@ -517,7 +517,7 @@ public class SmilPlayer implements Runnable {
         switch (entry.getAction()) {
             case TimelineEntry.ACTION_BEGIN:
                 if (LOCAL_LOGV) {
-                    Log.v(TAG, "[START] " + " at " + mCurrentTime + " "
+                    Timber.v("[START] " + " at " + mCurrentTime + " "
                             + entry.getElement());
                 }
                 entry.getElement().beginElement();
@@ -525,7 +525,7 @@ public class SmilPlayer implements Runnable {
                 break;
             case TimelineEntry.ACTION_END:
                 if (LOCAL_LOGV) {
-                    Log.v(TAG, "[STOP]  " + " at " + mCurrentTime + " "
+                    Timber.v("[STOP]  " + " at " + mCurrentTime + " "
                             + entry.getElement());
                 }
                 entry.getElement().endElement();
@@ -660,7 +660,7 @@ public class SmilPlayer implements Runnable {
                 try {
                     waitForEntry(offset - mCurrentTime);
                 } catch (InterruptedException e) {
-                    Log.e(TAG, "Unexpected InterruptedException.", e);
+                    Timber.e(e);
                 }
 
                 while (isPauseAction() || isStopAction() || isReloadAction() || isNextAction() ||
@@ -755,7 +755,7 @@ public class SmilPlayer implements Runnable {
     private void dumpAllEntries() {
         if (LOCAL_LOGV) {
             for (TimelineEntry entry : mAllEntries) {
-                Log.v(TAG, "[Entry] "+ entry);
+                Timber.v("[Entry] "+ entry);
             }
         }
     }

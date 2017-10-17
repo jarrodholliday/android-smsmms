@@ -30,7 +30,7 @@ import android.provider.Settings;
 import android.service.carrier.CarrierMessagingService;
 import android.telephony.SmsManager;
 import android.telephony.TelephonyManager;
-import com.klinker.android.logger.Log;
+import timber.log.Timber;
 import com.klinker.android.send_message.Utils;
 
 import com.android.mms.service_alt.exception.ApnException;
@@ -154,21 +154,21 @@ public abstract class MmsRequest {
         }
 
         mobileDataEnabled = Utils.isMobileDataEnabled(context);
-        Log.v(TAG, "mobile data enabled: " + mobileDataEnabled);
+        Timber.v("mobile data enabled: " + mobileDataEnabled);
 
         if (!mobileDataEnabled && !useWifi(context)) {
-            Log.v(TAG, "mobile data not enabled, so forcing it to enable");
+            Timber.v("mobile data not enabled, so forcing it to enable");
             Utils.setMobileDataEnabled(context, true);
         }
 
         if (!ensureMmsConfigLoaded()) { // Check mms config
-            Log.e(TAG, "MmsRequest: mms config is not loaded yet");
+            Timber.e("MmsRequest: mms config is not loaded yet");
             result = SmsManager.MMS_ERROR_CONFIGURATION_ERROR;
         } else if (!prepareForHttpRequest()) { // Prepare request, like reading pdu data from user
-            Log.e(TAG, "MmsRequest: failed to prepare for request");
+            Timber.e("MmsRequest: failed to prepare for request");
             result = SmsManager.MMS_ERROR_IO_ERROR;
         } else if (!isDataNetworkAvailable(context, mSubId)) {
-            Log.e(TAG, "MmsRequest: in airplane mode or mobile data disabled");
+            Timber.e("MmsRequest: in airplane mode or mobile data disabled");
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
                 result = SmsManager.MMS_ERROR_NO_DATA_NETWORK;
             } else {
@@ -182,7 +182,7 @@ public abstract class MmsRequest {
                     try {
                         networkManager.acquireNetwork();
                     } catch (Exception e) {
-                        Log.e(TAG, "error acquiring network", e);
+                        Timber.e("error acquiring network", e);
                     }
 
                     final String apnName = networkManager.getApnName();
@@ -196,11 +196,11 @@ public abstract class MmsRequest {
                                 // If the APN name was already null then don't need to retry
                                 throw (e);
                             }
-                            Log.i(TAG, "MmsRequest: No match with APN name:"
+                            Timber.i("MmsRequest: No match with APN name:"
                                     + apnName + ", try with no name");
                             apn = ApnSettings.load(context, null, mSubId);
                         }
-                        Log.i(TAG, "MmsRequest: using " + apn.toString());
+                        Timber.i("MmsRequest: using " + apn.toString());
                         response = doHttp(context, networkManager, apn);
                         result = Activity.RESULT_OK;
                         // Success
@@ -209,20 +209,20 @@ public abstract class MmsRequest {
                         networkManager.releaseNetwork();
                     }
                 } catch (ApnException e) {
-                    Log.e(TAG, "MmsRequest: APN failure", e);
+                    Timber.e("MmsRequest: APN failure", e);
                     result = SmsManager.MMS_ERROR_INVALID_APN;
                     break;
 //                    } catch (MmsNetworkException e) {
-//                        Log.e(TAG, "MmsRequest: MMS network acquiring failure", e);
+//                        Timber.e("MmsRequest: MMS network acquiring failure", e);
 //                        result = SmsManager.MMS_ERROR_UNABLE_CONNECT_MMS;
 //                        // Retry
                 } catch (MmsHttpException e) {
-                    Log.e(TAG, "MmsRequest: HTTP or network I/O failure", e);
+                    Timber.e("MmsRequest: HTTP or network I/O failure", e);
                     result = SmsManager.MMS_ERROR_HTTP_FAILURE;
                     httpStatusCode = e.getStatusCode();
                     // Retry
                 } catch (Exception e) {
-                    Log.e(TAG, "MmsRequest: unexpected failure", e);
+                    Timber.e("MmsRequest: unexpected failure", e);
                     result = SmsManager.MMS_ERROR_UNSPECIFIED;
                     break;
                 }
@@ -235,7 +235,7 @@ public abstract class MmsRequest {
         }
 
         if (!mobileDataEnabled) {
-            Log.v(TAG, "setting mobile data back to disabled");
+            Timber.v("setting mobile data back to disabled");
             Utils.setMobileDataEnabled(context, false);
         }
 
@@ -282,7 +282,7 @@ public abstract class MmsRequest {
                 }
                 pendingIntent.send(context, result, fillIn);
             } catch (PendingIntent.CanceledException e) {
-                Log.e(TAG, "MmsRequest: sending pending intent canceled", e);
+                Timber.e("MmsRequest: sending pending intent canceled", e);
             }
         }
 
@@ -314,7 +314,7 @@ public abstract class MmsRequest {
                 == CarrierMessagingService.SEND_STATUS_RETRY_ON_CARRIER_NETWORK
                 || carrierMessagingAppResult
                         == CarrierMessagingService.DOWNLOAD_STATUS_RETRY_ON_CARRIER_NETWORK) {
-            Log.d(TAG, "Sending/downloading MMS by IP failed.");
+            Timber.d("Sending/downloading MMS by IP failed.");
             mRequestManager.addSimRequest(MmsRequest.this);
             return true;
         } else {

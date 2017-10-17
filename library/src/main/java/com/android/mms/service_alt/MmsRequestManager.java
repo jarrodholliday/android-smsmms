@@ -29,6 +29,7 @@ import com.google.android.mms.pdu_alt.PduParser;
 import com.google.android.mms.pdu_alt.PduPersister;
 import com.google.android.mms.pdu_alt.RetrieveConf;
 import com.google.android.mms.util_alt.SqliteWrapper;
+import timber.log.Timber;
 
 public class MmsRequestManager implements MmsRequest.RequestManager {
 
@@ -64,7 +65,7 @@ public class MmsRequestManager implements MmsRequest.RequestManager {
     @Override
     public boolean writePduToContentUri(Uri contentUri, byte[] response) {
         if (response == null || response.length < 1) {
-            Log.e(TAG, "empty response");
+            Timber.e("empty response");
             return false;
         }
         try {
@@ -100,7 +101,7 @@ public class MmsRequestManager implements MmsRequest.RequestManager {
             // Don't mark the transaction as failed if we failed to send it.
             // sendAcknowledgeInd(retrieveConf);
         } catch (Throwable t) {
-            com.klinker.android.logger.Log.e(TAG, "error", t);
+            timber.log.Timber.e("error", t);
         }
 
         return false;

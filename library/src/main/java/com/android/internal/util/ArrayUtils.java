@@ -110,7 +110,7 @@ public class ArrayUtils {
             cache = Array.newInstance(kind, 0);
             sCache[bucket] = cache;
 
-            // Log.e("cache", "new empty " + kind.getName() + " at " + bucket);
+            // Timber.e("cache", "new empty " + kind.getName() + " at " + bucket);
         }
 
         return (T[]) cache;

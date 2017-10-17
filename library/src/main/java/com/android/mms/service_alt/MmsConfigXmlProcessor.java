@@ -20,7 +20,7 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 import android.content.ContentValues;
-import com.klinker.android.logger.Log;
+import timber.log.Timber;
 
 import java.io.IOException;
 
@@ -93,9 +93,9 @@ public class MmsConfigXmlProcessor {
                 processMmsConfig();
             }
         } catch (IOException e) {
-            Log.e(TAG, "MmsConfigXmlProcessor: I/O failure " + e, e);
+            Timber.e("MmsConfigXmlProcessor: I/O failure " + e, e);
         } catch (XmlPullParserException e) {
-            Log.e(TAG, "MmsConfigXmlProcessor: parsing failure " + e, e);
+            Timber.e("MmsConfigXmlProcessor: parsing failure " + e, e);
         }
     }
 
@@ -133,7 +133,7 @@ public class MmsConfigXmlProcessor {
                 }
                 return mLogStringBuilder.toString();
             } catch (XmlPullParserException e) {
-                Log.e(TAG, "xmlParserDebugContext: " + e, e);
+                Timber.e("xmlParserDebugContext: " + e, e);
             }
         }
         return "Unknown";
@@ -172,7 +172,7 @@ public class MmsConfigXmlProcessor {
      */
     private void processMmsConfigKeyValue() throws IOException, XmlPullParserException {
         final String key = mInputParser.getAttributeValue(null, "name");
-        // We are at the start tag, the name of the tag is the type
+        // We are at the start the name of the tag is the type
         // e.g. <int name="key">value</int>
         final String type = mInputParser.getName();
         int nextEvent = mInputParser.next();
@@ -191,7 +191,7 @@ public class MmsConfigXmlProcessor {
                 mMmsConfigHandler.process(key, value, type);
             }
         } else {
-            Log.w(TAG, "MmsConfig: invalid key=" + key + " or type=" + type);
+            Timber.w("MmsConfig: invalid key=" + key + " or type=" + type);
         }
     }
 }

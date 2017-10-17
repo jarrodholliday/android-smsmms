@@ -23,7 +23,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import com.klinker.android.logger.Log;
+import timber.log.Timber;
 
 import java.util.Calendar;
 
@@ -31,7 +31,7 @@ public class DeliveredReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.v("delivery_receiver", "marking message as delivered");
+        Timber.v("delivery_receiver", "marking message as delivered");
         Uri uri;
 
         try {

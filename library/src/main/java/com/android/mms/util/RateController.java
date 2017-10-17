@@ -26,7 +26,7 @@ import android.database.sqlite.SqliteWrapper;
 import android.provider.Telephony.Mms.Rate;
 
 import com.android.mms.logs.LogTag;
-import com.klinker.android.logger.Log;
+import timber.log.Timber;
 
 public class RateController {
     private static final String TAG = LogTag.TAG;
@@ -56,7 +56,7 @@ public class RateController {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (LOCAL_LOGV) {
-                Log.v(TAG, "Intent received: " + intent);
+                Timber.v("Intent received: " + intent);
             }
 
             if (RATE_LIMIT_CONFIRMED_ACTION.equals(intent.getAction())) {
@@ -75,11 +75,11 @@ public class RateController {
 
     public static void init(Context context) {
         if (LOCAL_LOGV) {
-            Log.v(TAG, "RateController.init()");
+            Timber.v("RateController.init()");
         }
 
         if (sInstance != null) {
-            Log.w(TAG, "Already initialized.");
+            Timber.w("Already initialized.");
             return;
         }
         sInstance = new RateController(context);
@@ -150,7 +150,7 @@ public class RateController {
         for (int t = 0; (mAnswer == NO_ANSWER) && (t < ANSWER_TIMEOUT); t += 1000) {
             try {
                 if (LOCAL_LOGV) {
-                    Log.v(TAG, "Waiting for answer..." + t / 1000);
+                    Timber.v("Waiting for answer..." + t / 1000);
                 }
                 wait(1000L);
             } catch (InterruptedException e) {

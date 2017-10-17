@@ -1,6 +1,6 @@
 package com.google.android.mms.smil;
 
-import com.klinker.android.logger.Log;
+import timber.log.Timber;
 import com.android.mms.dom.smil.SmilDocumentImpl;
 import com.google.android.mms.ContentType;
 import com.google.android.mms.pdu_alt.PduBody;
@@ -84,7 +84,7 @@ public class SmilHelper {
                 par.appendChild(textElement);
                 hasMedia = true;
             } else {
-                Log.e("creating_smil_document", "unknown mimetype");
+                Timber.e("creating_smil_document", "unknown mimetype");
             }
         }
 
