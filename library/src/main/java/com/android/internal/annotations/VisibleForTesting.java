@@ -29,28 +29,29 @@ import java.lang.annotation.RetentionPolicy;
  */
 @Retention(RetentionPolicy.SOURCE)
 public @interface VisibleForTesting {
-    /**
-     * Intended visibility if the element had not been made public or package-private for
-     * testing.
-     */
-    enum Visibility {
-        /**
-         * The element should be considered protected.
-         */
-        PROTECTED,
-        /**
-         * The element should be considered package-private.
-         */
-        PACKAGE,
-        /**
-         * The element should be considered private.
-         */
-        PRIVATE
-    }
 
+  /**
+   * Intended visibility if the element had not been made public or package-private for
+   * testing.
+   */
+  enum Visibility {
     /**
-     * Intended visibility if the element had not been made public or package-private for testing.
-     * If not specified, one should assume the element originally intended to be private.
+     * The element should be considered protected.
      */
-    Visibility visibility() default Visibility.PRIVATE;
+    PROTECTED,
+    /**
+     * The element should be considered package-private.
+     */
+    PACKAGE,
+    /**
+     * The element should be considered private.
+     */
+    PRIVATE
+  }
+
+  /**
+   * Intended visibility if the element had not been made public or package-private for testing.
+   * If not specified, one should assume the element originally intended to be private.
+   */
+  Visibility visibility() default Visibility.PRIVATE;
 }

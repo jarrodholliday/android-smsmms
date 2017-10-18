@@ -16,13 +16,9 @@
 
 package com.android.mms.transaction;
 
-import java.io.IOException;
-
 import android.content.Context;
 import android.net.Uri;
 import android.provider.Telephony.Mms.Sent;
-import timber.log.Timber;
-
 import com.android.mms.logs.LogTag;
 import com.google.android.mms.MmsException;
 import com.google.android.mms.pdu_alt.EncodedStringValue;
@@ -30,6 +26,8 @@ import com.google.android.mms.pdu_alt.PduComposer;
 import com.google.android.mms.pdu_alt.PduPersister;
 import com.google.android.mms.pdu_alt.ReadRecInd;
 import com.klinker.android.send_message.Utils;
+import java.io.IOException;
+import timber.log.Timber;
 
 /**
  * The ReadRecTransaction is responsible for sending read report
@@ -42,7 +40,8 @@ import com.klinker.android.send_message.Utils;
  * <li>Notifies the TransactionService about succesful completion.
  * </ul>
  */
-public class ReadRecTransaction extends Transaction implements Runnable{
+public class ReadRecTransaction extends Transaction implements Runnable {
+
     private static final String TAG = LogTag.TAG;
     private static final boolean DEBUG = false;
     private static final boolean LOCAL_LOGV = false;
@@ -51,9 +50,9 @@ public class ReadRecTransaction extends Transaction implements Runnable{
     private final Uri mReadReportURI;
 
     public ReadRecTransaction(Context context,
-            int transId,
-            TransactionSettings connectionSettings,
-            String uri) {
+        int transId,
+        TransactionSettings connectionSettings,
+        String uri) {
         super(context, transId, connectionSettings);
         mReadReportURI = Uri.parse(uri);
         mId = uri;
@@ -108,7 +107,7 @@ public class ReadRecTransaction extends Transaction implements Runnable{
                 mTransactionState.setContentUri(mReadReportURI);
             }
             notifyObservers();
-        }
+    }
     }
 
     @Override

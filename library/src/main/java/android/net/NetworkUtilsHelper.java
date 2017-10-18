@@ -16,13 +16,12 @@
 
 package android.net;
 
-import timber.log.Timber;
-
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Collection;
+import timber.log.Timber;
 
 /**
  * Native methods for managing network interfaces.
@@ -62,7 +61,7 @@ public class NetworkUtilsHelper {
      * Reset IPv6 or IPv4 sockets that are connected via the named interface.
      *
      * @param interfaceName is the interface to reset
-     * @param mask          {@see #RESET_IPV4_ADDRESSES} and {@see #RESET_IPV6_ADDRESSES}
+     * @param mask {@see #RESET_IPV4_ADDRESSES} and {@see #RESET_IPV6_ADDRESSES}
      */
     public native static int resetConnections(String interfaceName, int mask);
 
@@ -73,8 +72,8 @@ public class NetworkUtilsHelper {
      * or failure) from the daemon.
      *
      * @param interfaceName the name of the interface to configure
-     * @param ipInfo        if the request succeeds, this object is filled in with
-     *                      the IP address information.
+     * @param ipInfo if the request succeeds, this object is filled in with
+     * the IP address information.
      * @return {@code true} for success, {@code false} for failure
      */
     public native static boolean runDhcp(String interfaceName, DhcpInfoInternal ipInfo);
@@ -84,8 +83,8 @@ public class NetworkUtilsHelper {
      * a result (either success or failure) from the daemon.
      *
      * @param interfaceName the name of the interface to configure
-     * @param ipInfo        if the request succeeds, this object is filled in with
-     *                      the IP address information.
+     * @param ipInfo if the request succeeds, this object is filled in with
+     * the IP address information.
      * @return {@code true} for success, {@code false} for failure
      */
     public native static boolean runDhcpRenew(String interfaceName, DhcpInfoInternal ipInfo);
@@ -94,7 +93,7 @@ public class NetworkUtilsHelper {
      * Shut down the DHCP client daemon.
      *
      * @param interfaceName the name of the interface for which the daemon
-     *                      should be stopped
+     * should be stopped
      * @return {@code true} for success, {@code false} for failure
      */
     public native static boolean stopDhcp(String interfaceName);
@@ -103,7 +102,7 @@ public class NetworkUtilsHelper {
      * Release the current DHCP lease.
      *
      * @param interfaceName the name of the interface for which the lease should
-     *                      be released
+     * be released
      * @return {@code true} for success, {@code false} for failure
      */
     public native static boolean releaseDhcpLease(String interfaceName);
@@ -124,15 +123,15 @@ public class NetworkUtilsHelper {
      */
     public static InetAddress intToInetAddress(int hostAddress) {
         byte[] addressBytes = {(byte) (0xff & hostAddress),
-                (byte) (0xff & (hostAddress >> 8)),
-                (byte) (0xff & (hostAddress >> 16)),
-                (byte) (0xff & (hostAddress >> 24))};
+            (byte) (0xff & (hostAddress >> 8)),
+            (byte) (0xff & (hostAddress >> 16)),
+            (byte) (0xff & (hostAddress >> 24))};
 
         try {
             return InetAddress.getByAddress(addressBytes);
         } catch (UnknownHostException e) {
             throw new AssertionError();
-        }
+    }
     }
 
     /**
@@ -142,26 +141,25 @@ public class NetworkUtilsHelper {
      * @return the IP address as an integer in network byte order
      */
     public static int inetAddressToInt(InetAddress inetAddr)
-            throws IllegalArgumentException {
+        throws IllegalArgumentException {
         byte[] addr = inetAddr.getAddress();
         if (addr.length != 4) {
             throw new IllegalArgumentException("Not an IPv4 address");
-        }
+    }
         return ((addr[3] & 0xff) << 24) | ((addr[2] & 0xff) << 16) |
-                ((addr[1] & 0xff) << 8) | (addr[0] & 0xff);
+            ((addr[1] & 0xff) << 8) | (addr[0] & 0xff);
     }
 
     /**
      * Convert a network prefix length to an IPv4 netmask integer
      *
-     * @param prefixLength
      * @return the IPv4 netmask as an integer in network byte order
      */
     public static int prefixLengthToNetmaskInt(int prefixLength)
-            throws IllegalArgumentException {
+        throws IllegalArgumentException {
         if (prefixLength < 0 || prefixLength > 32) {
             throw new IllegalArgumentException("Invalid prefix length (0 <= prefix <= 32)");
-        }
+    }
         int value = 0xffffffff << (32 - prefixLength);
         return Integer.reverseBytes(value);
     }
@@ -181,25 +179,24 @@ public class NetworkUtilsHelper {
      * representation of a V4 or V6 address.  Avoids doing a DNS lookup on failure
      * but it will throw an IllegalArgumentException in that case.
      *
-     * @param addrString
      * @return the InetAddress
      * @hide
      */
     public static InetAddress numericToInetAddress(String addrString)
-            throws IllegalArgumentException {
+        throws IllegalArgumentException {
         return null;
     }
 
     /**
      * Get InetAddress masked with prefixLength.  Will never return null.
      *
-     * @param IP           address which will be masked with specified prefixLength
+     * @param IP address which will be masked with specified prefixLength
      * @param prefixLength the prefixLength used to mask the IP
      */
     public static InetAddress getNetworkPart(InetAddress address, int prefixLength) {
         if (address == null) {
             throw new RuntimeException("getNetworkPart doesn't accept null address");
-        }
+    }
 
         byte[] array = address.getAddress();
 
@@ -211,20 +208,22 @@ public class NetworkUtilsHelper {
         int reminder = prefixLength % 8;
         byte mask = (byte) (0xFF << (8 - reminder));
 
-        if (offset < array.length) array[offset] = (byte) (array[offset] & mask);
+        if (offset < array.length) {
+            array[offset] = (byte) (array[offset] & mask);
+        }
 
         offset++;
 
         for (; offset < array.length; offset++) {
             array[offset] = 0;
-        }
+    }
 
         InetAddress netPart = null;
         try {
             netPart = InetAddress.getByAddress(array);
         } catch (UnknownHostException e) {
             throw new RuntimeException("getNetworkPart error - " + e.toString());
-        }
+    }
         return netPart;
     }
 
@@ -235,7 +234,7 @@ public class NetworkUtilsHelper {
      */
     public static boolean addressTypeMatches(InetAddress left, InetAddress right) {
         return (((left instanceof Inet4Address) && (right instanceof Inet4Address)) ||
-                ((left instanceof Inet6Address) && (right instanceof Inet6Address)));
+            ((left instanceof Inet6Address) && (right instanceof Inet6Address)));
     }
 
     /**
@@ -247,17 +246,17 @@ public class NetworkUtilsHelper {
      * @return addr an InetAddress representation for the string
      */
     public static InetAddress hexToInet6Address(String addrHexString)
-            throws IllegalArgumentException {
+        throws IllegalArgumentException {
         try {
             return numericToInetAddress(String.format("%s:%s:%s:%s:%s:%s:%s:%s",
-                    addrHexString.substring(0, 4), addrHexString.substring(4, 8),
-                    addrHexString.substring(8, 12), addrHexString.substring(12, 16),
-                    addrHexString.substring(16, 20), addrHexString.substring(20, 24),
-                    addrHexString.substring(24, 28), addrHexString.substring(28, 32)));
+                addrHexString.substring(0, 4), addrHexString.substring(4, 8),
+                addrHexString.substring(8, 12), addrHexString.substring(12, 16),
+                addrHexString.substring(16, 20), addrHexString.substring(20, 24),
+                addrHexString.substring(24, 28), addrHexString.substring(28, 32)));
         } catch (Exception e) {
             Timber.e("error in hexToInet6Address(" + addrHexString + "): " + e.getMessage());
             throw new IllegalArgumentException(e);
-        }
+    }
     }
 
     /**
@@ -271,7 +270,7 @@ public class NetworkUtilsHelper {
         int i = 0;
         for (InetAddress addr : addrs) {
             result[i++] = addr.getHostAddress();
-        }
+    }
         return result;
     }
 
@@ -286,20 +285,28 @@ public class NetworkUtilsHelper {
      * @return a string propertly trimmed
      */
     public static String trimV4AddrZeros(String addr) {
-        if (addr == null) return null;
+        if (addr == null) {
+            return null;
+        }
         String[] octets = addr.split("\\.");
-        if (octets.length != 4) return addr;
+        if (octets.length != 4) {
+            return addr;
+        }
         StringBuilder builder = new StringBuilder(16);
         String result = null;
         for (int i = 0; i < 4; i++) {
             try {
-                if (octets[i].length() > 3) return addr;
+                if (octets[i].length() > 3) {
+                    return addr;
+                }
                 builder.append(Integer.parseInt(octets[i]));
             } catch (NumberFormatException e) {
                 return addr;
             }
-            if (i < 3) builder.append('.');
+            if (i < 3) {
+                builder.append('.');
         }
+    }
         result = builder.toString();
         return result;
     }

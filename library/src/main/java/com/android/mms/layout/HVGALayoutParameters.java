@@ -16,82 +16,82 @@
 
 package com.android.mms.layout;
 
-import com.android.mms.logs.LogTag;
-
 import android.content.Context;
+import com.android.mms.logs.LogTag;
 import timber.log.Timber;
 
 public class HVGALayoutParameters implements LayoutParameters {
-    private static final String TAG = LogTag.TAG;
-    private static final boolean DEBUG = false;
-    private static final boolean LOCAL_LOGV = false;
 
-    private int mType = -1;
+  private static final String TAG = LogTag.TAG;
+  private static final boolean DEBUG = false;
+  private static final boolean LOCAL_LOGV = false;
 
-    private static int mImageHeightLandscape;
-    private static int mTextHeightLandscape;
-    private static int mImageHeightPortrait;
-    private static int mTextHeightPortrait;
-    private static int mMaxHeight;
-    private static int mMaxWidth;
+  private int mType = -1;
 
-    public HVGALayoutParameters(Context context, int type) {
-        if ((type != HVGA_LANDSCAPE) && (type != HVGA_PORTRAIT)) {
-            throw new IllegalArgumentException(
-                    "Bad layout type detected: " + type);
-        }
+  private static int mImageHeightLandscape;
+  private static int mTextHeightLandscape;
+  private static int mImageHeightPortrait;
+  private static int mTextHeightPortrait;
+  private static int mMaxHeight;
+  private static int mMaxWidth;
 
-        if (LOCAL_LOGV) {
-            Timber.v("HVGALayoutParameters.<init>(" + type + ").");
-        }
-        mType = type;
-
-        float scale = context.getResources().getDisplayMetrics().density;
-        mMaxWidth = (int) (context.getResources().getConfiguration().screenWidthDp * scale + 0.5f);
-        mMaxHeight =
-            (int) (context.getResources().getConfiguration().screenHeightDp * scale + 0.5f);
-
-        mImageHeightLandscape = (int) (mMaxHeight * .90f);
-        mTextHeightLandscape = (int) (mMaxHeight * .10f);
-        mImageHeightPortrait = (int) (mMaxWidth * .90f);
-        mTextHeightPortrait = (int) (mMaxWidth * .10f);
-
-        if (LOCAL_LOGV) {
-            Timber.v("HVGALayoutParameters mMaxWidth: " + mMaxWidth +
-                    " mMaxHeight: " + mMaxHeight +
-                    " mImageHeightLandscape: " + mImageHeightLandscape +
-                    " mTextHeightLandscape: " + mTextHeightLandscape +
-                    " mImageHeightPortrait: " + mImageHeightPortrait +
-                    " mTextHeightPortrait: " + mTextHeightPortrait);
-        }
-
+  public HVGALayoutParameters(Context context, int type) {
+    if ((type != HVGA_LANDSCAPE) && (type != HVGA_PORTRAIT)) {
+      throw new IllegalArgumentException(
+          "Bad layout type detected: " + type);
     }
 
-    public int getWidth() {
-        return mType == HVGA_LANDSCAPE ? mMaxWidth
-                                       : mMaxHeight;
+    if (LOCAL_LOGV) {
+      Timber.v("HVGALayoutParameters.<init>(" + type + ").");
+    }
+    mType = type;
+
+    float scale = context.getResources().getDisplayMetrics().density;
+    mMaxWidth = (int) (context.getResources().getConfiguration().screenWidthDp * scale + 0.5f);
+    mMaxHeight =
+        (int) (context.getResources().getConfiguration().screenHeightDp * scale + 0.5f);
+
+    mImageHeightLandscape = (int) (mMaxHeight * .90f);
+    mTextHeightLandscape = (int) (mMaxHeight * .10f);
+    mImageHeightPortrait = (int) (mMaxWidth * .90f);
+    mTextHeightPortrait = (int) (mMaxWidth * .10f);
+
+    if (LOCAL_LOGV) {
+      Timber.v("HVGALayoutParameters mMaxWidth: " + mMaxWidth +
+          " mMaxHeight: " + mMaxHeight +
+          " mImageHeightLandscape: " + mImageHeightLandscape +
+          " mTextHeightLandscape: " + mTextHeightLandscape +
+          " mImageHeightPortrait: " + mImageHeightPortrait +
+          " mTextHeightPortrait: " + mTextHeightPortrait);
     }
 
-    public int getHeight() {
-        return mType == HVGA_LANDSCAPE ? mMaxHeight
-                                       : mMaxWidth;
-    }
+  }
 
-    public int getImageHeight() {
-        return mType == HVGA_LANDSCAPE ? mImageHeightLandscape
-                                       : mImageHeightPortrait;
-    }
+  public int getWidth() {
+    return mType == HVGA_LANDSCAPE ? mMaxWidth
+        : mMaxHeight;
+  }
 
-    public int getTextHeight() {
-        return mType == HVGA_LANDSCAPE ? mTextHeightLandscape
-                                       : mTextHeightPortrait;
-    }
+  public int getHeight() {
+    return mType == HVGA_LANDSCAPE ? mMaxHeight
+        : mMaxWidth;
+  }
 
-    public int getType() {
-        return mType;
-    }
+  public int getImageHeight() {
+    return mType == HVGA_LANDSCAPE ? mImageHeightLandscape
+        : mImageHeightPortrait;
+  }
 
-    public String getTypeDescription() {
-        return mType == HVGA_LANDSCAPE ? "HVGA-L" : "HVGA-P";
-    }
+  public int getTextHeight() {
+    return mType == HVGA_LANDSCAPE ? mTextHeightLandscape
+        : mTextHeightPortrait;
+  }
+
+  public int getType() {
+    return mType;
+  }
+
+  public String getTypeDescription() {
+    return mType == HVGA_LANDSCAPE ? "HVGA-L" : "HVGA-P";
+  }
 }

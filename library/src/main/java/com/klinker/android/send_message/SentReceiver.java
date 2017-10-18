@@ -28,87 +28,91 @@ import timber.log.Timber;
 
 public class SentReceiver extends BroadcastReceiver {
 
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        Timber.v("sent_receiver", "marking message as sent");
-        Uri uri;
+  @Override
+  public void onReceive(Context context, Intent intent) {
+    Timber.v("sent_receiver", "marking message as sent");
+    Uri uri;
 
-        try {
-            uri = Uri.parse(intent.getStringExtra("message_uri"));
+    try {
+      uri = Uri.parse(intent.getStringExtra("message_uri"));
 
-            if (uri.equals("")) {
-                uri = null;
-            }
-        } catch (Exception e) {
-            uri = null;
-        }
-
-        switch (getResultCode()) {
-            case Activity.RESULT_OK:
-                if (uri != null) {
-                    try {
-                        Timber.v("sent_receiver", "using supplied uri");
-                        ContentValues values = new ContentValues();
-                        values.put("type", 2);
-                        values.put("read", 1);
-                        context.getContentResolver().update(uri, values, null, null);
-                    } catch (NullPointerException e) {
-                        markFirstAsSent(context);
-                    }
-                } else {
-                    markFirstAsSent(context);
-                }
-
-                break;
-            case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
-            case SmsManager.RESULT_ERROR_NO_SERVICE:
-            case SmsManager.RESULT_ERROR_NULL_PDU:
-            case SmsManager.RESULT_ERROR_RADIO_OFF:
-                if (uri != null) {
-                    Timber.v("sent_receiver", "using supplied uri");
-                    ContentValues values = new ContentValues();
-                    values.put("type", 5);
-                    values.put("read", true);
-                    values.put("error_code", getResultCode());
-                    context.getContentResolver().update(uri, values, null, null);
-                } else {
-                    Timber.v("sent_receiver", "using first message");
-                    Cursor query = context.getContentResolver().query(Uri.parse("content://sms/outbox"), null, null, null, null);
-
-                    // mark message failed
-                    if (query != null && query.moveToFirst()) {
-                        String id = query.getString(query.getColumnIndex("_id"));
-                        ContentValues values = new ContentValues();
-                        values.put("type", 5);
-                        values.put("read", 1);
-                        values.put("error_code", getResultCode());
-                        context.getContentResolver().update(Uri.parse("content://sms/outbox"), values, "_id=" + id, null);
-
-                        query.close();
-                    }
-                }
-
-                BroadcastUtils.sendExplicitBroadcast(
-                        context, new Intent(), Transaction.NOTIFY_SMS_FAILURE);
-                break;
-        }
-
-        BroadcastUtils.sendExplicitBroadcast(context, new Intent(), Transaction.REFRESH);
+      if (uri.equals("")) {
+        uri = null;
+      }
+    } catch (Exception e) {
+      uri = null;
     }
 
-    private void markFirstAsSent(Context context) {
-        Timber.v("sent_receiver", "using first message");
-        Cursor query = context.getContentResolver().query(Uri.parse("content://sms/outbox"), null, null, null, null);
-
-        // mark message as sent successfully
-        if (query != null && query.moveToFirst()) {
-            String id = query.getString(query.getColumnIndex("_id"));
+    switch (getResultCode()) {
+      case Activity.RESULT_OK:
+        if (uri != null) {
+          try {
+            Timber.v("sent_receiver", "using supplied uri");
             ContentValues values = new ContentValues();
             values.put("type", 2);
             values.put("read", 1);
-            context.getContentResolver().update(Uri.parse("content://sms/outbox"), values, "_id=" + id, null);
+            context.getContentResolver().update(uri, values, null, null);
+          } catch (NullPointerException e) {
+            markFirstAsSent(context);
+          }
+        } else {
+          markFirstAsSent(context);
+        }
+
+        break;
+      case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
+      case SmsManager.RESULT_ERROR_NO_SERVICE:
+      case SmsManager.RESULT_ERROR_NULL_PDU:
+      case SmsManager.RESULT_ERROR_RADIO_OFF:
+        if (uri != null) {
+          Timber.v("sent_receiver", "using supplied uri");
+          ContentValues values = new ContentValues();
+          values.put("type", 5);
+          values.put("read", true);
+          values.put("error_code", getResultCode());
+          context.getContentResolver().update(uri, values, null, null);
+        } else {
+          Timber.v("sent_receiver", "using first message");
+          Cursor query = context.getContentResolver()
+              .query(Uri.parse("content://sms/outbox"), null, null, null, null);
+
+          // mark message failed
+          if (query != null && query.moveToFirst()) {
+            String id = query.getString(query.getColumnIndex("_id"));
+            ContentValues values = new ContentValues();
+            values.put("type", 5);
+            values.put("read", 1);
+            values.put("error_code", getResultCode());
+            context.getContentResolver()
+                .update(Uri.parse("content://sms/outbox"), values, "_id=" + id, null);
 
             query.close();
+          }
         }
+
+        BroadcastUtils.sendExplicitBroadcast(
+            context, new Intent(), Transaction.NOTIFY_SMS_FAILURE);
+        break;
     }
+
+    BroadcastUtils.sendExplicitBroadcast(context, new Intent(), Transaction.REFRESH);
+  }
+
+  private void markFirstAsSent(Context context) {
+    Timber.v("sent_receiver", "using first message");
+    Cursor query = context.getContentResolver()
+        .query(Uri.parse("content://sms/outbox"), null, null, null, null);
+
+    // mark message as sent successfully
+    if (query != null && query.moveToFirst()) {
+      String id = query.getString(query.getColumnIndex("_id"));
+      ContentValues values = new ContentValues();
+      values.put("type", 2);
+      values.put("read", 1);
+      context.getContentResolver()
+          .update(Uri.parse("content://sms/outbox"), values, "_id=" + id, null);
+
+      query.close();
+    }
+  }
 }

@@ -26,11 +26,9 @@ import android.os.Handler;
 import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.provider.Telephony.Mms;
-
-import com.android.mms.logs.LogTag;
 import android.widget.Toast;
-
 import com.android.internal.telephony.TelephonyProperties;
+import com.android.mms.logs.LogTag;
 import com.android.mms.service_alt.SystemPropertiesProxy;
 import com.google.android.mms.MmsException;
 import com.google.android.mms.pdu_alt.EncodedStringValue;
@@ -40,20 +38,21 @@ import com.klinker.android.send_message.R;
 import timber.log.Timber;
 
 public class DownloadManager {
+
     private static final String TAG = LogTag.TAG;
     private static final boolean DEBUG = false;
     private static final boolean LOCAL_LOGV = false;
 
-    public static final int DEFERRED_MASK           = 0x04;
+    public static final int DEFERRED_MASK = 0x04;
 
-    public static final int STATE_UNKNOWN           = 0x00;
-    public static final int STATE_UNSTARTED         = 0x80;
-    public static final int STATE_DOWNLOADING       = 0x81;
+    public static final int STATE_UNKNOWN = 0x00;
+    public static final int STATE_UNSTARTED = 0x80;
+    public static final int STATE_DOWNLOADING = 0x81;
     public static final int STATE_TRANSIENT_FAILURE = 0x82;
     public static final int STATE_PERMANENT_FAILURE = 0x87;
-    public static final int STATE_PRE_DOWNLOADING   = 0x88;
+    public static final int STATE_PRE_DOWNLOADING = 0x88;
     // TransactionService will skip downloading Mms if auto-download is off
-    public static final int STATE_SKIP_RETRYING     = 0x89;
+    public static final int STATE_SKIP_RETRYING = 0x89;
 
     private final Context mContext;
     private final Handler mHandler;
@@ -70,7 +69,7 @@ public class DownloadManager {
         mAutoDownload = getAutoDownloadState(context, mPreferences);
         if (LOCAL_LOGV) {
             Timber.v("mAutoDownload ------> " + mAutoDownload);
-        }
+    }
     }
 
     public boolean isAuto() {
@@ -80,18 +79,18 @@ public class DownloadManager {
     public static void init(Context context) {
         if (LOCAL_LOGV) {
             Timber.v("DownloadManager.init()");
-        }
+    }
 
         if (sInstance != null) {
             Timber.w("Already initialized.");
-        }
+    }
         sInstance = new DownloadManager(context);
     }
 
     public static DownloadManager getInstance() {
         if (sInstance == null) {
             throw new IllegalStateException("Uninitialized.");
-        }
+    }
         return sInstance;
     }
 
@@ -116,17 +115,17 @@ public class DownloadManager {
             if (!roaming || alwaysAuto) {
                 return true;
             }
-        }
+    }
         return false;
     }
 
     static boolean isRoaming(Context context) {
         // TODO: fix and put in Telephony layer
         String roaming = SystemPropertiesProxy.get(context,
-                TelephonyProperties.PROPERTY_OPERATOR_ISROAMING, null);
+            TelephonyProperties.PROPERTY_OPERATOR_ISROAMING, null);
         if (LOCAL_LOGV) {
             Timber.v("roaming ------> " + roaming);
-        }
+    }
         return "true".equals(roaming);
     }
 
@@ -134,22 +133,22 @@ public class DownloadManager {
         // Notify user if the message has expired.
         try {
             NotificationInd nInd = (NotificationInd) PduPersister.getPduPersister(mContext)
-                    .load(uri);
+                .load(uri);
             if ((nInd.getExpiry() < System.currentTimeMillis() / 1000L)
-                    && (state == STATE_DOWNLOADING || state == STATE_PRE_DOWNLOADING)) {
-                mHandler.post(new Runnable() {
-                    public void run() {
-                        Toast.makeText(mContext, R.string.service_message_not_found,
-                                Toast.LENGTH_LONG).show();
-                    }
-                });
+                && (state == STATE_DOWNLOADING || state == STATE_PRE_DOWNLOADING)) {
+        mHandler.post(new Runnable() {
+            public void run() {
+                Toast.makeText(mContext, R.string.service_message_not_found,
+                    Toast.LENGTH_LONG).show();
+            }
+        });
                 SqliteWrapper.delete(mContext, mContext.getContentResolver(), uri, null, null);
                 return;
             }
-        } catch(MmsException e) {
+        } catch (MmsException e) {
             Timber.e(e);
             return;
-        }
+    }
 
         // Notify user if downloading permanently failed.
         if (state == STATE_PERMANENT_FAILURE) {
@@ -157,7 +156,7 @@ public class DownloadManager {
                 public void run() {
                     try {
                         Toast.makeText(mContext, getMessage(uri),
-                                Toast.LENGTH_LONG).show();
+                            Toast.LENGTH_LONG).show();
                     } catch (MmsException e) {
                         Timber.e(e);
                     }
@@ -172,7 +171,7 @@ public class DownloadManager {
         ContentValues values = new ContentValues(1);
         values.put(Mms.STATUS, state);
         SqliteWrapper.update(mContext, mContext.getContentResolver(),
-                    uri, values, null, null);
+            uri, values, null, null);
     }
 
     public void showErrorCodeToast(int errorStr) {
@@ -190,11 +189,11 @@ public class DownloadManager {
 
     private String getMessage(Uri uri) throws MmsException {
         NotificationInd ind = (NotificationInd) PduPersister
-                .getPduPersister(mContext).load(uri);
+            .getPduPersister(mContext).load(uri);
 
         EncodedStringValue v = ind.getSubject();
         String subject = (v != null) ? v.getString()
-                : mContext.getString(R.string.no_subject);
+            : mContext.getString(R.string.no_subject);
 
         String from = mContext.getString(R.string.unknown_sender);
 
@@ -203,7 +202,7 @@ public class DownloadManager {
 
     public int getState(Uri uri) {
         Cursor cursor = SqliteWrapper.query(mContext, mContext.getContentResolver(),
-                            uri, new String[] {Mms.STATUS}, null, null, null);
+            uri, new String[]{Mms.STATUS}, null, null, null);
 
         if (cursor != null) {
             try {
@@ -211,11 +210,11 @@ public class DownloadManager {
                     int state = cursor.getInt(0) & ~DEFERRED_MASK;
                     cursor.close();
                     return state;
-                }
+        }
             } finally {
                 cursor.close();
             }
-        }
+    }
         return STATE_UNSTARTED;
     }
 }

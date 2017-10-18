@@ -21,6 +21,7 @@ package com.google.android.mms;
  * Thrown when an invalid header value was set.
  */
 public class InvalidHeaderValueException extends MmsException {
+
     private static final long serialVersionUID = -2053384496042052262L;
 
     /**

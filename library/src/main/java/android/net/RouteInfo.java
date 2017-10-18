@@ -18,13 +18,12 @@ package android.net;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import timber.log.Timber;
-
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Collection;
+import timber.log.Timber;
 
 /**
  * A simple container for route information.
@@ -32,6 +31,7 @@ import java.util.Collection;
  * @hide
  */
 public class RouteInfo implements Parcelable {
+
     private static final String TAG = "RouteInfo";
     /**
      * The IP destination address for this route.
@@ -56,38 +56,38 @@ public class RouteInfo implements Parcelable {
                         // TODO Auto-generated catch block
                         Timber.e(e);
                     }
-                } else {
+        } else {
                     try {
                         destination = new LinkAddress(Inet6Address.getLocalHost(), 0);
                     } catch (UnknownHostException e) {
                         // TODO Auto-generated catch block
                         Timber.e(e);
                     }
-                }
+        }
             } else {
                 // no destination, no gateway. invalid.
                 throw new RuntimeException("Invalid arguments passed in.");
             }
-        }
+    }
         if (gateway == null) {
             if (destination.getAddress() instanceof Inet4Address) {
-                try {
-                    gateway = Inet4Address.getLocalHost();
-                } catch (UnknownHostException e) {
-                    // TODO Auto-generated catch block
-                    Timber.e(e);
-                }
+        try {
+            gateway = Inet4Address.getLocalHost();
+        } catch (UnknownHostException e) {
+            // TODO Auto-generated catch block
+            Timber.e(e);
+        }
             } else {
                 try {
                     gateway = Inet6Address.getLocalHost();
                 } catch (UnknownHostException e) {
                     // TODO Auto-generated catch block
                     Timber.e(e);
-                }
-            }
         }
+            }
+    }
         mDestination = new LinkAddress(NetworkUtilsHelper.getNetworkPart(destination.getAddress(),
-                destination.getNetworkPrefixLength()), destination.getNetworkPrefixLength());
+            destination.getNetworkPrefixLength()), destination.getNetworkPrefixLength());
         mGateway = gateway;
         mIsDefault = isDefault();
         mIsHost = isHost();
@@ -102,22 +102,25 @@ public class RouteInfo implements Parcelable {
     }
 
     public static RouteInfo makeHostRoute(InetAddress host, InetAddress gateway) {
-        if (host == null) return null;
+        if (host == null) {
+            return null;
+        }
 
         if (host instanceof Inet4Address) {
             return new RouteInfo(new LinkAddress(host, 32), gateway);
         } else {
             return new RouteInfo(new LinkAddress(host, 128), gateway);
-        }
+    }
     }
 
     private boolean isHost() {
         try {
-            return (mGateway.equals(Inet4Address.getLocalHost()) || mGateway.equals(Inet6Address.getLocalHost()));
+            return (mGateway.equals(Inet4Address.getLocalHost()) || mGateway
+                .equals(Inet6Address.getLocalHost()));
         } catch (UnknownHostException e) {
             // TODO Auto-generated catch block
             return false;
-        }
+    }
     }
 
     private boolean isDefault() {
@@ -128,7 +131,7 @@ public class RouteInfo implements Parcelable {
             } else {
                 val = (mDestination == null || mDestination.getNetworkPrefixLength() == 0);
             }
-        }
+    }
         return val;
     }
 
@@ -151,8 +154,12 @@ public class RouteInfo implements Parcelable {
 
     public String toString() {
         String val = "";
-        if (mDestination != null) val = mDestination.toString();
-        if (mGateway != null) val += " -> " + mGateway.getHostAddress();
+        if (mDestination != null) {
+            val = mDestination.toString();
+        }
+        if (mGateway != null) {
+            val += " -> " + mGateway.getHostAddress();
+        }
         return val;
     }
 
@@ -167,93 +174,101 @@ public class RouteInfo implements Parcelable {
             dest.writeByte((byte) 1);
             dest.writeByteArray(mDestination.getAddress().getAddress());
             dest.writeInt(mDestination.getNetworkPrefixLength());
-        }
+    }
 
         if (mGateway == null) {
             dest.writeByte((byte) 0);
         } else {
             dest.writeByte((byte) 1);
             dest.writeByteArray(mGateway.getAddress());
-        }
+    }
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
+        if (this == obj) {
+            return true;
+        }
 
-        if (!(obj instanceof RouteInfo)) return false;
+        if (!(obj instanceof RouteInfo)) {
+            return false;
+        }
 
         RouteInfo target = (RouteInfo) obj;
 
         boolean sameDestination = (mDestination == null) ?
-                target.getDestination() == null
-                : mDestination.equals(target.getDestination());
+            target.getDestination() == null
+            : mDestination.equals(target.getDestination());
 
         boolean sameAddress = (mGateway == null) ?
-                target.getGateway() == null
-                : mGateway.equals(target.getGateway());
+            target.getGateway() == null
+            : mGateway.equals(target.getGateway());
 
         return sameDestination && sameAddress
-                && mIsDefault == target.mIsDefault;
+            && mIsDefault == target.mIsDefault;
     }
 
     @Override
     public int hashCode() {
         return (mDestination == null ? 0 : mDestination.hashCode())
-                + (mGateway == null ? 0 : mGateway.hashCode())
-                + (mIsDefault ? 3 : 7);
+            + (mGateway == null ? 0 : mGateway.hashCode())
+            + (mIsDefault ? 3 : 7);
     }
 
     public static final Creator<RouteInfo> CREATOR =
-            new Creator<RouteInfo>() {
-                public RouteInfo createFromParcel(Parcel in) {
-                    InetAddress destAddr = null;
-                    int prefix = 0;
-                    InetAddress gateway = null;
+        new Creator<RouteInfo>() {
+            public RouteInfo createFromParcel(Parcel in) {
+                InetAddress destAddr = null;
+                int prefix = 0;
+                InetAddress gateway = null;
 
-                    if (in.readByte() == 1) {
-                        byte[] addr = in.createByteArray();
-                        prefix = in.readInt();
+                if (in.readByte() == 1) {
+                    byte[] addr = in.createByteArray();
+                    prefix = in.readInt();
 
-                        try {
-                            destAddr = InetAddress.getByAddress(addr);
-                        } catch (UnknownHostException e) {
-                        }
+                    try {
+                        destAddr = InetAddress.getByAddress(addr);
+                    } catch (UnknownHostException e) {
                     }
-
-                    if (in.readByte() == 1) {
-                        byte[] addr = in.createByteArray();
-
-                        try {
-                            gateway = InetAddress.getByAddress(addr);
-                        } catch (UnknownHostException e) {
-                        }
-                    }
-
-                    LinkAddress dest = null;
-
-                    if (destAddr != null) {
-                        dest = new LinkAddress(destAddr, prefix);
-                    }
-
-                    return new RouteInfo(dest, gateway);
                 }
 
-                public RouteInfo[] newArray(int size) {
-                    return new RouteInfo[size];
+                if (in.readByte() == 1) {
+                    byte[] addr = in.createByteArray();
+
+                    try {
+                        gateway = InetAddress.getByAddress(addr);
+                    } catch (UnknownHostException e) {
+                    }
                 }
-            };
+
+                LinkAddress dest = null;
+
+                if (destAddr != null) {
+                    dest = new LinkAddress(destAddr, prefix);
+                }
+
+                return new RouteInfo(dest, gateway);
+        }
+
+            public RouteInfo[] newArray(int size) {
+                return new RouteInfo[size];
+            }
+        };
 
     private boolean matches(InetAddress destination) {
-        if (destination == null) return false;
+        if (destination == null) {
+            return false;
+        }
 
         // if the destination is present and the route is default.
         // return true
-        if (isDefault()) return true;
+        if (isDefault()) {
+            return true;
+        }
 
         // match the route destination and destination with prefix length
         InetAddress dstNet = NetworkUtilsHelper.getNetworkPart(destination,
-                mDestination.getNetworkPrefixLength());
+            mDestination.getNetworkPrefixLength());
 
         return mDestination.getAddress().equals(dstNet);
     }
@@ -263,24 +278,28 @@ public class RouteInfo implements Parcelable {
      * May return null if no routes are applicable.
      *
      * @param routes a Collection of RouteInfos to chose from
-     * @param dest   the InetAddress your trying to get to
+     * @param dest the InetAddress your trying to get to
      * @return the RouteInfo from the Collection that best fits the given address
      */
     public static RouteInfo selectBestRoute(Collection<RouteInfo> routes, InetAddress dest) {
-        if ((routes == null) || (dest == null)) return null;
+        if ((routes == null) || (dest == null)) {
+            return null;
+        }
 
         RouteInfo bestRoute = null;
         // pick a longest prefix match under same address type
         for (RouteInfo route : routes) {
             if (NetworkUtilsHelper.addressTypeMatches(route.mDestination.getAddress(), dest)) {
                 if ((bestRoute != null) &&
-                        (bestRoute.mDestination.getNetworkPrefixLength() >=
-                                route.mDestination.getNetworkPrefixLength())) {
+                    (bestRoute.mDestination.getNetworkPrefixLength() >=
+                        route.mDestination.getNetworkPrefixLength())) {
                     continue;
                 }
-                if (route.matches(dest)) bestRoute = route;
+                if (route.matches(dest)) {
+                    bestRoute = route;
+                }
             }
-        }
+    }
         return bestRoute;
     }
 }

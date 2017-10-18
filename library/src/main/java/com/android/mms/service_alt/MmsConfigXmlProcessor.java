@@ -16,21 +16,21 @@
 
 package com.android.mms.service_alt;
 
+import android.content.ContentValues;
+import java.io.IOException;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
-
-import android.content.ContentValues;
 import timber.log.Timber;
-
-import java.io.IOException;
 
 /*
  * XML processor for mms_config.xml
  */
 public class MmsConfigXmlProcessor {
+
     private static final String TAG = "MmsConfigXmlProcessor";
 
     public interface MmsConfigHandler {
+
         public void process(String key, String value, String type);
     }
 
@@ -60,19 +60,16 @@ public class MmsConfigXmlProcessor {
     /**
      * Move XML parser forward to next event type or the end of doc
      *
-     * @param eventType
      * @return The final event type we meet
-     * @throws XmlPullParserException
-     * @throws IOException
      */
     private int advanceToNextEvent(int eventType) throws XmlPullParserException, IOException {
-        for (;;) {
+        for (; ; ) {
             int nextEvent = mInputParser.next();
             if (nextEvent == eventType
-                    || nextEvent == XmlPullParser.END_DOCUMENT) {
+                || nextEvent == XmlPullParser.END_DOCUMENT) {
                 return nextEvent;
             }
-        }
+    }
     }
 
     public void process() {
@@ -80,7 +77,7 @@ public class MmsConfigXmlProcessor {
             // Find the first element
             if (advanceToNextEvent(XmlPullParser.START_TAG) != XmlPullParser.START_TAG) {
                 throw new XmlPullParserException("MmsConfigXmlProcessor: expecting start tag @"
-                        + xmlParserDebugContext());
+                    + xmlParserDebugContext());
             }
             // A single ContentValues object for holding the parsing result of
             // an apn element
@@ -94,17 +91,22 @@ public class MmsConfigXmlProcessor {
             }
         } catch (IOException | XmlPullParserException e) {
             Timber.e(e);
-        }
+    }
     }
 
     private static String xmlParserEventString(int event) {
         switch (event) {
-            case XmlPullParser.START_DOCUMENT: return "START_DOCUMENT";
-            case XmlPullParser.END_DOCUMENT: return "END_DOCUMENT";
-            case XmlPullParser.START_TAG: return "START_TAG";
-            case XmlPullParser.END_TAG: return "END_TAG";
-            case XmlPullParser.TEXT: return "TEXT";
-        }
+            case XmlPullParser.START_DOCUMENT:
+                return "START_DOCUMENT";
+            case XmlPullParser.END_DOCUMENT:
+                return "END_DOCUMENT";
+            case XmlPullParser.START_TAG:
+                return "START_TAG";
+            case XmlPullParser.END_TAG:
+                return "END_TAG";
+            case XmlPullParser.TEXT:
+                return "TEXT";
+    }
         return Integer.toString(event);
     }
 
@@ -118,8 +120,8 @@ public class MmsConfigXmlProcessor {
                 final int eventType = mInputParser.getEventType();
                 mLogStringBuilder.append(xmlParserEventString(eventType));
                 if (eventType == XmlPullParser.START_TAG
-                        || eventType == XmlPullParser.END_TAG
-                        || eventType == XmlPullParser.TEXT) {
+                    || eventType == XmlPullParser.END_TAG
+                    || eventType == XmlPullParser.TEXT) {
                     mLogStringBuilder.append('<').append(mInputParser.getName());
                     for (int i = 0; i < mInputParser.getAttributeCount(); i++) {
                         mLogStringBuilder.append(' ')
@@ -128,28 +130,27 @@ public class MmsConfigXmlProcessor {
                             .append(mInputParser.getAttributeValue(i));
                     }
                     mLogStringBuilder.append("/>");
-                }
+        }
                 return mLogStringBuilder.toString();
             } catch (XmlPullParserException e) {
                 Timber.e("xmlParserDebugContext: " + e, e);
             }
-        }
+    }
         return "Unknown";
     }
 
     /**
      * Process one mms_config.
-     *
-     * @throws IOException
-     * @throws XmlPullParserException
      */
     private void processMmsConfig()
-            throws IOException, XmlPullParserException {
+        throws IOException, XmlPullParserException {
         // We are at the start tag
-        for (;;) {
+        for (; ; ) {
             int nextEvent;
             // Skipping spaces
-            while ((nextEvent = mInputParser.next()) == XmlPullParser.TEXT);
+            while ((nextEvent = mInputParser.next()) == XmlPullParser.TEXT) {
+                ;
+        }
             if (nextEvent == XmlPullParser.START_TAG) {
                 // Parse one mms config key/value
                 processMmsConfigKeyValue();
@@ -157,16 +158,13 @@ public class MmsConfigXmlProcessor {
                 break;
             } else {
                 throw new XmlPullParserException("MmsConfig: expecting start or end tag @"
-                        + xmlParserDebugContext());
+                    + xmlParserDebugContext());
             }
-        }
+    }
     }
 
     /**
      * Process one mms_config key/value pair
-     *
-     * @throws IOException
-     * @throws XmlPullParserException
      */
     private void processMmsConfigKeyValue() throws IOException, XmlPullParserException {
         final String key = mInputParser.getAttributeValue(null, "name");
@@ -178,10 +176,10 @@ public class MmsConfigXmlProcessor {
         if (nextEvent == XmlPullParser.TEXT) {
             value = mInputParser.getText();
             nextEvent = mInputParser.next();
-        }
+    }
         if (nextEvent != XmlPullParser.END_TAG) {
             throw new XmlPullParserException("MmsConfigXmlProcessor: expecting end tag @"
-                    + xmlParserDebugContext());
+                + xmlParserDebugContext());
         }
         if (MmsConfig.isValidKey(key, type)) {
             // We are done parsing one mms_config key/value, call the handler

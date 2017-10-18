@@ -31,17 +31,17 @@ import android.net.Uri;
 import android.provider.Telephony.Mms;
 import android.provider.Telephony.MmsSms;
 import android.provider.Telephony.MmsSms.PendingMessages;
-
 import android.util.Log;
 import com.android.mms.logs.LogTag;
 import com.android.mms.util.DownloadManager;
 import com.google.android.mms.pdu_alt.PduHeaders;
 import com.google.android.mms.pdu_alt.PduPersister;
-import timber.log.Timber;
 import com.klinker.android.send_message.BroadcastUtils;
 import com.klinker.android.send_message.R;
+import timber.log.Timber;
 
 public class RetryScheduler implements Observer {
+
     private static final String TAG = LogTag.TAG;
     private static final boolean DEBUG = false;
     private static final boolean LOCAL_LOGV = false;
@@ -55,16 +55,17 @@ public class RetryScheduler implements Observer {
     }
 
     private static RetryScheduler sInstance;
+
     public static RetryScheduler getInstance(Context context) {
         if (sInstance == null) {
             sInstance = new RetryScheduler(context);
-        }
+    }
         return sInstance;
     }
 
     private boolean isConnected() {
         ConnectivityManager mConnMgr = (ConnectivityManager)
-                mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+            mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo ni = mConnMgr.getNetworkInfo(ConnectivityManager.TYPE_MOBILE_MMS);
         return (ni == null ? false : ni.isConnected());
     }
@@ -80,26 +81,26 @@ public class RetryScheduler implements Observer {
             // We are only supposed to handle M-Notification.ind, M-Send.req
             // and M-ReadRec.ind.
             if ((t instanceof NotificationTransaction)
-                    || (t instanceof RetrieveTransaction)
-                    || (t instanceof ReadRecTransaction)
-                    || (t instanceof SendTransaction)) {
+                || (t instanceof RetrieveTransaction)
+                || (t instanceof ReadRecTransaction)
+                || (t instanceof SendTransaction)) {
                 try {
                     TransactionState state = t.getState();
                     if (state.getState() == TransactionState.FAILED) {
                         Uri uri = state.getContentUri();
                         if (uri != null) {
                             scheduleRetry(uri);
-                        }
+            }
                     }
-                } finally {
+        } finally {
                     t.detach(this);
-                }
+        }
             }
         } finally {
             if (isConnected()) {
                 setRetryAlarm(mContext);
             }
-        }
+    }
     }
 
     private void scheduleRetry(Uri uri) {
@@ -110,16 +111,16 @@ public class RetryScheduler implements Observer {
         uriBuilder.appendQueryParameter("message", String.valueOf(msgId));
 
         Cursor cursor = SqliteWrapper.query(mContext, mContentResolver,
-                uriBuilder.build(), null, null, null, null);
+            uriBuilder.build(), null, null, null, null);
 
         if (cursor != null) {
             try {
                 if ((cursor.getCount() == 1) && cursor.moveToFirst()) {
                     int msgType = cursor.getInt(cursor.getColumnIndexOrThrow(
-                            PendingMessages.MSG_TYPE));
+                        PendingMessages.MSG_TYPE));
 
                     int retryIndex = cursor.getInt(cursor.getColumnIndexOrThrow(
-                            PendingMessages.RETRY_INDEX)) + 1; // Count this time.
+                        PendingMessages.RETRY_INDEX)) + 1; // Count this time.
 
                     // TODO Should exactly understand what was happened.
                     int errorType = MmsSms.ERR_TYPE_GENERIC;
@@ -129,7 +130,7 @@ public class RetryScheduler implements Observer {
                     ContentValues values = new ContentValues(4);
                     long current = System.currentTimeMillis();
                     boolean isRetryDownloading =
-                            (msgType == PduHeaders.MESSAGE_TYPE_NOTIFICATION_IND);
+                        (msgType == PduHeaders.MESSAGE_TYPE_NOTIFICATION_IND);
                     boolean retry = true;
                     int respStatus = getResponseStatus(msgId);
                     int errorString = 0;
@@ -161,12 +162,12 @@ public class RetryScheduler implements Observer {
                         // Notification Transaction case
                         respStatus = getRetrieveStatus(msgId);
                         if (respStatus ==
-                                PduHeaders.RESPONSE_STATUS_ERROR_PERMANENT_MESSAGE_NOT_FOUND) {
+                            PduHeaders.RESPONSE_STATUS_ERROR_PERMANENT_MESSAGE_NOT_FOUND) {
                             DownloadManager.init(mContext.getApplicationContext());
                             DownloadManager.getInstance().showErrorCodeToast(
-                                    R.string.service_message_not_found);
+                                R.string.service_message_not_found);
                             SqliteWrapper.delete(mContext, mContext.getContentResolver(), uri,
-                                    null, null);
+                                null, null);
                             retry = false;
                             return;
                         }
@@ -176,7 +177,7 @@ public class RetryScheduler implements Observer {
 
                         if (Log.isLoggable(LogTag.TRANSACTION, Log.VERBOSE)) {
                             Log.v(TAG, "scheduleRetry: retry for " + uri + " is scheduled at "
-                                    + (retryAt - System.currentTimeMillis()) + "ms from now");
+                                + (retryAt - System.currentTimeMillis()) + "ms from now");
                         }
 
                         values.put(PendingMessages.DUE_TIME, retryAt);
@@ -185,13 +186,14 @@ public class RetryScheduler implements Observer {
                             // Downloading process is transiently failed.
                             DownloadManager.init(mContext.getApplicationContext());
                             DownloadManager.getInstance().markState(
-                                    uri, DownloadManager.STATE_TRANSIENT_FAILURE);
+                                uri, DownloadManager.STATE_TRANSIENT_FAILURE);
                         }
                     } else {
                         errorType = MmsSms.ERR_TYPE_GENERIC_PERMANENT;
                         if (isRetryDownloading) {
-                            Cursor c = SqliteWrapper.query(mContext, mContext.getContentResolver(), uri,
-                                    new String[] { Mms.THREAD_ID }, null, null, null);
+                            Cursor c = SqliteWrapper
+                                .query(mContext, mContext.getContentResolver(), uri,
+                                    new String[]{Mms.THREAD_ID}, null, null, null);
 
                             long threadId = -1;
                             if (c != null) {
@@ -211,38 +213,39 @@ public class RetryScheduler implements Observer {
 
                             DownloadManager.init(mContext.getApplicationContext());
                             DownloadManager.getInstance().markState(
-                                    uri, DownloadManager.STATE_PERMANENT_FAILURE);
+                                uri, DownloadManager.STATE_PERMANENT_FAILURE);
                         } else {
                             // Mark the failed message as unread.
                             ContentValues readValues = new ContentValues(1);
                             readValues.put(Mms.READ, 0);
                             SqliteWrapper.update(mContext, mContext.getContentResolver(),
-                                    uri, readValues, null, null);
+                                uri, readValues, null, null);
                             markMmsFailed(mContext);
                         }
                     }
 
-                    values.put(PendingMessages.ERROR_TYPE,  errorType);
+                    values.put(PendingMessages.ERROR_TYPE, errorType);
                     values.put(PendingMessages.RETRY_INDEX, retryIndex);
-                    values.put(PendingMessages.LAST_TRY,    current);
+                    values.put(PendingMessages.LAST_TRY, current);
 
                     int columnIndex = cursor.getColumnIndexOrThrow(
-                            PendingMessages._ID);
+                        PendingMessages._ID);
                     long id = cursor.getLong(columnIndex);
                     SqliteWrapper.update(mContext, mContentResolver,
-                            PendingMessages.CONTENT_URI,
-                            values, PendingMessages._ID + "=" + id, null);
+                        PendingMessages.CONTENT_URI,
+                        values, PendingMessages._ID + "=" + id, null);
                 } else if (LOCAL_LOGV) {
                     Timber.v("Cannot found correct pending status for: " + msgId);
-                }
+        }
             } finally {
                 cursor.close();
             }
-        }
+    }
     }
 
     private void markMmsFailed(final Context context) {
-        Cursor query = context.getContentResolver().query(Mms.CONTENT_URI, new String[]{Mms._ID}, null, null, "date desc");
+        Cursor query = context.getContentResolver()
+            .query(Mms.CONTENT_URI, new String[]{Mms._ID}, null, null, "date desc");
 
         try {
             query.moveToFirst();
@@ -256,30 +259,30 @@ public class RetryScheduler implements Observer {
             context.getContentResolver().update(Mms.CONTENT_URI, values, where, null);
 
             BroadcastUtils.sendExplicitBroadcast(
-                    mContext, new Intent(), com.klinker.android.send_message.Transaction.REFRESH);
+                mContext, new Intent(), com.klinker.android.send_message.Transaction.REFRESH);
             BroadcastUtils.sendExplicitBroadcast(
-                    mContext,
-                    new Intent(),
-                    com.klinker.android.send_message.Transaction.NOTIFY_SMS_FAILURE);
+                mContext,
+                new Intent(),
+                com.klinker.android.send_message.Transaction.NOTIFY_SMS_FAILURE);
 
             // broadcast that mms has failed and you can notify user from there if you would like
             BroadcastUtils.sendExplicitBroadcast(
-                    mContext, new Intent(), com.klinker.android.send_message.Transaction.MMS_ERROR);
+                mContext, new Intent(), com.klinker.android.send_message.Transaction.MMS_ERROR);
         } catch (Exception e) {
-        }
+    }
     }
 
     private int getResponseStatus(long msgID) {
         int respStatus = 0;
         Cursor cursor = SqliteWrapper.query(mContext, mContentResolver,
-                Mms.Outbox.CONTENT_URI, null, Mms._ID + "=" + msgID, null, null);
+            Mms.Outbox.CONTENT_URI, null, Mms._ID + "=" + msgID, null, null);
         try {
             if (cursor.moveToFirst()) {
                 respStatus = cursor.getInt(cursor.getColumnIndexOrThrow(Mms.RESPONSE_STATUS));
             }
         } finally {
             cursor.close();
-        }
+    }
         if (respStatus != 0) {
             Timber.e("Response status is: " + respStatus);
         }
@@ -290,15 +293,15 @@ public class RetryScheduler implements Observer {
     private int getRetrieveStatus(long msgID) {
         int retrieveStatus = 0;
         Cursor cursor = SqliteWrapper.query(mContext, mContentResolver,
-                Mms.Inbox.CONTENT_URI, null, Mms._ID + "=" + msgID, null, null);
+            Mms.Inbox.CONTENT_URI, null, Mms._ID + "=" + msgID, null, null);
         try {
             if (cursor.moveToFirst()) {
                 retrieveStatus = cursor.getInt(cursor.getColumnIndexOrThrow(
-                            Mms.RESPONSE_STATUS));
+                    Mms.RESPONSE_STATUS));
             }
         } finally {
             cursor.close();
-        }
+    }
         if (retrieveStatus != 0) {
             if (Log.isLoggable(LogTag.TRANSACTION, Log.VERBOSE)) {
                 Log.v(TAG, "Retrieve status is: " + retrieveStatus);
@@ -309,30 +312,30 @@ public class RetryScheduler implements Observer {
 
     public static void setRetryAlarm(Context context) {
         Cursor cursor = PduPersister.getPduPersister(context).getPendingMessages(
-                Long.MAX_VALUE);
+            Long.MAX_VALUE);
         if (cursor != null) {
             try {
                 if (cursor.moveToFirst()) {
                     // The result of getPendingMessages() is order by due time.
                     long retryAt = cursor.getLong(cursor.getColumnIndexOrThrow(
-                            PendingMessages.DUE_TIME));
+                        PendingMessages.DUE_TIME));
 
                     Intent service = new Intent(TransactionService.ACTION_ONALARM,
-                                        null, context, TransactionService.class);
+                        null, context, TransactionService.class);
                     PendingIntent operation = PendingIntent.getService(
-                            context, 0, service, PendingIntent.FLAG_ONE_SHOT);
+                        context, 0, service, PendingIntent.FLAG_ONE_SHOT);
                     AlarmManager am = (AlarmManager) context.getSystemService(
-                            Context.ALARM_SERVICE);
+                        Context.ALARM_SERVICE);
                     am.set(AlarmManager.RTC, retryAt, operation);
 
                     if (Log.isLoggable(LogTag.TRANSACTION, Log.VERBOSE)) {
                         Log.v(TAG, "Next retry is scheduled at"
-                                + (retryAt - System.currentTimeMillis()) + "ms from now");
+                            + (retryAt - System.currentTimeMillis()) + "ms from now");
                     }
-                }
+        }
             } finally {
                 cursor.close();
             }
-        }
+    }
     }
 }

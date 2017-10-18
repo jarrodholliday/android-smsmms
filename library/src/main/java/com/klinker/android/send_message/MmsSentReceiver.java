@@ -22,35 +22,33 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.provider.Telephony;
-
 import com.google.android.mms.util_alt.SqliteWrapper;
-import timber.log.Timber;
-
 import java.io.File;
+import timber.log.Timber;
 
 public class MmsSentReceiver extends BroadcastReceiver {
 
-    private static final String TAG = "MmsSentReceiver";
+  private static final String TAG = "MmsSentReceiver";
 
-    public static final String MMS_SENT = "com.klinker.android.messaging.MMS_SENT";
-    public static final String EXTRA_CONTENT_URI = "content_uri";
-    public static final String EXTRA_FILE_PATH = "file_path";
+  public static final String MMS_SENT = "com.klinker.android.messaging.MMS_SENT";
+  public static final String EXTRA_CONTENT_URI = "content_uri";
+  public static final String EXTRA_FILE_PATH = "file_path";
 
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        Timber.v("MMS has finished sending, marking it as so in the database");
+  @Override
+  public void onReceive(Context context, Intent intent) {
+    Timber.v("MMS has finished sending, marking it as so in the database");
 
-        Uri uri = Uri.parse(intent.getStringExtra(EXTRA_CONTENT_URI));
-        Timber.v(uri.toString());
+    Uri uri = Uri.parse(intent.getStringExtra(EXTRA_CONTENT_URI));
+    Timber.v(uri.toString());
 
-        ContentValues values = new ContentValues(1);
-        values.put(Telephony.Mms.MESSAGE_BOX, Telephony.Mms.MESSAGE_BOX_SENT);
-        SqliteWrapper.update(context, context.getContentResolver(), uri, values,
-                null, null);
+    ContentValues values = new ContentValues(1);
+    values.put(Telephony.Mms.MESSAGE_BOX, Telephony.Mms.MESSAGE_BOX_SENT);
+    SqliteWrapper.update(context, context.getContentResolver(), uri, values,
+        null, null);
 
-        String filePath = intent.getStringExtra(EXTRA_FILE_PATH);
-        Timber.v(filePath);
-        new File(filePath).delete();
-    }
+    String filePath = intent.getStringExtra(EXTRA_FILE_PATH);
+    Timber.v(filePath);
+    new File(filePath).delete();
+  }
 
 }

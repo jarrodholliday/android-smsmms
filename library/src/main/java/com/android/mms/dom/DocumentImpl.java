@@ -39,156 +39,160 @@ public abstract class DocumentImpl extends NodeImpl implements Document {
      * Internal methods
      */
 
-    public DocumentImpl() {
-        super(null);
-    }
+  public DocumentImpl() {
+    super(null);
+  }
 
     /*
      * Document Interface Methods
      */
 
-    public Attr createAttribute(String name) throws DOMException {
-        return new AttrImpl(this, name);
-    }
+  public Attr createAttribute(String name) throws DOMException {
+    return new AttrImpl(this, name);
+  }
 
-    public Attr createAttributeNS(String namespaceURI, String qualifiedName)
-            throws DOMException {
-        // TODO Auto-generated method stub
-        return null;
-    }
+  public Attr createAttributeNS(String namespaceURI, String qualifiedName)
+      throws DOMException {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-    public CDATASection createCDATASection(String data) throws DOMException {
-        // TODO Auto-generated method stub
-        return null;
-    }
+  public CDATASection createCDATASection(String data) throws DOMException {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-    public Comment createComment(String data) {
-        // TODO Auto-generated method stub
-        return null;
-    }
+  public Comment createComment(String data) {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-    public DocumentFragment createDocumentFragment() {
-        // TODO Auto-generated method stub
-        return null;
-    }
+  public DocumentFragment createDocumentFragment() {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-    public abstract Element createElement(String tagName) throws DOMException;
+  public abstract Element createElement(String tagName) throws DOMException;
 
-    public Element createElementNS(String namespaceURI, String qualifiedName)
-            throws DOMException {
-        // TODO Auto-generated method stub
-        return null;
-    }
+  public Element createElementNS(String namespaceURI, String qualifiedName)
+      throws DOMException {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-    public EntityReference createEntityReference(String name) throws DOMException {
-        // TODO Auto-generated method stub
-        return null;
-    }
+  public EntityReference createEntityReference(String name) throws DOMException {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-    public ProcessingInstruction createProcessingInstruction(String target, String data)
-            throws DOMException {
-        // TODO Auto-generated method stub
-        return null;
-    }
+  public ProcessingInstruction createProcessingInstruction(String target, String data)
+      throws DOMException {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-    public Text createTextNode(String data) {
-        // TODO Auto-generated method stub
-        return null;
-    }
+  public Text createTextNode(String data) {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-    public DocumentType getDoctype() {
-        // TODO Auto-generated method stub
-        return null;
-    }
+  public DocumentType getDoctype() {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-    public abstract Element getDocumentElement();
+  public abstract Element getDocumentElement();
 
-    public Element getElementById(String elementId) {
-        // TODO Auto-generated method stub
-        return null;
-    }
+  public Element getElementById(String elementId) {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-    public NodeList getElementsByTagName(String tagname) {
-        // TODO Auto-generated method stub
-        return null;
-    }
+  public NodeList getElementsByTagName(String tagname) {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-    public NodeList getElementsByTagNameNS(String namespaceURI, String localName) {
-        // TODO Auto-generated method stub
-        return null;
-    }
+  public NodeList getElementsByTagNameNS(String namespaceURI, String localName) {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-    public DOMImplementation getImplementation() {
-        // TODO Auto-generated method stub
-        return null;
-    }
+  public DOMImplementation getImplementation() {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-    public Node importNode(Node importedNode, boolean deep) throws DOMException {
-        // TODO Auto-generated method stub
-        return null;
-    }
+  public Node importNode(Node importedNode, boolean deep) throws DOMException {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
     /*
      * Node Interface methods
      */
 
-    @Override
-    public short getNodeType() {
-        return Node.DOCUMENT_NODE;
-    }
+  @Override
+  public short getNodeType() {
+    return Node.DOCUMENT_NODE;
+  }
 
-    @Override
-    public String getNodeName() {
-        // The value of nodeName is "#document" when Node is a Document
-        return "#document";
-    }
+  @Override
+  public String getNodeName() {
+    // The value of nodeName is "#document" when Node is a Document
+    return "#document";
+  }
 
-    public String getInputEncoding() {
-        return null;
-    }
+  public String getInputEncoding() {
+    return null;
+  }
 
-    public String getXmlEncoding() {
-        return null;
-    }
+  public String getXmlEncoding() {
+    return null;
+  }
 
-    public boolean getXmlStandalone() {
-        return false;
-    }
+  public boolean getXmlStandalone() {
+    return false;
+  }
 
-    public void setXmlStandalone(boolean xmlStandalone) throws DOMException {}
+  public void setXmlStandalone(boolean xmlStandalone) throws DOMException {
+  }
 
-    public String getXmlVersion() {
-        return null;
-    }
+  public String getXmlVersion() {
+    return null;
+  }
 
-    public void setXmlVersion(String xmlVersion) throws DOMException {}
+  public void setXmlVersion(String xmlVersion) throws DOMException {
+  }
 
-    public boolean getStrictErrorChecking() {
-        return true;
-    }
+  public boolean getStrictErrorChecking() {
+    return true;
+  }
 
-    public void setStrictErrorChecking(boolean strictErrorChecking) {}
+  public void setStrictErrorChecking(boolean strictErrorChecking) {
+  }
 
-    public String getDocumentURI() {
-        return null;
-    }
+  public String getDocumentURI() {
+    return null;
+  }
 
-    public void setDocumentURI(String documentURI) {}
+  public void setDocumentURI(String documentURI) {
+  }
 
-    public Node adoptNode(Node source) throws DOMException {
-        throw new DOMException(DOMException.NOT_SUPPORTED_ERR, null);
-    }
+  public Node adoptNode(Node source) throws DOMException {
+    throw new DOMException(DOMException.NOT_SUPPORTED_ERR, null);
+  }
 
-    public DOMConfiguration getDomConfig() {
-        throw new DOMException(DOMException.NOT_SUPPORTED_ERR, null);
-    }
+  public DOMConfiguration getDomConfig() {
+    throw new DOMException(DOMException.NOT_SUPPORTED_ERR, null);
+  }
 
-    public void normalizeDocument() {
-        throw new DOMException(DOMException.NOT_SUPPORTED_ERR, null);
-    }
+  public void normalizeDocument() {
+    throw new DOMException(DOMException.NOT_SUPPORTED_ERR, null);
+  }
 
-    public Node renameNode(Node n, String namespaceURI, String qualifiedName)
-            throws DOMException {
-        throw new DOMException(DOMException.NOT_SUPPORTED_ERR, null);
-    }
+  public Node renameNode(Node n, String namespaceURI, String qualifiedName)
+      throws DOMException {
+    throw new DOMException(DOMException.NOT_SUPPORTED_ERR, null);
+  }
 }

@@ -20,36 +20,34 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
-import android.net.NetworkRequest;
 import android.net.NetworkInfo;
+import android.net.NetworkRequest;
 import android.net.SSLCertificateSocketFactory;
 import android.os.Build;
 import android.os.SystemClock;
-
-import timber.log.Timber;
-
 import com.android.mms.service_alt.exception.MmsNetworkException;
 import com.squareup.okhttp.ConnectionPool;
-
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import timber.log.Timber;
 
 public class MmsNetworkManager implements com.squareup.okhttp.internal.Network {
+
     private static final String TAG = "MmsNetworkManager";
     // Timeout used to call ConnectivityManager.requestNetwork
     private static final int NETWORK_REQUEST_TIMEOUT_MILLIS = 60 * 1000;
     // Wait timeout for this class, a little bit longer than the above timeout
     // to make sure we don't bail prematurely
     private static final int NETWORK_ACQUIRE_TIMEOUT_MILLIS =
-            NETWORK_REQUEST_TIMEOUT_MILLIS + (5 * 1000);
+        NETWORK_REQUEST_TIMEOUT_MILLIS + (5 * 1000);
 
     // Borrowed from {@link android.net.Network}
     private static final boolean httpKeepAlive =
-            Boolean.parseBoolean(System.getProperty("http.keepAlive", "true"));
+        Boolean.parseBoolean(System.getProperty("http.keepAlive", "true"));
     private static final int httpMaxConnections =
-            httpKeepAlive ? Integer.parseInt(System.getProperty("http.maxConnections", "5")) : 0;
+        httpKeepAlive ? Integer.parseInt(System.getProperty("http.maxConnections", "5")) : 0;
     private static final long httpKeepAliveDurationMs =
-            Long.parseLong(System.getProperty("http.keepAliveDuration", "300000"));  // 5 minutes.
+        Long.parseLong(System.getProperty("http.keepAliveDuration", "300000"));  // 5 minutes.
 
     private final Context mContext;
 
@@ -91,21 +89,21 @@ public class MmsNetworkManager implements com.squareup.okhttp.internal.Network {
         if (!MmsRequest.useWifi(context)) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
                 mNetworkRequest = new NetworkRequest.Builder()
-                        .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
-                        .addCapability(NetworkCapabilities.NET_CAPABILITY_MMS)
-                        .setNetworkSpecifier(Integer.toString(mSubId))
-                        .build();
+                    .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
+                    .addCapability(NetworkCapabilities.NET_CAPABILITY_MMS)
+                    .setNetworkSpecifier(Integer.toString(mSubId))
+                    .build();
             } else {
                 mNetworkRequest = new NetworkRequest.Builder()
-                        .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
-                        .addCapability(NetworkCapabilities.NET_CAPABILITY_MMS)
-                        .build();
+                    .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
+                    .addCapability(NetworkCapabilities.NET_CAPABILITY_MMS)
+                    .build();
             }
         } else {
             mNetworkRequest = new NetworkRequest.Builder()
-                    .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-                    .build();
-        }
+                .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                .build();
+    }
 
         MmsConfigManager.getInstance().init(context);
     }
@@ -133,7 +131,7 @@ public class MmsNetworkManager implements com.squareup.okhttp.internal.Network {
                     this.wait(waitTime);
                 } catch (InterruptedException e) {
                     Timber.w("MmsNetworkManager: acquire network wait interrupted");
-                }
+        }
                 if (mNetwork != null || permissionError) {
                     // Success
                     return mNetwork;
@@ -145,7 +143,7 @@ public class MmsNetworkManager implements com.squareup.okhttp.internal.Network {
             Timber.d("MmsNetworkManager: timed out");
             releaseRequestLocked(mNetworkCallback);
             throw new MmsNetworkException("Acquiring network timed out");
-        }
+    }
     }
 
     /**
@@ -158,9 +156,9 @@ public class MmsNetworkManager implements com.squareup.okhttp.internal.Network {
                 Timber.d("MmsNetworkManager: release, count=" + mMmsRequestCount);
                 if (mMmsRequestCount < 1) {
                     releaseRequestLocked(mNetworkCallback);
-                }
-            }
         }
+            }
+    }
     }
 
     /**
@@ -203,11 +201,11 @@ public class MmsNetworkManager implements com.squareup.okhttp.internal.Network {
 
         try {
             connectivityManager.requestNetwork(
-                    mNetworkRequest, mNetworkCallback);
+                mNetworkRequest, mNetworkCallback);
         } catch (SecurityException e) {
             Timber.e(e);
             permissionError = true;
-        }
+    }
     }
 
     /**
@@ -224,7 +222,7 @@ public class MmsNetworkManager implements com.squareup.okhttp.internal.Network {
             } catch (Exception e) {
                 Timber.e(e);
             }
-        }
+    }
         resetLocked();
     }
 
@@ -253,22 +251,22 @@ public class MmsNetworkManager implements com.squareup.okhttp.internal.Network {
                 return EMPTY_ADDRESS_ARRAY;
             }
             network = mNetwork;
-        }
+    }
         return network.getAllByName(host);
     }
 
     private ConnectivityManager getConnectivityManager() {
         if (mConnectivityManager == null) {
             mConnectivityManager = (ConnectivityManager) mContext.getSystemService(
-                    Context.CONNECTIVITY_SERVICE);
-        }
+                Context.CONNECTIVITY_SERVICE);
+    }
         return mConnectivityManager;
     }
 
     private ConnectionPool getOrCreateConnectionPoolLocked() {
         if (mConnectionPool == null) {
             mConnectionPool = new ConnectionPool(httpMaxConnections, httpKeepAliveDurationMs);
-        }
+    }
         return mConnectionPool;
     }
 
@@ -283,20 +281,20 @@ public class MmsNetworkManager implements com.squareup.okhttp.internal.Network {
                 if (mNetwork != null) {
                     // Create new MmsHttpClient for the current Network
                     mMmsHttpClient = new MmsHttpClient(
-                            mContext,
-                            mNetwork.getSocketFactory(),
-                            MmsNetworkManager.this,
-                            getOrCreateConnectionPoolLocked());
+                        mContext,
+                        mNetwork.getSocketFactory(),
+                        MmsNetworkManager.this,
+                        getOrCreateConnectionPoolLocked());
                 } else if (permissionError) {
                     mMmsHttpClient = new MmsHttpClient(
-                            mContext,
-                            new SSLCertificateSocketFactory(NETWORK_REQUEST_TIMEOUT_MILLIS),
-                            MmsNetworkManager.this,
-                            getOrCreateConnectionPoolLocked());
-                }
+                        mContext,
+                        new SSLCertificateSocketFactory(NETWORK_REQUEST_TIMEOUT_MILLIS),
+                        MmsNetworkManager.this,
+                        getOrCreateConnectionPoolLocked());
+        }
             }
             return mMmsHttpClient;
-        }
+    }
     }
 
     /**
@@ -310,12 +308,12 @@ public class MmsNetworkManager implements com.squareup.okhttp.internal.Network {
             if (mNetwork == null) {
                 Timber.d("MmsNetworkManager: getApnName: network not available");
                 mNetworkRequest = new NetworkRequest.Builder()
-                        .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-                        .build();
+                    .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                    .build();
                 return null;
             }
             network = mNetwork;
-        }
+    }
         String apnName = null;
         final ConnectivityManager connectivityManager = getConnectivityManager();
         NetworkInfo mmsNetworkInfo = connectivityManager.getNetworkInfo(network);

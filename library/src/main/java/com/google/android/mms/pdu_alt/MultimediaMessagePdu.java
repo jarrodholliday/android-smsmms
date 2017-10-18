@@ -21,129 +21,130 @@ import com.google.android.mms.InvalidHeaderValueException;
 /**
  * Multimedia message PDU.
  */
-public class MultimediaMessagePdu extends GenericPdu{
-    /**
-     * The body.
-     */
-    private PduBody mMessageBody;
+public class MultimediaMessagePdu extends GenericPdu {
 
-    /**
-     * Constructor.
-     */
-    public MultimediaMessagePdu() {
-        super();
-    }
+  /**
+   * The body.
+   */
+  private PduBody mMessageBody;
 
-    /**
-     * Constructor.
-     *
-     * @param header the header of this PDU
-     * @param body the body of this PDU
-     */
-    public MultimediaMessagePdu(PduHeaders header, PduBody body) {
-        super(header);
-        mMessageBody = body;
-    }
+  /**
+   * Constructor.
+   */
+  public MultimediaMessagePdu() {
+    super();
+  }
 
-    /**
-     * Constructor with given headers.
-     *
-     * @param headers Headers for this PDU.
-     */
-    MultimediaMessagePdu(PduHeaders headers) {
-        super(headers);
-    }
+  /**
+   * Constructor.
+   *
+   * @param header the header of this PDU
+   * @param body the body of this PDU
+   */
+  public MultimediaMessagePdu(PduHeaders header, PduBody body) {
+    super(header);
+    mMessageBody = body;
+  }
 
-    /**
-     * Get body of the PDU.
-     *
-     * @return the body
-     */
-    public PduBody getBody() {
-        return mMessageBody;
-    }
+  /**
+   * Constructor with given headers.
+   *
+   * @param headers Headers for this PDU.
+   */
+  MultimediaMessagePdu(PduHeaders headers) {
+    super(headers);
+  }
 
-    /**
-     * Set body of the PDU.
-     *
-     * @param body the body
-     */
-    public void setBody(PduBody body) {
-        mMessageBody = body;
-    }
+  /**
+   * Get body of the PDU.
+   *
+   * @return the body
+   */
+  public PduBody getBody() {
+    return mMessageBody;
+  }
 
-    /**
-     * Get subject.
-     *
-     * @return the value
-     */
-    public EncodedStringValue getSubject() {
-        return mPduHeaders.getEncodedStringValue(PduHeaders.SUBJECT);
-    }
+  /**
+   * Set body of the PDU.
+   *
+   * @param body the body
+   */
+  public void setBody(PduBody body) {
+    mMessageBody = body;
+  }
 
-    /**
-     * Set subject.
-     *
-     * @param value the value
-     * @throws NullPointerException if the value is null.
-     */
-    public void setSubject(EncodedStringValue value) {
-        mPduHeaders.setEncodedStringValue(value, PduHeaders.SUBJECT);
-    }
+  /**
+   * Get subject.
+   *
+   * @return the value
+   */
+  public EncodedStringValue getSubject() {
+    return mPduHeaders.getEncodedStringValue(PduHeaders.SUBJECT);
+  }
 
-    /**
-     * Get To value.
-     *
-     * @return the value
-     */
-    public EncodedStringValue[] getTo() {
-        return mPduHeaders.getEncodedStringValues(PduHeaders.TO);
-    }
+  /**
+   * Set subject.
+   *
+   * @param value the value
+   * @throws NullPointerException if the value is null.
+   */
+  public void setSubject(EncodedStringValue value) {
+    mPduHeaders.setEncodedStringValue(value, PduHeaders.SUBJECT);
+  }
 
-    /**
-     * Add a "To" value.
-     *
-     * @param value the value
-     * @throws NullPointerException if the value is null.
-     */
-    public void addTo(EncodedStringValue value) {
-        mPduHeaders.appendEncodedStringValue(value, PduHeaders.TO);
-    }
+  /**
+   * Get To value.
+   *
+   * @return the value
+   */
+  public EncodedStringValue[] getTo() {
+    return mPduHeaders.getEncodedStringValues(PduHeaders.TO);
+  }
 
-    /**
-     * Get X-Mms-Priority value.
-     *
-     * @return the value
-     */
-    public int getPriority() {
-        return mPduHeaders.getOctet(PduHeaders.PRIORITY);
-    }
+  /**
+   * Add a "To" value.
+   *
+   * @param value the value
+   * @throws NullPointerException if the value is null.
+   */
+  public void addTo(EncodedStringValue value) {
+    mPduHeaders.appendEncodedStringValue(value, PduHeaders.TO);
+  }
 
-    /**
-     * Set X-Mms-Priority value.
-     *
-     * @param value the value
-     * @throws InvalidHeaderValueException if the value is invalid.
-     */
-    public void setPriority(int value) throws InvalidHeaderValueException {
-        mPduHeaders.setOctet(value, PduHeaders.PRIORITY);
-    }
+  /**
+   * Get X-Mms-Priority value.
+   *
+   * @return the value
+   */
+  public int getPriority() {
+    return mPduHeaders.getOctet(PduHeaders.PRIORITY);
+  }
 
-    /**
-     * Get Date value.
-     *
-     * @return the value
-     */
-    public long getDate() {
-        return mPduHeaders.getLongInteger(PduHeaders.DATE);
-    }
+  /**
+   * Set X-Mms-Priority value.
+   *
+   * @param value the value
+   * @throws InvalidHeaderValueException if the value is invalid.
+   */
+  public void setPriority(int value) throws InvalidHeaderValueException {
+    mPduHeaders.setOctet(value, PduHeaders.PRIORITY);
+  }
 
-    /**
-     * Set Date value in seconds.
-     *
-     * @param value the value
-     */
-    public void setDate(long value) {
-        mPduHeaders.setLongInteger(value, PduHeaders.DATE);
-    }
+  /**
+   * Get Date value.
+   *
+   * @return the value
+   */
+  public long getDate() {
+    return mPduHeaders.getLongInteger(PduHeaders.DATE);
+  }
+
+  /**
+   * Set Date value in seconds.
+   *
+   * @param value the value
+   */
+  public void setDate(long value) {
+    mPduHeaders.setLongInteger(value, PduHeaders.DATE);
+  }
 }

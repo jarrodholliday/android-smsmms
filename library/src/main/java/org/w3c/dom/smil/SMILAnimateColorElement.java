@@ -13,8 +13,9 @@
 package org.w3c.dom.smil;
 
 /**
- *  This interface represents the SMIL <code>animateColor</code> element. 
+ * This interface represents the SMIL <code>animateColor</code> element.
  */
 public interface SMILAnimateColorElement extends SMILAnimation {
+
 }
 

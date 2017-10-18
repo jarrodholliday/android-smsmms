@@ -27,6 +27,7 @@ import java.lang.reflect.Array;
  * the most efficient increments by which to grow arrays.
  */
 public class ArrayUtils {
+
     private static Object[] EMPTY = new Object[0];
     private static final int CACHE_SIZE = 73;
     private static Object[] sCache = new Object[CACHE_SIZE];
@@ -34,9 +35,11 @@ public class ArrayUtils {
     private ArrayUtils() { /* cannot be instantiated */ }
 
     public static int idealByteArraySize(int need) {
-        for (int i = 4; i < 32; i++)
-            if (need <= (1 << i) - 12)
+        for (int i = 4; i < 32; i++) {
+            if (need <= (1 << i) - 12) {
                 return (1 << i) - 12;
+            }
+        }
 
         return need;
     }
@@ -80,7 +83,7 @@ public class ArrayUtils {
     public static boolean equals(byte[] array1, byte[] array2, int length) {
         if (array1 == array2) {
             return true;
-        }
+    }
         if (array1 == null || array2 == null || array1.length < length || array2.length < length) {
             return false;
         }
@@ -101,7 +104,7 @@ public class ArrayUtils {
     public static <T> T[] emptyArray(Class<T> kind) {
         if (kind == Object.class) {
             return (T[]) EMPTY;
-        }
+    }
 
         int bucket = ((System.identityHashCode(kind) / 8) & 0x7FFFFFFF) % CACHE_SIZE;
         Object cache = sCache[bucket];
@@ -126,11 +129,15 @@ public class ArrayUtils {
     public static <T> boolean contains(T[] array, T value) {
         for (T element : array) {
             if (element == null) {
-                if (value == null) return true;
+                if (value == null) {
+                    return true;
+                }
             } else {
-                if (value != null && element.equals(value)) return true;
+                if (value != null && element.equals(value)) {
+                    return true;
+                }
             }
-        }
+    }
         return false;
     }
 
@@ -139,7 +146,7 @@ public class ArrayUtils {
             if (element == value) {
                 return true;
             }
-        }
+    }
         return false;
     }
 
@@ -147,14 +154,14 @@ public class ArrayUtils {
         long total = 0;
         for (long value : array) {
             total += value;
-        }
+    }
         return total;
     }
 
     /**
      * Appends an element to a copy of the array and returns the copy.
      *
-     * @param array   The original array, or null to represent an empty array.
+     * @param array The original array, or null to represent an empty array.
      * @param element The element to add.
      * @return A new array that contains all of the elements of the original array
      * with the specified element added at the end.
@@ -170,7 +177,7 @@ public class ArrayUtils {
         } else {
             end = 0;
             result = (T[]) Array.newInstance(kind, 1);
-        }
+    }
         result[end] = element;
         return result;
     }
@@ -179,7 +186,7 @@ public class ArrayUtils {
      * Removes an element from a copy of the array and returns the copy.
      * If the element is not present, then the original array is returned unmodified.
      *
-     * @param array   The original array, or null to represent an empty array.
+     * @param array The original array, or null to represent an empty array.
      * @param element The element to remove.
      * @return A new array that contains all of the elements of the original array
      * except the first copy of the specified element removed.  If the specified element
@@ -199,16 +206,16 @@ public class ArrayUtils {
                     System.arraycopy(array, 0, result, 0, i);
                     System.arraycopy(array, i + 1, result, i, length - i - 1);
                     return result;
-                }
-            }
         }
+            }
+    }
         return array;
     }
 
     public static int[] appendInt(int[] cur, int val) {
         if (cur == null) {
             return new int[]{val};
-        }
+    }
         final int N = cur.length;
         for (int i = 0; i < N; i++) {
             if (cur[i] == val) {
@@ -231,13 +238,13 @@ public class ArrayUtils {
                 int[] ret = new int[N - 1];
                 if (i > 0) {
                     System.arraycopy(cur, 0, ret, 0, i);
-                }
+        }
                 if (i < (N - 1)) {
                     System.arraycopy(cur, i + 1, ret, i, N - i - 1);
-                }
-                return ret;
-            }
         }
+        return ret;
+            }
+    }
         return cur;
     }
 }

@@ -21,8 +21,6 @@ import android.content.Context;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.provider.Telephony;
-import android.util.Log;
-
 import com.android.mms.transaction.NotificationTransaction;
 import com.google.android.mms.MmsException;
 import com.google.android.mms.pdu_alt.PduParser;
@@ -67,7 +65,7 @@ public class MmsRequestManager implements MmsRequest.RequestManager {
         if (response == null || response.length < 1) {
             Timber.e("empty response");
             return false;
-        }
+    }
         try {
             // Parse M-Retrieve.conf
             RetrieveConf retrieveConf = (RetrieveConf) new PduParser(response).parse();
@@ -81,20 +79,21 @@ public class MmsRequestManager implements MmsRequest.RequestManager {
             try {
                 group = com.klinker.android.send_message.Transaction.settings.getGroup();
             } catch (Exception e) {
-                group = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("group_message", true);
+                group = PreferenceManager.getDefaultSharedPreferences(context)
+                    .getBoolean("group_message", true);
             }
 
             // Store M-Retrieve.conf into Inbox
             PduPersister persister = PduPersister.getPduPersister(context);
             msgUri = persister.persist(retrieveConf, Telephony.Mms.Inbox.CONTENT_URI, true,
-                    group, null);
+                group, null);
 
             // Use local time instead of PDU time
             ContentValues values = new ContentValues(2);
             values.put(Telephony.Mms.DATE, System.currentTimeMillis() / 1000L);
             values.put(Telephony.Mms.MESSAGE_SIZE, response.length);
             SqliteWrapper.update(context, context.getContentResolver(),
-                    msgUri, values, null, null);
+                msgUri, values, null, null);
 
             // Send ACK to the Proxy-Relay to indicate we have fetched the
             // MM successfully.
@@ -102,7 +101,7 @@ public class MmsRequestManager implements MmsRequest.RequestManager {
             // sendAcknowledgeInd(retrieveConf);
         } catch (Throwable t) {
             timber.log.Timber.e(t);
-        }
+    }
 
         return false;
     }

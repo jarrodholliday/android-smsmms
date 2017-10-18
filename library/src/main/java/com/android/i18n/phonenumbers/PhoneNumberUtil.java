@@ -17,28 +17,29 @@
 package com.android.i18n.phonenumbers;
 
 public class PhoneNumberUtil {
-    private static PhoneNumberUtil instance;
 
-    public static PhoneNumberUtil getInstance() {
-        return instance;
-    }
+  private static PhoneNumberUtil instance;
 
-    public String format(Phonenumber.PhoneNumber parsed, PhoneNumberFormat format) {
-        return null;
-    }
+  public static PhoneNumberUtil getInstance() {
+    return instance;
+  }
 
-    public Phonenumber.PhoneNumber parse(String s, String s2) throws NumberParseException {
-        return new Phonenumber.PhoneNumber();
-    }
+  public String format(Phonenumber.PhoneNumber parsed, PhoneNumberFormat format) {
+    return null;
+  }
 
-    public boolean isValidNumber(Phonenumber.PhoneNumber phoneNumber) {
-        return true;
-    }
+  public Phonenumber.PhoneNumber parse(String s, String s2) throws NumberParseException {
+    return new Phonenumber.PhoneNumber();
+  }
 
-    public enum PhoneNumberFormat {
-        E164,
-        INTERNATIONAL,
-        NATIONAL,
-        RFC3966
-    }
+  public boolean isValidNumber(Phonenumber.PhoneNumber phoneNumber) {
+    return true;
+  }
+
+  public enum PhoneNumberFormat {
+    E164,
+    INTERNATIONAL,
+    NATIONAL,
+    RFC3966
+  }
 }

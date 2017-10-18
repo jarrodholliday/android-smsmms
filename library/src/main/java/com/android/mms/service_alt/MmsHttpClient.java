@@ -19,7 +19,6 @@ package com.android.mms.service_alt;
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
-
 import com.android.mms.service_alt.exception.MmsHttpException;
 import com.squareup.okhttp.ConnectionPool;
 import com.squareup.okhttp.ConnectionSpec;
@@ -30,7 +29,6 @@ import com.squareup.okhttp.Response;
 import com.squareup.okhttp.internal.Internal;
 import com.squareup.okhttp.internal.huc.HttpURLConnectionImpl;
 import com.squareup.okhttp.internal.huc.HttpsURLConnectionImpl;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
@@ -62,6 +60,7 @@ import timber.log.Timber;
  * MMS HTTP client for sending and downloading MMS messages
  */
 public class MmsHttpClient {
+
     private static final String TAG = "MmsHttpClient";
 
     public static final String METHOD_POST = "POST";
@@ -74,12 +73,12 @@ public class MmsHttpClient {
 
     // The "Accept" header value
     private static final String HEADER_VALUE_ACCEPT =
-            "*/*, application/vnd.wap.mms-message, application/vnd.wap.sic";
+        "*/*, application/vnd.wap.mms-message, application/vnd.wap.sic";
     // The "Content-Type" header value
     private static final String HEADER_VALUE_CONTENT_TYPE_WITH_CHARSET =
-            "application/vnd.wap.mms-message; charset=utf-8";
+        "application/vnd.wap.mms-message; charset=utf-8";
     private static final String HEADER_VALUE_CONTENT_TYPE_WITHOUT_CHARSET =
-            "application/vnd.wap.mms-message";
+        "application/vnd.wap.mms-message";
 
     private final Context mContext;
     private final SocketFactory mSocketFactory;
@@ -94,8 +93,9 @@ public class MmsHttpClient {
      * @param hostResolver The host name resolver for creating an OKHttp client
      * @param connectionPool The connection pool for creating an OKHttp client
      */
-    public MmsHttpClient(Context context, SocketFactory socketFactory, MmsNetworkManager hostResolver,
-            ConnectionPool connectionPool) {
+    public MmsHttpClient(Context context, SocketFactory socketFactory,
+        MmsNetworkManager hostResolver,
+        ConnectionPool connectionPool) {
         mContext = context;
         mSocketFactory = socketFactory;
         mHostResolver = hostResolver;
@@ -106,7 +106,7 @@ public class MmsHttpClient {
      * Execute an MMS HTTP request, either a POST (sending) or a GET (downloading)
      *
      * @param urlString The request URL, for sending it is usually the MMSC, and for downloading
-     *                  it is the message URL
+     * it is the message URL
      * @param pdu For POST (sending) only, the PDU to send
      * @param method HTTP method, POST for sending and GET for downloading
      * @param isProxySet Is there a proxy for the MMSC
@@ -117,11 +117,11 @@ public class MmsHttpClient {
      * @throws MmsHttpException For any failures
      */
     public byte[] execute(String urlString, byte[] pdu, String method, boolean isProxySet,
-            String proxyHost, int proxyPort, MmsConfig.Overridden mmsConfig)
-            throws MmsHttpException {
+        String proxyHost, int proxyPort, MmsConfig.Overridden mmsConfig)
+        throws MmsHttpException {
         Timber.d("HTTP: " + method + " " + redactUrlForNonVerbose(urlString)
-                + (isProxySet ? (", proxy=" + proxyHost + ":" + proxyPort) : "")
-                + ", PDU size=" + (pdu != null ? pdu.length : 0));
+            + (isProxySet ? (", proxy=" + proxyHost + ":" + proxyPort) : "")
+            + ", PDU size=" + (pdu != null ? pdu.length : 0));
         checkMethod(method);
         HttpURLConnection connection = null;
         try {
@@ -139,7 +139,7 @@ public class MmsHttpClient {
             connection.setRequestProperty(HEADER_ACCEPT, HEADER_VALUE_ACCEPT);
             // Header: Accept-Language
             connection.setRequestProperty(
-                    HEADER_ACCEPT_LANGUAGE, getCurrentAcceptLanguage(Locale.getDefault()));
+                HEADER_ACCEPT_LANGUAGE, getCurrentAcceptLanguage(Locale.getDefault()));
             // Header: User-Agent
             final String userAgent = mmsConfig.getUserAgent();
             Timber.i("HTTP: User-Agent=" + userAgent);
@@ -158,15 +158,15 @@ public class MmsHttpClient {
                 if (pdu == null || pdu.length < 1) {
                     Timber.e("HTTP: empty pdu");
                     throw new MmsHttpException(0/*statusCode*/, "Sending empty PDU");
-                }
+        }
                 connection.setDoOutput(true);
                 connection.setRequestMethod(METHOD_POST);
                 if (mmsConfig.getSupportHttpCharsetHeader()) {
                     connection.setRequestProperty(HEADER_CONTENT_TYPE,
-                            HEADER_VALUE_CONTENT_TYPE_WITH_CHARSET);
+                        HEADER_VALUE_CONTENT_TYPE_WITH_CHARSET);
                 } else {
                     connection.setRequestProperty(HEADER_CONTENT_TYPE,
-                            HEADER_VALUE_CONTENT_TYPE_WITHOUT_CHARSET);
+                        HEADER_VALUE_CONTENT_TYPE_WITHOUT_CHARSET);
                 }
                 if (Log.isLoggable(TAG, Log.VERBOSE)) {
                     logHttpHeaders(connection.getRequestProperties());
@@ -174,7 +174,7 @@ public class MmsHttpClient {
                 connection.setFixedLengthStreamingMode(pdu.length);
                 // Sending request body
                 final OutputStream out =
-                        new BufferedOutputStream(connection.getOutputStream());
+                    new BufferedOutputStream(connection.getOutputStream());
                 out.write(pdu);
                 out.flush();
                 out.close();
@@ -204,7 +204,7 @@ public class MmsHttpClient {
             in.close();
             final byte[] responseBody = byteOut.toByteArray();
             Timber.d("HTTP: response size="
-                    + (responseBody != null ? responseBody.length : 0));
+                + (responseBody != null ? responseBody.length : 0));
             return responseBody;
         } catch (MalformedURLException e) {
             final String redactedUrl = redactUrlForNonVerbose(urlString);
@@ -221,7 +221,7 @@ public class MmsHttpClient {
             if (connection != null) {
                 connection.disconnect();
             }
-        }
+    }
     }
 
     /**
@@ -237,7 +237,8 @@ public class MmsHttpClient {
      * @return The opened HttpURLConnection
      * @throws MalformedURLException If URL is malformed
      */
-    private HttpURLConnection openConnection(URL url, final Proxy proxy) throws MalformedURLException {
+    private HttpURLConnection openConnection(URL url, final Proxy proxy)
+        throws MalformedURLException {
         final String protocol = url.getProtocol();
         OkHttpClient okHttpClient;
         if (protocol.equals("http")) {
@@ -266,7 +267,8 @@ public class MmsHttpClient {
                 }
 
                 @Override
-                public Request authenticateProxy(Proxy proxy, Response response) throws IOException {
+                public Request authenticateProxy(Proxy proxy, Response response)
+                    throws IOException {
                     return null;
                 }
             });
@@ -304,9 +306,10 @@ public class MmsHttpClient {
                 }
 
                 @Override
-                public Request authenticateProxy(Proxy proxy, Response response) throws IOException {
+                public Request authenticateProxy(Proxy proxy, Response response)
+                    throws IOException {
                     return null;
-                }
+        }
             });
             okHttpClient.setConnectionSpecs(Arrays.asList(ConnectionSpec.CLEARTEXT));
             okHttpClient.setConnectionPool(new ConnectionPool(3, 60000));
@@ -315,7 +318,7 @@ public class MmsHttpClient {
             return new HttpsURLConnectionImpl(url, okHttpClient);
         } else {
             throw new MalformedURLException("Invalid URL or unrecognized protocol " + protocol);
-        }
+    }
     }
 
     private static void logHttpHeaders(Map<String, List<String>> headers) {
@@ -328,16 +331,16 @@ public class MmsHttpClient {
                     for (String value : values) {
                         sb.append(key).append('=').append(value).append('\n');
                     }
-                }
+        }
             }
             Timber.v("HTTP: headers\n" + sb.toString());
-        }
+    }
     }
 
     private static void checkMethod(String method) throws MmsHttpException {
         if (!METHOD_GET.equals(method) && !METHOD_POST.equals(method)) {
             throw new MmsHttpException(0/*statusCode*/, "Invalid method " + method);
-        }
+    }
     }
 
     private static final String ACCEPT_LANG_FOR_US_LOCALE = "en-US";
@@ -358,7 +361,7 @@ public class MmsHttpClient {
                 buffer.append(", ");
             }
             buffer.append(ACCEPT_LANG_FOR_US_LOCALE);
-        }
+    }
 
         return buffer.toString();
     }
@@ -370,7 +373,7 @@ public class MmsHttpClient {
     private static String convertObsoleteLanguageCodeToNew(String langCode) {
         if (langCode == null) {
             return null;
-        }
+    }
         if ("iw".equals(langCode)) {
             // Hebrew
             return "he";
@@ -393,10 +396,11 @@ public class MmsHttpClient {
                 builder.append("-");
                 builder.append(country);
             }
-        }
+    }
     }
 
     private static final Pattern MACRO_P = Pattern.compile("##(\\S+)##");
+
     /**
      * Resolve the macro in HTTP param value text
      * For example, "something##LINE1##something" is resolved to "something9139531419something"
@@ -405,10 +409,10 @@ public class MmsHttpClient {
      * @return The HTTP param with macro resolved to real value
      */
     private static String resolveMacro(Context context, String value,
-            MmsConfig.Overridden mmsConfig) {
+        MmsConfig.Overridden mmsConfig) {
         if (TextUtils.isEmpty(value)) {
             return value;
-        }
+    }
         final Matcher matcher = MACRO_P.matcher(value);
         int nextStart = 0;
         StringBuilder replaced = null;
@@ -457,23 +461,20 @@ public class MmsHttpClient {
                         // Add the header if the param is valid
                         connection.setRequestProperty(name, value);
                     }
-                }
-            }
         }
+            }
+    }
     }
 
     /**
      * Redact the URL for non-VERBOSE logging. Replace url with only the host part and the length
      * of the input URL string.
-     *
-     * @param urlString
-     * @return
      */
     public static String redactUrlForNonVerbose(String urlString) {
         if (Log.isLoggable(TAG, Log.VERBOSE)) {
             // Don't redact for VERBOSE level logging
             return urlString;
-        }
+    }
         if (TextUtils.isEmpty(urlString)) {
             return urlString;
         }
@@ -489,7 +490,7 @@ public class MmsHttpClient {
         // Print "http://host[length]"
         final StringBuilder sb = new StringBuilder();
         sb.append(protocol).append("://").append(host)
-                .append("[").append(urlString.length()).append("]");
+            .append("[").append(urlString.length()).append("]");
         return sb.toString();
     }
 }

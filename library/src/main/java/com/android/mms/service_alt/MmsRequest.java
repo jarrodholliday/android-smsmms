@@ -30,16 +30,16 @@ import android.provider.Settings;
 import android.service.carrier.CarrierMessagingService;
 import android.telephony.SmsManager;
 import android.telephony.TelephonyManager;
-import timber.log.Timber;
-import com.klinker.android.send_message.Utils;
-
 import com.android.mms.service_alt.exception.ApnException;
 import com.android.mms.service_alt.exception.MmsHttpException;
+import com.klinker.android.send_message.Utils;
+import timber.log.Timber;
 
 /**
  * Base class for MMS requests. This has the common logic of sending/downloading MMS.
  */
 public abstract class MmsRequest {
+
     private static final String TAG = "MmsRequest";
 
     private static final int RETRY_TIMES = 3;
@@ -48,12 +48,13 @@ public abstract class MmsRequest {
      * Interface for certain functionalities from MmsService
      */
     public static interface RequestManager {
-        /**
-         * Enqueue an MMS request
-         *
-         * @param request the request to enqueue
-         */
-        public void addSimRequest(MmsRequest request);
+
+    /**
+     * Enqueue an MMS request
+     *
+     * @param request the request to enqueue
+     */
+    public void addSimRequest(MmsRequest request);
 
         /*
          * @return Whether to auto persist received MMS
@@ -62,6 +63,7 @@ public abstract class MmsRequest {
 
         /**
          * Read pdu (up to maxSize bytes) from supplied content uri
+         *
          * @param contentUri content uri from which to read
          * @param maxSize maximum number of bytes to read
          * @return read pdu (else null in case of error or too big)
@@ -70,6 +72,7 @@ public abstract class MmsRequest {
 
         /**
          * Write pdu to supplied content uri
+         *
          * @param contentUri content uri to which bytes should be written
          * @param pdu pdu bytes to write
          * @return true in case of success (else false)
@@ -91,7 +94,7 @@ public abstract class MmsRequest {
     private boolean mobileDataEnabled;
 
     public MmsRequest(RequestManager requestManager, int subId, String creator,
-            Bundle configOverrides) {
+        Bundle configOverrides) {
         mRequestManager = requestManager;
         mSubId = subId;
         mCreator = creator;
@@ -116,18 +119,18 @@ public abstract class MmsRequest {
             if (config != null) {
                 mMmsConfig = new MmsConfig.Overridden(config, mMmsConfigOverrides);
             }
-        }
+    }
         return mMmsConfig != null;
     }
 
     private static boolean inAirplaneMode(final Context context) {
         return Settings.System.getInt(context.getContentResolver(),
-                Settings.Global.AIRPLANE_MODE_ON, 0) != 0;
+            Settings.Global.AIRPLANE_MODE_ON, 0) != 0;
     }
 
     private static boolean isMobileDataEnabled(final Context context, final int subId) {
         final TelephonyManager telephonyManager =
-                (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+            (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
         return Utils.isDataEnabled(telephonyManager, subId);
     }
 
@@ -197,7 +200,7 @@ public abstract class MmsRequest {
                                 throw (e);
                             }
                             Timber.i("MmsRequest: No match with APN name:"
-                                    + apnName + ", try with no name");
+                                + apnName + ", try with no name");
                             apn = ApnSettings.load(context, null, mSubId);
                         }
                         Timber.i("MmsRequest: using " + apn.toString());
@@ -225,11 +228,11 @@ public abstract class MmsRequest {
                     Timber.e(e);
                     result = SmsManager.MMS_ERROR_UNSPECIFIED;
                     break;
-                }
+        }
                 try {
                     Thread.sleep(retryDelaySecs * 1000, 0/*nano*/);
                 } catch (InterruptedException e) {
-                }
+        }
                 retryDelaySecs <<= 1;
             }
         }
@@ -241,7 +244,7 @@ public abstract class MmsRequest {
 
         if (!useWifi(context)) {
             wifi.setWifiEnabled(isWifiEnabled);
-        }
+    }
 
         processResult(context, result, response, httpStatusCode);
     }
@@ -249,7 +252,8 @@ public abstract class MmsRequest {
     /**
      * Process the result of the completed request, including updating the message status
      * in database and sending back the result via pending intents.
-     *  @param context The context
+     *
+     * @param context The context
      * @param result The result code of execution
      * @param response The response body
      * @param httpStatusCode The optional http status code in case of http failure
@@ -284,7 +288,7 @@ public abstract class MmsRequest {
             } catch (PendingIntent.CanceledException e) {
                 Timber.e(e);
             }
-        }
+    }
 
         revokeUriPermission(context);
     }
@@ -294,14 +298,15 @@ public abstract class MmsRequest {
      */
     public static boolean useWifi(Context context) {
         if (Utils.isMmsOverWifiEnabled(context)) {
-            ConnectivityManager mConnMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            ConnectivityManager mConnMgr = (ConnectivityManager) context
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
             if (mConnMgr != null) {
                 NetworkInfo niWF = mConnMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
                 if ((niWF != null) && (niWF.isConnected())) {
                     return true;
-                }
-            }
         }
+            }
+    }
         return false;
     }
 
@@ -311,15 +316,15 @@ public abstract class MmsRequest {
      */
     protected boolean maybeFallbackToRegularDelivery(int carrierMessagingAppResult) {
         if (carrierMessagingAppResult
-                == CarrierMessagingService.SEND_STATUS_RETRY_ON_CARRIER_NETWORK
-                || carrierMessagingAppResult
-                        == CarrierMessagingService.DOWNLOAD_STATUS_RETRY_ON_CARRIER_NETWORK) {
+            == CarrierMessagingService.SEND_STATUS_RETRY_ON_CARRIER_NETWORK
+            || carrierMessagingAppResult
+            == CarrierMessagingService.DOWNLOAD_STATUS_RETRY_ON_CARRIER_NETWORK) {
             Timber.d("Sending/downloading MMS by IP failed.");
             mRequestManager.addSimRequest(MmsRequest.this);
             return true;
         } else {
             return false;
-        }
+    }
     }
 
     /**
@@ -333,7 +338,7 @@ public abstract class MmsRequest {
                 return SmsManager.MMS_ERROR_RETRY;
             default:
                 return SmsManager.MMS_ERROR_UNSPECIFIED;
-        }
+    }
     }
 
     /**
@@ -346,7 +351,7 @@ public abstract class MmsRequest {
      * @throws MmsHttpException If any network error happens
      */
     protected abstract byte[] doHttp(Context context, MmsNetworkManager netMgr, ApnSettings apn)
-            throws MmsHttpException;
+        throws MmsHttpException;
 
     /**
      * @return The PendingIntent associate with the MMS sending invocation
@@ -371,6 +376,7 @@ public abstract class MmsRequest {
 
     /**
      * Prepare to make the HTTP request - will download message for sending
+     *
      * @return true if preparation succeeds (and request can proceed) else false
      */
     protected abstract boolean prepareForHttpRequest();

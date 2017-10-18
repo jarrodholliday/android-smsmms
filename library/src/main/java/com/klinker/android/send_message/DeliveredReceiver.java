@@ -23,9 +23,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import timber.log.Timber;
-
 import java.util.Calendar;
+import timber.log.Timber;
 
 public class DeliveredReceiver extends BroadcastReceiver {
 
@@ -51,7 +50,7 @@ public class DeliveredReceiver extends BroadcastReceiver {
                 delivered.putExtra("result", true);
                 delivered.putExtra("message_uri", uri == null ? "" : uri.toString());
                 BroadcastUtils.sendExplicitBroadcast(
-                        context, delivered, Transaction.NOTIFY_OF_DELIVERY);
+                    context, delivered, Transaction.NOTIFY_OF_DELIVERY);
 
                 if (uri != null) {
                     ContentValues values = new ContentValues();
@@ -60,7 +59,8 @@ public class DeliveredReceiver extends BroadcastReceiver {
                     values.put("read", true);
                     context.getContentResolver().update(uri, values, null, null);
                 } else {
-                    Cursor query = context.getContentResolver().query(Uri.parse("content://sms/sent"), null, null, null, "date desc");
+                    Cursor query = context.getContentResolver()
+                        .query(Uri.parse("content://sms/sent"), null, null, null, "date desc");
 
                     // mark message as delivered in database
                     if (query.moveToFirst()) {
@@ -69,7 +69,8 @@ public class DeliveredReceiver extends BroadcastReceiver {
                         values.put("status", "0");
                         values.put("date_sent", Calendar.getInstance().getTimeInMillis());
                         values.put("read", true);
-                        context.getContentResolver().update(Uri.parse("content://sms/sent"), values, "_id=" + id, null);
+                        context.getContentResolver()
+                            .update(Uri.parse("content://sms/sent"), values, "_id=" + id, null);
                     }
 
                     query.close();
@@ -82,7 +83,7 @@ public class DeliveredReceiver extends BroadcastReceiver {
                 notDelivered.putExtra("result", false);
                 notDelivered.putExtra("message_uri", uri == null ? "" : uri.toString());
                 BroadcastUtils.sendExplicitBroadcast(
-                        context, notDelivered, Transaction.NOTIFY_OF_DELIVERY);
+                    context, notDelivered, Transaction.NOTIFY_OF_DELIVERY);
 
                 if (uri != null) {
                     ContentValues values = new ContentValues();
@@ -92,7 +93,8 @@ public class DeliveredReceiver extends BroadcastReceiver {
                     values.put("error_code", getResultCode());
                     context.getContentResolver().update(uri, values, null, null);
                 } else {
-                    Cursor query2 = context.getContentResolver().query(Uri.parse("content://sms/sent"), null, null, null, "date desc");
+                    Cursor query2 = context.getContentResolver()
+                        .query(Uri.parse("content://sms/sent"), null, null, null, "date desc");
 
                     // mark failed in database
                     if (query2.moveToFirst()) {
@@ -101,13 +103,14 @@ public class DeliveredReceiver extends BroadcastReceiver {
                         values.put("status", "64");
                         values.put("read", true);
                         values.put("error_code", getResultCode());
-                        context.getContentResolver().update(Uri.parse("content://sms/sent"), values, "_id=" + id, null);
+                        context.getContentResolver()
+                            .update(Uri.parse("content://sms/sent"), values, "_id=" + id, null);
                     }
 
                     query2.close();
-                }
-                break;
         }
+                break;
+    }
 
         BroadcastUtils.sendExplicitBroadcast(context, new Intent(), Transaction.REFRESH);
     }

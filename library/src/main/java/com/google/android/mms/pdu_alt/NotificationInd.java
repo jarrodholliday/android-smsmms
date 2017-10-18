@@ -22,216 +22,217 @@ import com.google.android.mms.InvalidHeaderValueException;
  * M-Notification.ind PDU.
  */
 public class NotificationInd extends GenericPdu {
-    /**
-     * Empty constructor.
-     * Since the Pdu corresponding to this class is constructed
-     * by the Proxy-Relay server, this class is only instantiated
-     * by the Pdu Parser.
-     *
-     * @throws InvalidHeaderValueException if error occurs.
-     *         RuntimeException if an undeclared error occurs.
-     */
-    public NotificationInd() throws InvalidHeaderValueException {
-        super();
-        setMessageType(PduHeaders.MESSAGE_TYPE_NOTIFICATION_IND);
-    }
 
-    /**
-     * Constructor with given headers.
-     *
-     * @param headers Headers for this PDU.
-     */
-    NotificationInd(PduHeaders headers) {
-        super(headers);
-    }
+  /**
+   * Empty constructor.
+   * Since the Pdu corresponding to this class is constructed
+   * by the Proxy-Relay server, this class is only instantiated
+   * by the Pdu Parser.
+   *
+   * @throws InvalidHeaderValueException if error occurs.
+   * RuntimeException if an undeclared error occurs.
+   */
+  public NotificationInd() throws InvalidHeaderValueException {
+    super();
+    setMessageType(PduHeaders.MESSAGE_TYPE_NOTIFICATION_IND);
+  }
 
-    /**
-     * Get X-Mms-Content-Class Value.
-     *
-     * @return the value
-     */
-    public int getContentClass() {
-        return mPduHeaders.getOctet(PduHeaders.CONTENT_CLASS);
-    }
+  /**
+   * Constructor with given headers.
+   *
+   * @param headers Headers for this PDU.
+   */
+  NotificationInd(PduHeaders headers) {
+    super(headers);
+  }
 
-    /**
-     * Set X-Mms-Content-Class Value.
-     *
-     * @param value the value
-     * @throws InvalidHeaderValueException if the value is invalid.
-     *         RuntimeException if an undeclared error occurs.
-     */
-    public void setContentClass(int value) throws InvalidHeaderValueException {
-        mPduHeaders.setOctet(value, PduHeaders.CONTENT_CLASS);
-    }
+  /**
+   * Get X-Mms-Content-Class Value.
+   *
+   * @return the value
+   */
+  public int getContentClass() {
+    return mPduHeaders.getOctet(PduHeaders.CONTENT_CLASS);
+  }
 
-    /**
-     * Get X-Mms-Content-Location value.
-     * When used in a PDU other than M-Mbox-Delete.conf and M-Delete.conf:
-     * Content-location-value = Uri-value
-     *
-     * @return the value
-     */
-    public byte[] getContentLocation() {
-        return mPduHeaders.getTextString(PduHeaders.CONTENT_LOCATION);
-    }
+  /**
+   * Set X-Mms-Content-Class Value.
+   *
+   * @param value the value
+   * @throws InvalidHeaderValueException if the value is invalid.
+   * RuntimeException if an undeclared error occurs.
+   */
+  public void setContentClass(int value) throws InvalidHeaderValueException {
+    mPduHeaders.setOctet(value, PduHeaders.CONTENT_CLASS);
+  }
 
-    /**
-     * Set X-Mms-Content-Location value.
-     *
-     * @param value the value
-     * @throws NullPointerException if the value is null.
-     *         RuntimeException if an undeclared error occurs.
-     */
-    public void setContentLocation(byte[] value) {
-        mPduHeaders.setTextString(value, PduHeaders.CONTENT_LOCATION);
-    }
+  /**
+   * Get X-Mms-Content-Location value.
+   * When used in a PDU other than M-Mbox-Delete.conf and M-Delete.conf:
+   * Content-location-value = Uri-value
+   *
+   * @return the value
+   */
+  public byte[] getContentLocation() {
+    return mPduHeaders.getTextString(PduHeaders.CONTENT_LOCATION);
+  }
 
-    /**
-     * Get X-Mms-Expiry value.
-     *
-     * Expiry-value = Value-length
-     *      (Absolute-token Date-value | Relative-token Delta-seconds-value)
-     *
-     * @return the value
-     */
-    public long getExpiry() {
-        return mPduHeaders.getLongInteger(PduHeaders.EXPIRY);
-    }
+  /**
+   * Set X-Mms-Content-Location value.
+   *
+   * @param value the value
+   * @throws NullPointerException if the value is null.
+   * RuntimeException if an undeclared error occurs.
+   */
+  public void setContentLocation(byte[] value) {
+    mPduHeaders.setTextString(value, PduHeaders.CONTENT_LOCATION);
+  }
 
-    /**
-     * Set X-Mms-Expiry value.
-     *
-     * @param value the value
-     * @throws RuntimeException if an undeclared error occurs.
-     */
-    public void setExpiry(long value) {
-        mPduHeaders.setLongInteger(value, PduHeaders.EXPIRY);
-    }
+  /**
+   * Get X-Mms-Expiry value.
+   *
+   * Expiry-value = Value-length
+   * (Absolute-token Date-value | Relative-token Delta-seconds-value)
+   *
+   * @return the value
+   */
+  public long getExpiry() {
+    return mPduHeaders.getLongInteger(PduHeaders.EXPIRY);
+  }
 
-    /**
-     * Get From value.
-     * From-value = Value-length
-     *      (Address-present-token Encoded-string-value | Insert-address-token)
-     *
-     * @return the value
-     */
-    public EncodedStringValue getFrom() {
-       return mPduHeaders.getEncodedStringValue(PduHeaders.FROM);
-    }
+  /**
+   * Set X-Mms-Expiry value.
+   *
+   * @param value the value
+   * @throws RuntimeException if an undeclared error occurs.
+   */
+  public void setExpiry(long value) {
+    mPduHeaders.setLongInteger(value, PduHeaders.EXPIRY);
+  }
 
-    /**
-     * Set From value.
-     *
-     * @param value the value
-     * @throws NullPointerException if the value is null.
-     *         RuntimeException if an undeclared error occurs.
-     */
-    public void setFrom(EncodedStringValue value) {
-        mPduHeaders.setEncodedStringValue(value, PduHeaders.FROM);
-    }
+  /**
+   * Get From value.
+   * From-value = Value-length
+   * (Address-present-token Encoded-string-value | Insert-address-token)
+   *
+   * @return the value
+   */
+  public EncodedStringValue getFrom() {
+    return mPduHeaders.getEncodedStringValue(PduHeaders.FROM);
+  }
 
-    /**
-     * Get X-Mms-Message-Class value.
-     * Message-class-value = Class-identifier | Token-text
-     * Class-identifier = Personal | Advertisement | Informational | Auto
-     *
-     * @return the value
-     */
-    public byte[] getMessageClass() {
-        return mPduHeaders.getTextString(PduHeaders.MESSAGE_CLASS);
-    }
+  /**
+   * Set From value.
+   *
+   * @param value the value
+   * @throws NullPointerException if the value is null.
+   * RuntimeException if an undeclared error occurs.
+   */
+  public void setFrom(EncodedStringValue value) {
+    mPduHeaders.setEncodedStringValue(value, PduHeaders.FROM);
+  }
 
-    /**
-     * Set X-Mms-Message-Class value.
-     *
-     * @param value the value
-     * @throws NullPointerException if the value is null.
-     *         RuntimeException if an undeclared error occurs.
-     */
-    public void setMessageClass(byte[] value) {
-        mPduHeaders.setTextString(value, PduHeaders.MESSAGE_CLASS);
-    }
+  /**
+   * Get X-Mms-Message-Class value.
+   * Message-class-value = Class-identifier | Token-text
+   * Class-identifier = Personal | Advertisement | Informational | Auto
+   *
+   * @return the value
+   */
+  public byte[] getMessageClass() {
+    return mPduHeaders.getTextString(PduHeaders.MESSAGE_CLASS);
+  }
 
-    /**
-     * Get X-Mms-Message-Size value.
-     * Message-size-value = Long-integer
-     *
-     * @return the value
-     */
-    public long getMessageSize() {
-        return mPduHeaders.getLongInteger(PduHeaders.MESSAGE_SIZE);
-    }
+  /**
+   * Set X-Mms-Message-Class value.
+   *
+   * @param value the value
+   * @throws NullPointerException if the value is null.
+   * RuntimeException if an undeclared error occurs.
+   */
+  public void setMessageClass(byte[] value) {
+    mPduHeaders.setTextString(value, PduHeaders.MESSAGE_CLASS);
+  }
 
-    /**
-     * Set X-Mms-Message-Size value.
-     *
-     * @param value the value
-     * @throws RuntimeException if an undeclared error occurs.
-     */
-    public void setMessageSize(long value) {
-        mPduHeaders.setLongInteger(value, PduHeaders.MESSAGE_SIZE);
-    }
+  /**
+   * Get X-Mms-Message-Size value.
+   * Message-size-value = Long-integer
+   *
+   * @return the value
+   */
+  public long getMessageSize() {
+    return mPduHeaders.getLongInteger(PduHeaders.MESSAGE_SIZE);
+  }
 
-    /**
-     * Get subject.
-     *
-     * @return the value
-     */
-    public EncodedStringValue getSubject() {
-        return mPduHeaders.getEncodedStringValue(PduHeaders.SUBJECT);
-    }
+  /**
+   * Set X-Mms-Message-Size value.
+   *
+   * @param value the value
+   * @throws RuntimeException if an undeclared error occurs.
+   */
+  public void setMessageSize(long value) {
+    mPduHeaders.setLongInteger(value, PduHeaders.MESSAGE_SIZE);
+  }
 
-    /**
-     * Set subject.
-     *
-     * @param value the value
-     * @throws NullPointerException if the value is null.
-     *         RuntimeException if an undeclared error occurs.
-     */
-    public void setSubject(EncodedStringValue value) {
-        mPduHeaders.setEncodedStringValue(value, PduHeaders.SUBJECT);
-    }
+  /**
+   * Get subject.
+   *
+   * @return the value
+   */
+  public EncodedStringValue getSubject() {
+    return mPduHeaders.getEncodedStringValue(PduHeaders.SUBJECT);
+  }
 
-    /**
-     * Get X-Mms-Transaction-Id.
-     *
-     * @return the value
-     */
-    public byte[] getTransactionId() {
-        return mPduHeaders.getTextString(PduHeaders.TRANSACTION_ID);
-    }
+  /**
+   * Set subject.
+   *
+   * @param value the value
+   * @throws NullPointerException if the value is null.
+   * RuntimeException if an undeclared error occurs.
+   */
+  public void setSubject(EncodedStringValue value) {
+    mPduHeaders.setEncodedStringValue(value, PduHeaders.SUBJECT);
+  }
 
-    /**
-     * Set X-Mms-Transaction-Id.
-     *
-     * @param value the value
-     * @throws NullPointerException if the value is null.
-     *         RuntimeException if an undeclared error occurs.
-     */
-    public void setTransactionId(byte[] value) {
-        mPduHeaders.setTextString(value, PduHeaders.TRANSACTION_ID);
-    }
+  /**
+   * Get X-Mms-Transaction-Id.
+   *
+   * @return the value
+   */
+  public byte[] getTransactionId() {
+    return mPduHeaders.getTextString(PduHeaders.TRANSACTION_ID);
+  }
 
-    /**
-     * Get X-Mms-Delivery-Report Value.
-     *
-     * @return the value
-     */
-    public int getDeliveryReport() {
-        return mPduHeaders.getOctet(PduHeaders.DELIVERY_REPORT);
-    }
+  /**
+   * Set X-Mms-Transaction-Id.
+   *
+   * @param value the value
+   * @throws NullPointerException if the value is null.
+   * RuntimeException if an undeclared error occurs.
+   */
+  public void setTransactionId(byte[] value) {
+    mPduHeaders.setTextString(value, PduHeaders.TRANSACTION_ID);
+  }
 
-    /**
-     * Set X-Mms-Delivery-Report Value.
-     *
-     * @param value the value
-     * @throws InvalidHeaderValueException if the value is invalid.
-     *         RuntimeException if an undeclared error occurs.
-     */
-    public void setDeliveryReport(int value) throws InvalidHeaderValueException {
-        mPduHeaders.setOctet(value, PduHeaders.DELIVERY_REPORT);
-    }
+  /**
+   * Get X-Mms-Delivery-Report Value.
+   *
+   * @return the value
+   */
+  public int getDeliveryReport() {
+    return mPduHeaders.getOctet(PduHeaders.DELIVERY_REPORT);
+  }
+
+  /**
+   * Set X-Mms-Delivery-Report Value.
+   *
+   * @param value the value
+   * @throws InvalidHeaderValueException if the value is invalid.
+   * RuntimeException if an undeclared error occurs.
+   */
+  public void setDeliveryReport(int value) throws InvalidHeaderValueException {
+    mPduHeaders.setOctet(value, PduHeaders.DELIVERY_REPORT);
+  }
 
     /*
      * Optional, not supported header fields:

@@ -24,133 +24,131 @@ import android.os.Bundle;
  * instantiate transactions.
  */
 public class TransactionBundle {
-    /**
-     * Key for the transaction-type.
-     * Allowed values for this key are: TYPE_PUSH_TRANSACTION, TYPE_RETRIEVE_TRANSACTION,
-     * TYPE_SEND_TRANSACTION, and TYPE_READREC_TRANSACTION.
-     */
-    public static final String TRANSACTION_TYPE = "type";
 
-    /**
-     * Key of the push-data.
-     * Used when TRANSACTION_TYPE is TYPE_PUSH_TRANSACTION.
-     */
-    private static final String PUSH_DATA = "mms-push-data";
+  /**
+   * Key for the transaction-type.
+   * Allowed values for this key are: TYPE_PUSH_TRANSACTION, TYPE_RETRIEVE_TRANSACTION,
+   * TYPE_SEND_TRANSACTION, and TYPE_READREC_TRANSACTION.
+   */
+  public static final String TRANSACTION_TYPE = "type";
 
-    public static final String LOLLIPOP_RECEIVING = "receive_with_new_method";
+  /**
+   * Key of the push-data.
+   * Used when TRANSACTION_TYPE is TYPE_PUSH_TRANSACTION.
+   */
+  private static final String PUSH_DATA = "mms-push-data";
 
-    /**
-     * Key of the MMSC server URL.
-     */
-    private static final String MMSC_URL = "mmsc-url";
+  public static final String LOLLIPOP_RECEIVING = "receive_with_new_method";
 
-    /**
-     * Key of the HTTP Proxy address.
-     */
-    private static final String PROXY_ADDRESS = "proxy-address";
+  /**
+   * Key of the MMSC server URL.
+   */
+  private static final String MMSC_URL = "mmsc-url";
 
-    /**
-     * Key of the HTTP Proxy port.
-     */
-    private static final String PROXY_PORT = "proxy-port";
+  /**
+   * Key of the HTTP Proxy address.
+   */
+  private static final String PROXY_ADDRESS = "proxy-address";
 
-    /**
-     * Key of the URI.
-     * Indicates the URL of the M-Retrieve.conf in TYPE_RETRIEVE_TRANSACTION, or the
-     * Uri of the M-Send.req/M-Read-Rec.ind in TYPE_SEND_TRANSACTION and
-     * TYPE_READREC_TRANSACTION, respectively.
-     */
-    public static final String URI = "uri";
+  /**
+   * Key of the HTTP Proxy port.
+   */
+  private static final String PROXY_PORT = "proxy-port";
 
-    /**
-     * This is the real Bundle to be sent to the TransactionService upon calling
-     * startService.
-     */
-    private final Bundle mBundle;
+  /**
+   * Key of the URI.
+   * Indicates the URL of the M-Retrieve.conf in TYPE_RETRIEVE_TRANSACTION, or the
+   * Uri of the M-Send.req/M-Read-Rec.ind in TYPE_SEND_TRANSACTION and
+   * TYPE_READREC_TRANSACTION, respectively.
+   */
+  public static final String URI = "uri";
 
-    /**
-     * Private constructor.
-     *
-     * @param transactionType
-     */
-    private TransactionBundle(int transactionType) {
-        mBundle = new Bundle();
-        mBundle.putInt(TRANSACTION_TYPE, transactionType);
-    }
+  /**
+   * This is the real Bundle to be sent to the TransactionService upon calling
+   * startService.
+   */
+  private final Bundle mBundle;
 
-    /**
-     * Constructor of a bundle used for TransactionBundle instances of type
-     * TYPE_RETRIEVE_TRANSACTION, TYPE_SEND_TRANSACTION, and TYPE_READREC_TRANSACTION.
-     *
-     * @param transactionType
-     * @param uri The relevant URI for this transaction. Indicates the URL of the
-     * M-Retrieve.conf in TYPE_RETRIEVE_TRANSACTION, or the Uri of the
-     * M-Send.req/M-Read-Rec.ind in TYPE_SEND_TRANSACTION and
-     * TYPE_READREC_TRANSACTION, respectively.
-     */
-    public TransactionBundle(int transactionType, String uri) {
-        this(transactionType);
-        mBundle.putString(URI, uri);
-    }
+  /**
+   * Private constructor.
+   */
+  private TransactionBundle(int transactionType) {
+    mBundle = new Bundle();
+    mBundle.putInt(TRANSACTION_TYPE, transactionType);
+  }
 
-    /**
-     * Constructor of a transaction bundle used for incoming bundle instances.
-     *
-     * @param bundle The incoming bundle
-     */
-    public TransactionBundle(Bundle bundle) {
-        mBundle = bundle;
-    }
+  /**
+   * Constructor of a bundle used for TransactionBundle instances of type
+   * TYPE_RETRIEVE_TRANSACTION, TYPE_SEND_TRANSACTION, and TYPE_READREC_TRANSACTION.
+   *
+   * @param uri The relevant URI for this transaction. Indicates the URL of the
+   * M-Retrieve.conf in TYPE_RETRIEVE_TRANSACTION, or the Uri of the
+   * M-Send.req/M-Read-Rec.ind in TYPE_SEND_TRANSACTION and
+   * TYPE_READREC_TRANSACTION, respectively.
+   */
+  public TransactionBundle(int transactionType, String uri) {
+    this(transactionType);
+    mBundle.putString(URI, uri);
+  }
 
-    public void setConnectionSettings(String mmscUrl,
-            String proxyAddress,
-            int proxyPort) {
-        mBundle.putString(MMSC_URL, mmscUrl);
-        mBundle.putString(PROXY_ADDRESS, proxyAddress);
-        mBundle.putInt(PROXY_PORT, proxyPort);
-    }
+  /**
+   * Constructor of a transaction bundle used for incoming bundle instances.
+   *
+   * @param bundle The incoming bundle
+   */
+  public TransactionBundle(Bundle bundle) {
+    mBundle = bundle;
+  }
 
-    public void setConnectionSettings(TransactionSettings settings) {
-        setConnectionSettings(
-                settings.getMmscUrl(),
-                settings.getProxyAddress(),
-                settings.getProxyPort());
-    }
+  public void setConnectionSettings(String mmscUrl,
+      String proxyAddress,
+      int proxyPort) {
+    mBundle.putString(MMSC_URL, mmscUrl);
+    mBundle.putString(PROXY_ADDRESS, proxyAddress);
+    mBundle.putInt(PROXY_PORT, proxyPort);
+  }
 
-    public Bundle getBundle() {
-        return mBundle;
-    }
+  public void setConnectionSettings(TransactionSettings settings) {
+    setConnectionSettings(
+        settings.getMmscUrl(),
+        settings.getProxyAddress(),
+        settings.getProxyPort());
+  }
 
-    public int getTransactionType() {
-        return mBundle.getInt(TRANSACTION_TYPE);
-    }
+  public Bundle getBundle() {
+    return mBundle;
+  }
 
-    public String getUri() {
-        return mBundle.getString(URI);
-    }
+  public int getTransactionType() {
+    return mBundle.getInt(TRANSACTION_TYPE);
+  }
 
-    public byte[] getPushData() {
-        return mBundle.getByteArray(PUSH_DATA);
-    }
+  public String getUri() {
+    return mBundle.getString(URI);
+  }
 
-    public String getMmscUrl() {
-        return mBundle.getString(MMSC_URL);
-    }
+  public byte[] getPushData() {
+    return mBundle.getByteArray(PUSH_DATA);
+  }
 
-    public String getProxyAddress() {
-        return mBundle.getString(PROXY_ADDRESS);
-    }
+  public String getMmscUrl() {
+    return mBundle.getString(MMSC_URL);
+  }
 
-    public int getProxyPort() {
-        return mBundle.getInt(PROXY_PORT);
-    }
+  public String getProxyAddress() {
+    return mBundle.getString(PROXY_ADDRESS);
+  }
 
-    @Override
-    public String toString() {
-        return "transactionType: " + getTransactionType() +
-            " uri: " + getUri() +
-            " mmscUrl: " + getMmscUrl() +
-            " proxyAddress: " + getProxyAddress() +
-            " proxyPort: " + getProxyPort();
-    }
+  public int getProxyPort() {
+    return mBundle.getInt(PROXY_PORT);
+  }
+
+  @Override
+  public String toString() {
+    return "transactionType: " + getTransactionType() +
+        " uri: " + getUri() +
+        " mmscUrl: " + getMmscUrl() +
+        " proxyAddress: " + getProxyAddress() +
+        " proxyPort: " + getProxyPort();
+  }
 }

@@ -16,9 +16,7 @@
 
 package com.klinker.android.send_message;
 
-import android.net.wifi.WifiInfo;
 import android.os.Build;
-
 import timber.log.Timber;
 
 /**
@@ -57,11 +55,13 @@ public class Settings {
      * Default constructor to set everything to default values
      */
     public Settings() {
-        this("", "", "0", true, false, false, false, false, "", "", true, 3, true, DEFAULT_SUBSCRIPTION_ID);
+        this("", "", "0", true, false, false, false, false, "", "", true, 3, true,
+            DEFAULT_SUBSCRIPTION_ID);
     }
 
     /**
      * Copy constuctor
+     *
      * @param s is the Settings object to copy from
      */
     public Settings(Settings s) {
@@ -84,23 +84,29 @@ public class Settings {
     }
 
     /**
-     * @param mmsc               is the address contained by the apn to send MMS to
-     * @param proxy              is the proxy address in the apn to send MMS through
-     * @param port               is the port from the apn to send MMS through
-     * @param group              is a boolean specifying whether or not to send messages with multiple recipients as a group MMS message
-     * @param deliveryReports    is a boolean to retrieve delivery reports from SMS messages
-     * @param split              is a boolean to manually split messages (shouldn't be necessary, but some carriers do not split on their own)
-     * @param splitCounter       adds a split counter to the front of all split messages
-     * @param stripUnicode       replaces many unicode characters with their gsm compatible equivalent to allow for sending 160 characters instead of 70
-     * @param signature          a signature to attach at the end of each message
-     * @param sendLongAsMms      if a message is too long to be multiple SMS, convert it to a single MMS
+     * @param mmsc is the address contained by the apn to send MMS to
+     * @param proxy is the proxy address in the apn to send MMS through
+     * @param port is the port from the apn to send MMS through
+     * @param group is a boolean specifying whether or not to send messages with multiple recipients
+     * as a group MMS message
+     * @param deliveryReports is a boolean to retrieve delivery reports from SMS messages
+     * @param split is a boolean to manually split messages (shouldn't be necessary, but some
+     * carriers
+     * do not split on their own)
+     * @param splitCounter adds a split counter to the front of all split messages
+     * @param stripUnicode replaces many unicode characters with their gsm compatible equivalent to
+     * allow for sending 160 characters instead of 70
+     * @param signature a signature to attach at the end of each message
+     * @param sendLongAsMms if a message is too long to be multiple SMS, convert it to a single MMS
      * @param sendLongAsMmsAfter is an int of how many pages long an SMS must be before it is split
-     * @param subscriptionId     is the ID for the SIM card. Can be null unless you are trying to use dual SIM support
+     * @param subscriptionId is the ID for the SIM card. Can be null unless you are trying to use
+     * dual
+     * SIM support
      */
     public Settings(String mmsc, String proxy, String port, boolean group,
-                    boolean deliveryReports, boolean split, boolean splitCounter,
-                    boolean stripUnicode, String signature, String preText, boolean sendLongAsMms,
-                    int sendLongAsMmsAfter, boolean useSystemSending, Integer subscriptionId) {
+        boolean deliveryReports, boolean split, boolean splitCounter,
+        boolean stripUnicode, String signature, String preText, boolean sendLongAsMms,
+        int sendLongAsMmsAfter, boolean useSystemSending, Integer subscriptionId) {
         this.mmsc = mmsc;
         this.proxy = proxy;
         this.port = port;
@@ -153,26 +159,33 @@ public class Settings {
      *
      * @param agent is the agent to send http request with
      */
-    public void setAgent(String agent) { this.userAgent = agent; }
+    public void setAgent(String agent) {
+        this.userAgent = agent;
+    }
 
     /**
      * Sets the user agent profile url
      *
      * @param userProfileUrl is the user agent profile url
      */
-    public void setUserProfileUrl(String userProfileUrl) { this.uaProfUrl = userProfileUrl; }
+    public void setUserProfileUrl(String userProfileUrl) {
+        this.uaProfUrl = userProfileUrl;
+    }
 
     /**
      * Sets the user agent profile tag name
      *
      * @param tagName the tag name to use
      */
-    public void setUaProfTagName(String tagName) { this.uaProfTagName = tagName; }
+    public void setUaProfTagName(String tagName) {
+        this.uaProfTagName = tagName;
+    }
 
     /**
      * Sets group MMS messages
      *
-     * @param group is a boolean specifying whether or not to send messages with multiple recipients as a group MMS message
+     * @param group is a boolean specifying whether or not to send messages with multiple recipients
+     * as a group MMS message
      */
     public void setGroup(boolean group) {
         this.group = group;
@@ -190,7 +203,9 @@ public class Settings {
     /**
      * Sets whether to manually split an SMS or not
      *
-     * @param split is a boolean to manually split messages (shouldn't be necessary, but some carriers do not split on their own)
+     * @param split is a boolean to manually split messages (shouldn't be necessary, but some
+     * carriers
+     * do not split on their own)
      */
     public void setSplit(boolean split) {
         this.split = split;
@@ -206,9 +221,11 @@ public class Settings {
     }
 
     /**
-     * Sets whether or not unicode characters should be sent or converted to their GSM compatible alternative
+     * Sets whether or not unicode characters should be sent or converted to their GSM compatible
+     * alternative
      *
-     * @param stripUnicode replaces many unicode characters with their gsm compatible equivalent to allow for sending 160 characters instead of 70
+     * @param stripUnicode replaces many unicode characters with their gsm compatible equivalent to
+     * allow for sending 160 characters instead of 70
      */
     public void setStripUnicode(boolean stripUnicode) {
         this.stripUnicode = stripUnicode;
@@ -259,11 +276,12 @@ public class Settings {
         } else {
             this.useSystemSending = false;
             Timber.e("Settings", "System sending only available on Lollipop+ devices");
-        }
+    }
     }
 
     /**
-     * Set the subscription ID that should be used for sending. It isn't applied to receiving at this time.
+     * Set the subscription ID that should be used for sending. It isn't applied to receiving at this
+     * time.
      *
      * @param subscriptionId null if you do not want to use one.
      */
@@ -273,7 +291,7 @@ public class Settings {
             this.subscriptionId = DEFAULT_SUBSCRIPTION_ID;
         } else {
             this.subscriptionId = subscriptionId;
-        }
+    }
     }
 
     /**
@@ -300,17 +318,23 @@ public class Settings {
     /**
      * @return the user agent to send mms with
      */
-    public String getAgent() { return this.userAgent; }
+    public String getAgent() {
+        return this.userAgent;
+    }
 
     /**
      * @return the user agent profile url to send mms with
      */
-    public String getUserProfileUrl() { return this.uaProfUrl; }
+    public String getUserProfileUrl() {
+        return this.uaProfUrl;
+    }
 
     /**
      * @return the user agent profile tag name
      */
-    public String getUaProfTagName() { return this.uaProfTagName; }
+    public String getUaProfTagName() {
+        return this.uaProfTagName;
+    }
 
     /**
      * @return whether or not to send Group MMS or multiple SMS/Voice messages
@@ -391,7 +415,8 @@ public class Settings {
 
     /**
      * Enables or disables logging for debug purposes logs will be written both to your devices
-     * logcat log and an external file you can specify so that other users can assist with debugging easily
+     * logcat log and an external file you can specify so that other users can assist with debugging
+     * easily
      * if you would like
      *
      * @param debugLogging true to enable debug logging when sending and receiving messages

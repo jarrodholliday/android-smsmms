@@ -16,79 +16,78 @@
 
 package com.android.mms.dom.smil.parser;
 
+import com.android.mms.dom.smil.SmilDocumentImpl;
+import com.android.mms.logs.LogTag;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.smil.SMILDocument;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
-
 import timber.log.Timber;
 
-import com.android.mms.logs.LogTag;
-import com.android.mms.dom.smil.SmilDocumentImpl;
-
 public class SmilContentHandler extends DefaultHandler {
-    private static final String TAG = LogTag.TAG;
-    private static final boolean DEBUG = false;
-    private static final boolean LOCAL_LOGV = false;
 
-    private SMILDocument mSmilDocument;
-    private Node mCurrentNode;
+  private static final String TAG = LogTag.TAG;
+  private static final boolean DEBUG = false;
+  private static final boolean LOCAL_LOGV = false;
 
-    /**
-     * Resets this handler.
-     *
-     */
-    public void reset() {
-        mSmilDocument = new SmilDocumentImpl();
-        mCurrentNode = mSmilDocument;
+  private SMILDocument mSmilDocument;
+  private Node mCurrentNode;
+
+  /**
+   * Resets this handler.
+   */
+  public void reset() {
+    mSmilDocument = new SmilDocumentImpl();
+    mCurrentNode = mSmilDocument;
+  }
+
+  /**
+   * Returns the SMILDocument.
+   *
+   * @return The SMILDocument instance
+   */
+  public SMILDocument getSmilDocument() {
+    return mSmilDocument;
+  }
+
+  @Override
+  public void startElement(String uri, String localName, String qName, Attributes attributes) {
+    if (LOCAL_LOGV) {
+      Timber.v("SmilContentHandler.startElement. Creating element " + localName);
     }
-
-    /**
-     * Returns the SMILDocument.
-     * @return The SMILDocument instance
-     */
-    public SMILDocument getSmilDocument() {
-        return mSmilDocument;
-    }
-
-    @Override
-    public void startElement(String uri, String localName, String qName, Attributes attributes) {
+    Element element = mSmilDocument.createElement(localName);
+    if (attributes != null) {
+      for (int i = 0; i < attributes.getLength(); i++) {
         if (LOCAL_LOGV) {
-            Timber.v("SmilContentHandler.startElement. Creating element " + localName);
+          Timber.v("Attribute " + i +
+              " lname = " + attributes.getLocalName(i) +
+              " value = " + attributes.getValue(i));
         }
-        Element element = mSmilDocument.createElement(localName);
-        if (attributes != null) {
-            for (int i = 0; i < attributes.getLength(); i++) {
-                if (LOCAL_LOGV) {
-                    Timber.v("Attribute " + i +
-                        " lname = " + attributes.getLocalName(i) +
-                        " value = " + attributes.getValue(i));
-                }
-                element.setAttribute(attributes.getLocalName(i),
-                        attributes.getValue(i));
-            }
-        }
-        if (LOCAL_LOGV) {
-            Timber.v("Appending " + localName + " to " + mCurrentNode.getNodeName());
-        }
-        mCurrentNode.appendChild(element);
-
-        mCurrentNode = element;
+        element.setAttribute(attributes.getLocalName(i),
+            attributes.getValue(i));
+      }
     }
-
-    @Override
-    public void endElement(String uri, String localName, String qName) {
-        if (LOCAL_LOGV) {
-            Timber.v("SmilContentHandler.endElement. localName " + localName);
-        }
-        mCurrentNode = mCurrentNode.getParentNode();
+    if (LOCAL_LOGV) {
+      Timber.v("Appending " + localName + " to " + mCurrentNode.getNodeName());
     }
+    mCurrentNode.appendChild(element);
 
-    @Override
-    public void characters(char[] ch, int start, int length) {
-        if (LOCAL_LOGV) {
-            Timber.v("SmilContentHandler.characters. ch = " + new String(ch, start, length));
-        }
+    mCurrentNode = element;
+  }
+
+  @Override
+  public void endElement(String uri, String localName, String qName) {
+    if (LOCAL_LOGV) {
+      Timber.v("SmilContentHandler.endElement. localName " + localName);
     }
+    mCurrentNode = mCurrentNode.getParentNode();
+  }
+
+  @Override
+  public void characters(char[] ch, int start, int length) {
+    if (LOCAL_LOGV) {
+      Timber.v("SmilContentHandler.characters. ch = " + new String(ch, start, length));
+    }
+  }
 }

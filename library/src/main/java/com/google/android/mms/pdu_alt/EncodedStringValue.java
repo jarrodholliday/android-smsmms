@@ -16,17 +16,17 @@
 
 package com.google.android.mms.pdu_alt;
 
-import timber.log.Timber;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import timber.log.Timber;
 
 /**
  * Encoded-string-value = Text-string | Value-length Char-set Text-string
  */
 public class EncodedStringValue implements Cloneable {
+
     private static final String TAG = "EncodedStringValue";
     private static final boolean DEBUG = false;
     private static final boolean LOCAL_LOGV = false;
@@ -50,9 +50,9 @@ public class EncodedStringValue implements Cloneable {
      */
     public EncodedStringValue(int charset, byte[] data) {
         // TODO: CharSet needs to be validated against MIBEnum.
-        if(null == data) {
+        if (null == data) {
             throw new NullPointerException("EncodedStringValue: Text-string is null.");
-        }
+    }
 
         mCharacterSet = charset;
         mData = new byte[data.length];
@@ -75,7 +75,7 @@ public class EncodedStringValue implements Cloneable {
             mCharacterSet = CharacterSets.DEFAULT_CHARSET;
         } catch (UnsupportedEncodingException e) {
             Timber.e(e);
-        }
+    }
     }
 
     /**
@@ -116,9 +116,9 @@ public class EncodedStringValue implements Cloneable {
      * @throws NullPointerException if Text-string value is null.
      */
     public void setTextString(byte[] textString) {
-        if(null == textString) {
+        if (null == textString) {
             throw new NullPointerException("EncodedStringValue: Text-string is null.");
-        }
+    }
 
         mData = new byte[textString.length];
         System.arraycopy(textString, 0, mData, 0, textString.length);
@@ -131,7 +131,7 @@ public class EncodedStringValue implements Cloneable {
      *
      * @return The decoded String.
      */
-    public String getString()  {
+    public String getString() {
         if (CharacterSets.ANY_CHARSET == mCharacterSet) {
             return new String(mData); // system default encoding.
         } else {
@@ -139,16 +139,16 @@ public class EncodedStringValue implements Cloneable {
                 String name = CharacterSets.getMimeName(mCharacterSet);
                 return new String(mData, name);
             } catch (UnsupportedEncodingException e) {
-            	if (LOCAL_LOGV) {
-            		Timber.v(e.getMessage(), e);
-            	}
-            	try {
+                if (LOCAL_LOGV) {
+                    Timber.v(e.getMessage(), e);
+        }
+                try {
                     return new String(mData, CharacterSets.MIMENAME_ISO_8859_1);
                 } catch (UnsupportedEncodingException f) {
                     return new String(mData); // system default encoding.
                 }
             }
-        }
+    }
     }
 
     /**
@@ -156,14 +156,14 @@ public class EncodedStringValue implements Cloneable {
      *
      * @param textString the textString to append
      * @throws NullPointerException if the text String is null
-     *                      or an IOException occured.
+     * or an IOException occured.
      */
     public void appendTextString(byte[] textString) {
-        if(null == textString) {
+        if (null == textString) {
             throw new NullPointerException("Text-string is null.");
         }
 
-        if(null == mData) {
+        if (null == mData) {
             mData = new byte[textString.length];
             System.arraycopy(textString, 0, mData, 0, textString.length);
         } else {
@@ -175,11 +175,11 @@ public class EncodedStringValue implements Cloneable {
                 Timber.e(e);
                 e.printStackTrace();
                 throw new NullPointerException(
-                        "appendTextString: failed when write a new Text-string");
+                    "appendTextString: failed when write a new Text-string");
             }
 
             mData = newTextString.toByteArray();
-        }
+    }
     }
 
     /*
@@ -199,7 +199,7 @@ public class EncodedStringValue implements Cloneable {
             Timber.e(e);
             e.printStackTrace();
             throw new CloneNotSupportedException(e.getMessage());
-        }
+    }
     }
 
     /**
@@ -207,7 +207,7 @@ public class EncodedStringValue implements Cloneable {
      *
      * @param pattern the delimiting pattern
      * @return the array of encoded strings computed by splitting this encoded
-     *         string around matches of the given pattern
+     * string around matches of the given pattern
      */
     public EncodedStringValue[] split(String pattern) {
         String[] temp = getString().split(pattern);
@@ -215,12 +215,12 @@ public class EncodedStringValue implements Cloneable {
         for (int i = 0; i < ret.length; ++i) {
             try {
                 ret[i] = new EncodedStringValue(mCharacterSet,
-                        temp[i].getBytes());
+                    temp[i].getBytes());
             } catch (NullPointerException e) {
                 // Can't arrive here
                 return null;
             }
-        }
+    }
         return ret;
     }
 
@@ -242,7 +242,7 @@ public class EncodedStringValue implements Cloneable {
             return list.toArray(new EncodedStringValue[len]);
         } else {
             return null;
-        }
+    }
     }
 
     /**
@@ -256,7 +256,7 @@ public class EncodedStringValue implements Cloneable {
             if (i < maxIndex) {
                 sb.append(";");
             }
-        }
+    }
 
         return sb.toString();
     }
@@ -264,7 +264,7 @@ public class EncodedStringValue implements Cloneable {
     public static EncodedStringValue copy(EncodedStringValue value) {
         if (value == null) {
             return null;
-        }
+    }
 
         return new EncodedStringValue(value.mCharacterSet, value.mData);
     }
@@ -277,7 +277,7 @@ public class EncodedStringValue implements Cloneable {
                 encodedArray[i] = new EncodedStringValue(array[i]);
             }
             return encodedArray;
-        }
+    }
         return null;
     }
 }

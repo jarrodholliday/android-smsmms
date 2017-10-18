@@ -20,9 +20,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.io.Writer;
-
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -31,50 +29,51 @@ import org.w3c.dom.smil.SMILElement;
 import timber.log.Timber;
 
 public class SmilXmlSerializer {
-    private static final String TAG = "SmilXmlSerializer";
 
-    public static void serialize(SMILDocument smilDoc, OutputStream out) {
-        try {
-            Writer writer = new BufferedWriter(new OutputStreamWriter(out, "UTF-8"), 2048);
+  private static final String TAG = "SmilXmlSerializer";
 
-            writeElement(writer, smilDoc.getDocumentElement());
-            writer.flush();
-        } catch (IOException e) {
-            Timber.e(e);
-        }
+  public static void serialize(SMILDocument smilDoc, OutputStream out) {
+    try {
+      Writer writer = new BufferedWriter(new OutputStreamWriter(out, "UTF-8"), 2048);
+
+      writeElement(writer, smilDoc.getDocumentElement());
+      writer.flush();
+    } catch (IOException e) {
+      Timber.e(e);
+    }
+  }
+
+  private static void writeElement(Writer writer, Element element)
+      throws IOException {
+    writer.write('<');
+    writer.write(element.getTagName());
+
+    if (element.hasAttributes()) {
+      NamedNodeMap attributes = element.getAttributes();
+      for (int i = 0; i < attributes.getLength(); i++) {
+        Attr attribute = (Attr) attributes.item(i);
+        writer.write(" " + attribute.getName());
+        writer.write("=\"" + attribute.getValue() + "\"");
+      }
     }
 
-    private static void writeElement(Writer writer, Element element)
-            throws IOException {
-        writer.write('<');
-        writer.write(element.getTagName());
+    // FIXME: Might throw ClassCastException
+    SMILElement childElement = (SMILElement) element.getFirstChild();
 
-        if (element.hasAttributes()) {
-            NamedNodeMap attributes = element.getAttributes();
-            for (int i = 0; i < attributes.getLength(); i++) {
-                Attr attribute = (Attr)attributes.item(i);
-                writer.write(" " + attribute.getName());
-                writer.write("=\"" + attribute.getValue() + "\"");
-            }
-        }
+    if (childElement != null) {
+      writer.write('>');
 
-        // FIXME: Might throw ClassCastException
-        SMILElement childElement = (SMILElement) element.getFirstChild();
+      do {
+        writeElement(writer, childElement);
+        childElement = (SMILElement) childElement.getNextSibling();
+      } while (childElement != null);
 
-        if (childElement != null) {
-            writer.write('>');
-
-            do {
-                writeElement(writer, childElement);
-                childElement = (SMILElement) childElement.getNextSibling();
-            } while (childElement != null);
-
-            writer.write("</");
-            writer.write(element.getTagName());
-            writer.write('>');
-        } else {
-            writer.write("/>");
-        }
+      writer.write("</");
+      writer.write(element.getTagName());
+      writer.write('>');
+    } else {
+      writer.write("/>");
     }
+  }
 }
 

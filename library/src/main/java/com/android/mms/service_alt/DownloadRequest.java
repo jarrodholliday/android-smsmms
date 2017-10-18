@@ -21,17 +21,12 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Bundle;
 import android.provider.Telephony;
-
 import android.text.TextUtils;
-import android.util.Log;
-
 import com.android.mms.service_alt.exception.MmsHttpException;
-
 import com.google.android.mms.MmsException;
 import com.google.android.mms.pdu_alt.GenericPdu;
 import com.google.android.mms.pdu_alt.PduHeaders;
@@ -47,32 +42,33 @@ import timber.log.Timber;
  * Request to download an MMS
  */
 public class DownloadRequest extends MmsRequest {
+
     private static final String TAG = "DownloadRequest";
 
     private static final String LOCATION_SELECTION =
-            Telephony.Mms.MESSAGE_TYPE + "=? AND " + Telephony.Mms.CONTENT_LOCATION + " =?";
+        Telephony.Mms.MESSAGE_TYPE + "=? AND " + Telephony.Mms.CONTENT_LOCATION + " =?";
 
-    static final String[] PROJECTION = new String[] {
-            Telephony.Mms.CONTENT_LOCATION
+    static final String[] PROJECTION = new String[]{
+        Telephony.Mms.CONTENT_LOCATION
     };
 
     // The indexes of the columns which must be consistent with above PROJECTION.
-    static final int COLUMN_CONTENT_LOCATION      = 0;
+    static final int COLUMN_CONTENT_LOCATION = 0;
 
     private final String mLocationUrl;
     private final PendingIntent mDownloadedIntent;
     private final Uri mContentUri;
 
     public DownloadRequest(RequestManager manager, int subId, String locationUrl,
-            Uri contentUri, PendingIntent downloadedIntent, String creator,
-            Bundle configOverrides, Context context) throws MmsException {
+        Uri contentUri, PendingIntent downloadedIntent, String creator,
+        Bundle configOverrides, Context context) throws MmsException {
         super(manager, subId, creator, configOverrides);
 
         if (locationUrl == null) {
             mLocationUrl = getContentLocation(context, contentUri);
         } else {
             mLocationUrl = locationUrl;
-        }
+    }
 
         mDownloadedIntent = downloadedIntent;
         mContentUri = contentUri;
@@ -80,20 +76,20 @@ public class DownloadRequest extends MmsRequest {
 
     @Override
     protected byte[] doHttp(Context context, MmsNetworkManager netMgr, ApnSettings apn)
-            throws MmsHttpException {
+        throws MmsHttpException {
         final MmsHttpClient mmsHttpClient = netMgr.getOrCreateHttpClient();
         if (mmsHttpClient == null) {
             Timber.e("MMS network is not ready!");
             throw new MmsHttpException(0/*statusCode*/, "MMS network is not ready");
-        }
+    }
         return mmsHttpClient.execute(
-                mLocationUrl,
-                null/*pud*/,
-                MmsHttpClient.METHOD_GET,
-                apn.isProxySet(),
-                apn.getProxyAddress(),
-                apn.getProxyPort(),
-                mMmsConfig);
+            mLocationUrl,
+            null/*pud*/,
+            MmsHttpClient.METHOD_GET,
+            apn.isProxySet(),
+            apn.getProxyAddress(),
+            apn.getProxyPort(),
+            mMmsConfig);
     }
 
     @Override
@@ -111,13 +107,13 @@ public class DownloadRequest extends MmsRequest {
         if (!mRequestManager.getAutoPersistingPref()) {
             notifyOfDownload(context, null);
             return null;
-        }
+    }
 
         return persist(context, response, mMmsConfig, mLocationUrl, mSubId, mCreator);
     }
 
     public static Uri persist(Context context, byte[] response, MmsConfig.Overridden mmsConfig,
-                              String locationUrl, int subId, String creator) {
+        String locationUrl, int subId, String creator) {
         Timber.d("DownloadRequest.persistIfRequired");
         if (response == null || response.length < 1) {
             Timber.e("DownloadRequest.persistIfRequired: empty response");
@@ -125,21 +121,21 @@ public class DownloadRequest extends MmsRequest {
             final ContentValues values = new ContentValues(1);
             values.put(Telephony.Mms.RETRIEVE_STATUS, PduHeaders.RETRIEVE_STATUS_ERROR_END);
             SqliteWrapper.update(
-                    context,
-                    context.getContentResolver(),
-                    Telephony.Mms.CONTENT_URI,
-                    values,
-                    LOCATION_SELECTION,
-                    new String[]{
-                            Integer.toString(PduHeaders.MESSAGE_TYPE_NOTIFICATION_IND),
-                            locationUrl
-                    });
+                context,
+                context.getContentResolver(),
+                Telephony.Mms.CONTENT_URI,
+                values,
+                LOCATION_SELECTION,
+                new String[]{
+                    Integer.toString(PduHeaders.MESSAGE_TYPE_NOTIFICATION_IND),
+                    locationUrl
+                });
             return null;
         }
         final long identity = Binder.clearCallingIdentity();
         try {
             final GenericPdu pdu =
-                    (new PduParser(response, mmsConfig.getSupportMmsContentDisposition())).parse();
+                (new PduParser(response, mmsConfig.getSupportMmsContentDisposition())).parse();
             if (pdu == null || !(pdu instanceof RetrieveConf)) {
                 Timber.e("DownloadRequest.persistIfRequired: invalid parsed PDU");
 
@@ -170,11 +166,11 @@ public class DownloadRequest extends MmsRequest {
             // Store the downloaded message
             final PduPersister persister = PduPersister.getPduPersister(context);
             final Uri messageUri = persister.persist(
-                    pdu,
-                    Telephony.Mms.Inbox.CONTENT_URI,
-                    true/*createThreadId*/,
-                    true/*groupMmsEnabled*/,
-                    null/*preOpenedFiles*/);
+                pdu,
+                Telephony.Mms.Inbox.CONTENT_URI,
+                true/*createThreadId*/,
+                true/*groupMmsEnabled*/,
+                null/*preOpenedFiles*/);
             if (messageUri == null) {
                 Timber.e("DownloadRequest.persistIfRequired: can not persist message");
                 return null;
@@ -196,36 +192,36 @@ public class DownloadRequest extends MmsRequest {
             }
 
             if (SqliteWrapper.update(
-                    context,
-                    context.getContentResolver(),
-                    messageUri,
-                    values,
-                    null/*where*/,
-                    null/*selectionArg*/) != 1) {
+                context,
+                context.getContentResolver(),
+                messageUri,
+                values,
+                null/*where*/,
+                null/*selectionArg*/) != 1) {
                 Timber.e("DownloadRequest.persistIfRequired: can not update message");
             }
             // Delete the corresponding NotificationInd
             SqliteWrapper.delete(context,
-                    context.getContentResolver(),
-                    Telephony.Mms.CONTENT_URI,
-                    LOCATION_SELECTION,
-                    new String[]{
-                            Integer.toString(PduHeaders.MESSAGE_TYPE_NOTIFICATION_IND),
-                            locationUrl
-                    });
+                context.getContentResolver(),
+                Telephony.Mms.CONTENT_URI,
+                LOCATION_SELECTION,
+                new String[]{
+                    Integer.toString(PduHeaders.MESSAGE_TYPE_NOTIFICATION_IND),
+                    locationUrl
+                });
 
             return messageUri;
         } catch (MmsException | RuntimeException e) {
             Timber.e(e);
         } finally {
             Binder.restoreCallingIdentity(identity);
-        }
+    }
         return null;
     }
 
     private static void notifyOfDownload(Context context, Uri messageUri) {
         Intent intent = new Intent();
-        if(messageUri != null) {
+        if (messageUri != null) {
             intent.putExtra("messageUri", messageUri.toString());
         }
         BroadcastUtils.sendExplicitBroadcast(context, intent, Transaction.NOTIFY_OF_MMS);
@@ -306,8 +302,9 @@ public class DownloadRequest extends MmsRequest {
     }
 
     private String getContentLocation(Context context, Uri uri)
-            throws MmsException {
-        Cursor cursor = android.database.sqlite.SqliteWrapper.query(context, context.getContentResolver(),
+        throws MmsException {
+        Cursor cursor = android.database.sqlite.SqliteWrapper
+            .query(context, context.getContentResolver(),
                 uri, PROJECTION, null, null, null);
 
         if (cursor != null) {
@@ -316,31 +313,31 @@ public class DownloadRequest extends MmsRequest {
                     String location = cursor.getString(COLUMN_CONTENT_LOCATION);
                     cursor.close();
                     return location;
-                }
+        }
             } finally {
                 cursor.close();
             }
-        }
+    }
 
         throw new MmsException("Cannot get X-Mms-Content-Location from: " + uri);
     }
 
     private static Long getId(Context context, String location) {
         String selection = Telephony.Mms.CONTENT_LOCATION + " = ?";
-        String[] selectionArgs = new String[] { location };
+        String[] selectionArgs = new String[]{location};
         Cursor c = android.database.sqlite.SqliteWrapper.query(
-                context, context.getContentResolver(),
-                Telephony.Mms.CONTENT_URI, new String[] { Telephony.Mms._ID },
-                selection, selectionArgs, null);
+            context, context.getContentResolver(),
+            Telephony.Mms.CONTENT_URI, new String[]{Telephony.Mms._ID},
+            selection, selectionArgs, null);
         if (c != null) {
             try {
                 if (c.moveToFirst()) {
                     return c.getLong(c.getColumnIndex(Telephony.Mms._ID));
-                }
+        }
             } finally {
                 c.close();
             }
-        }
+    }
         return null;
     }
 
@@ -354,7 +351,8 @@ public class DownloadRequest extends MmsRequest {
         uriBuilder.appendQueryParameter("protocol", "mms");
         uriBuilder.appendQueryParameter("message", String.valueOf(msgId));
 
-        Cursor cursor = android.database.sqlite.SqliteWrapper.query(context, context.getContentResolver(),
+        Cursor cursor = android.database.sqlite.SqliteWrapper
+            .query(context, context.getContentResolver(),
                 uriBuilder.build(), null, null, null, null);
         if (cursor == null) {
             return;
@@ -366,15 +364,15 @@ public class DownloadRequest extends MmsRequest {
                 values.put(Telephony.MmsSms.PendingMessages.ERROR_TYPE, errorType);
 
                 int columnIndex = cursor.getColumnIndexOrThrow(
-                        Telephony.MmsSms.PendingMessages._ID);
+                    Telephony.MmsSms.PendingMessages._ID);
                 long id = cursor.getLong(columnIndex);
 
                 android.database.sqlite.SqliteWrapper.update(context, context.getContentResolver(),
-                        Telephony.MmsSms.PendingMessages.CONTENT_URI,
-                        values, Telephony.MmsSms.PendingMessages._ID + "=" + id, null);
+                    Telephony.MmsSms.PendingMessages.CONTENT_URI,
+                    values, Telephony.MmsSms.PendingMessages._ID + "=" + id, null);
             }
         } finally {
             cursor.close();
-        }
+    }
     }
 }

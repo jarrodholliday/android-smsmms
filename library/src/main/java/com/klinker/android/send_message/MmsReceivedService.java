@@ -1,6 +1,12 @@
 package com.klinker.android.send_message;
 
 
+import static com.google.android.mms.pdu_alt.PduHeaders.STATUS_RETRIEVED;
+import static com.klinker.android.send_message.MmsReceivedReceiver.EXTRA_FILE_PATH;
+import static com.klinker.android.send_message.MmsReceivedReceiver.EXTRA_LOCATION_URL;
+import static com.klinker.android.send_message.MmsReceivedReceiver.EXTRA_TRIGGER_PUSH;
+import static com.klinker.android.send_message.MmsReceivedReceiver.EXTRA_URI;
+
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
@@ -8,14 +14,12 @@ import android.net.Uri;
 import android.os.Build;
 import android.provider.Telephony;
 import android.telephony.SmsManager;
-
 import com.android.mms.service_alt.DownloadRequest;
 import com.android.mms.service_alt.MmsConfig;
 import com.android.mms.transaction.DownloadManager;
 import com.android.mms.transaction.HttpUtils;
 import com.android.mms.transaction.TransactionSettings;
 import com.android.mms.util.SendingProgressTokenManager;
-import com.google.android.mms.InvalidHeaderValueException;
 import com.google.android.mms.MmsException;
 import com.google.android.mms.pdu_alt.EncodedStringValue;
 import com.google.android.mms.pdu_alt.GenericPdu;
@@ -27,24 +31,18 @@ import com.google.android.mms.pdu_alt.PduParser;
 import com.google.android.mms.pdu_alt.PduPersister;
 import com.google.android.mms.pdu_alt.RetrieveConf;
 import com.google.android.mms.util_alt.SqliteWrapper;
-import timber.log.Timber;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-
-import static com.google.android.mms.pdu_alt.PduHeaders.STATUS_RETRIEVED;
-import static com.klinker.android.send_message.MmsReceivedReceiver.EXTRA_FILE_PATH;
-import static com.klinker.android.send_message.MmsReceivedReceiver.EXTRA_LOCATION_URL;
-import static com.klinker.android.send_message.MmsReceivedReceiver.EXTRA_TRIGGER_PUSH;
-import static com.klinker.android.send_message.MmsReceivedReceiver.EXTRA_URI;
+import timber.log.Timber;
 
 public class MmsReceivedService extends IntentService {
+
     private static final String TAG = "MmsReceivedService";
 
     private static final String LOCATION_SELECTION =
-            Telephony.Mms.MESSAGE_TYPE + "=? AND " + Telephony.Mms.CONTENT_LOCATION + " =?";
+        Telephony.Mms.MESSAGE_TYPE + "=? AND " + Telephony.Mms.CONTENT_LOCATION + " =?";
 
     public MmsReceivedService() {
         super("MmsReceivedService");
@@ -73,9 +71,9 @@ public class MmsReceivedService extends IntentService {
             executeNotificationTask(task);
 
             DownloadRequest.persist(this, response,
-                    new MmsConfig.Overridden(new MmsConfig(this), null),
-                    intent.getStringExtra(EXTRA_LOCATION_URL),
-                    Utils.getDefaultSubscriptionId(), null);
+                new MmsConfig.Overridden(new MmsConfig(this), null),
+                intent.getStringExtra(EXTRA_LOCATION_URL),
+                Utils.getDefaultSubscriptionId(), null);
 
             Timber.v("response saved successfully");
             Timber.v("response length: " + response.length);
@@ -90,39 +88,42 @@ public class MmsReceivedService extends IntentService {
                     reader.close();
                 } catch (IOException e) {
                     Timber.e("MMS received, io exception: %s", e.getMessage());
-                }
+        }
             }
 
             handleHttpError(this, intent);
             DownloadManager.finishDownload(intent.getStringExtra(EXTRA_LOCATION_URL));
-        }
+    }
     }
 
     private static void handleHttpError(Context context, Intent intent) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
             return;
-        }
-        
-        final int httpError = intent.getIntExtra(SmsManager.EXTRA_MMS_HTTP_STATUS, 0);
-        if (httpError == 404 ||
-                httpError == 400) {
-            // Delete the corresponding NotificationInd
-            SqliteWrapper.delete(context,
-                    context.getContentResolver(),
-                    Telephony.Mms.CONTENT_URI,
-                    LOCATION_SELECTION,
-                    new String[]{
-                            Integer.toString(PduHeaders.MESSAGE_TYPE_NOTIFICATION_IND),
-                            intent.getStringExtra(EXTRA_LOCATION_URL)
-                    });
-        }
     }
 
-    private static NotificationInd getNotificationInd(Context context, Intent intent) throws MmsException {
-        return (NotificationInd) PduPersister.getPduPersister(context).load((Uri) intent.getParcelableExtra(EXTRA_URI));
+        final int httpError = intent.getIntExtra(SmsManager.EXTRA_MMS_HTTP_STATUS, 0);
+        if (httpError == 404 ||
+            httpError == 400) {
+            // Delete the corresponding NotificationInd
+            SqliteWrapper.delete(context,
+                context.getContentResolver(),
+                Telephony.Mms.CONTENT_URI,
+                LOCATION_SELECTION,
+                new String[]{
+                    Integer.toString(PduHeaders.MESSAGE_TYPE_NOTIFICATION_IND),
+                    intent.getStringExtra(EXTRA_LOCATION_URL)
+                });
+    }
+    }
+
+    private static NotificationInd getNotificationInd(Context context, Intent intent)
+        throws MmsException {
+        return (NotificationInd) PduPersister.getPduPersister(context)
+            .load((Uri) intent.getParcelableExtra(EXTRA_URI));
     }
 
     private static abstract class CommonNotificationTask {
+
         protected final Context mContext;
         private final TransactionSettings mTransactionSettings;
         final NotificationInd mNotificationInd;
@@ -141,9 +142,9 @@ public class MmsReceivedService extends IntentService {
          * @param pdu A byte array which contains the data of the PDU.
          * @param mmscUrl Url of the recipient MMSC.
          * @return A byte array which contains the response data.
-         *         If an HTTP error code is returned, an IOException will be thrown.
+         * If an HTTP error code is returned, an IOException will be thrown.
          * @throws java.io.IOException if any error occurred on network interface or
-         *         an HTTP error code(>=400) returned from the server.
+         * an HTTP error code(>=400) returned from the server.
          * @throws com.google.android.mms.MmsException if pdu is null.
          */
         byte[] sendPdu(byte[] pdu, String mmscUrl) throws IOException, MmsException {
@@ -155,14 +156,14 @@ public class MmsReceivedService extends IntentService {
          *
          * @param pdu A byte array which contains the data of the PDU.
          * @return A byte array which contains the response data.
-         *         If an HTTP error code is returned, an IOException will be thrown.
+         * If an HTTP error code is returned, an IOException will be thrown.
          * @throws java.io.IOException if any error occurred on network interface or
-         *         an HTTP error code(>=400) returned from the server.
+         * an HTTP error code(>=400) returned from the server.
          * @throws com.google.android.mms.MmsException if pdu is null.
          */
         byte[] sendPdu(byte[] pdu) throws IOException, MmsException {
             return sendPdu(SendingProgressTokenManager.NO_TOKEN, pdu,
-                    mTransactionSettings.getMmscUrl());
+                mTransactionSettings.getMmscUrl());
         }
 
         /**
@@ -172,13 +173,13 @@ public class MmsReceivedService extends IntentService {
          * @param pdu A byte array which contains the data of the PDU.
          * @param mmscUrl Url of the recipient MMSC.
          * @return A byte array which contains the response data.
-         *         If an HTTP error code is returned, an IOException will be thrown.
+         * If an HTTP error code is returned, an IOException will be thrown.
          * @throws java.io.IOException if any error occurred on network interface or
-         *         an HTTP error code(>=400) returned from the server.
+         * an HTTP error code(>=400) returned from the server.
          * @throws com.google.android.mms.MmsException if pdu is null.
          */
         private byte[] sendPdu(final long token, final byte[] pdu,
-                               final String mmscUrl) throws IOException, MmsException {
+            final String mmscUrl) throws IOException, MmsException {
             if (pdu == null) {
                 throw new MmsException();
             }
@@ -189,33 +190,36 @@ public class MmsReceivedService extends IntentService {
 
             if (com.android.mms.transaction.Transaction.useWifi(mContext)) {
                 return HttpUtils.httpConnection(
-                        mContext, token,
-                        mmscUrl,
-                        pdu, HttpUtils.HTTP_POST_METHOD,
-                        false, null, 0);
+                    mContext, token,
+                    mmscUrl,
+                    pdu, HttpUtils.HTTP_POST_METHOD,
+                    false, null, 0);
             }
 
-            return Utils.ensureRouteToMmsNetwork(mContext, mmscUrl, mTransactionSettings.getProxyAddress(), new Utils.Task<byte[]>() {
+            return Utils
+                .ensureRouteToMmsNetwork(mContext, mmscUrl, mTransactionSettings.getProxyAddress(),
+                    new Utils.Task<byte[]>() {
                 @Override
                 public byte[] run() throws IOException {
                     return HttpUtils.httpConnection(
-                            mContext, token,
-                            mmscUrl,
-                            pdu, HttpUtils.HTTP_POST_METHOD,
-                            mTransactionSettings.isProxySet(),
-                            mTransactionSettings.getProxyAddress(),
-                            mTransactionSettings.getProxyPort());
+                        mContext, token,
+                        mmscUrl,
+                        pdu, HttpUtils.HTTP_POST_METHOD,
+                        mTransactionSettings.isProxySet(),
+                        mTransactionSettings.getProxyAddress(),
+                        mTransactionSettings.getProxyPort());
                 }
-            });
-        }
+                    });
+    }
 
         public abstract void run() throws IOException;
     }
 
     private static class NotifyRespTask extends CommonNotificationTask {
+
         NotifyRespTask(Context context, NotificationInd ind, TransactionSettings settings) {
             super(context, settings, ind);
-        }
+    }
 
         @Override
         public void run() throws IOException {
@@ -223,16 +227,16 @@ public class MmsReceivedService extends IntentService {
             NotifyRespInd notifyRespInd = null;
             try {
                 notifyRespInd = new NotifyRespInd(
-                        PduHeaders.CURRENT_MMS_VERSION,
-                        mNotificationInd.getTransactionId(),
-                        STATUS_RETRIEVED);
+                    PduHeaders.CURRENT_MMS_VERSION,
+                    mNotificationInd.getTransactionId(),
+                    STATUS_RETRIEVED);
 
                 // Pack M-NotifyResp.ind and send it
-                if(com.android.mms.MmsConfig.getNotifyWapMMSC()) {
+                if (com.android.mms.MmsConfig.getNotifyWapMMSC()) {
                     sendPdu(new PduComposer(mContext, notifyRespInd).make(), mContentLocation);
                 } else {
                     sendPdu(new PduComposer(mContext, notifyRespInd).make());
-                }
+        }
             } catch (MmsException e) {
                 Timber.e("error", e);
             }
@@ -240,12 +244,14 @@ public class MmsReceivedService extends IntentService {
     }
 
     private static class AcknowledgeIndTask extends CommonNotificationTask {
+
         private final RetrieveConf mRetrieveConf;
 
-        AcknowledgeIndTask(Context context, NotificationInd ind, TransactionSettings settings, RetrieveConf rc) {
+        AcknowledgeIndTask(Context context, NotificationInd ind, TransactionSettings settings,
+            RetrieveConf rc) {
             super(context, settings, ind);
             mRetrieveConf = rc;
-        }
+    }
 
         @Override
         public void run() throws IOException {
@@ -258,37 +264,38 @@ public class MmsReceivedService extends IntentService {
                 com.google.android.mms.pdu_alt.AcknowledgeInd acknowledgeInd = null;
                 try {
                     acknowledgeInd = new com.google.android.mms.pdu_alt.AcknowledgeInd(
-                            PduHeaders.CURRENT_MMS_VERSION, tranId);
+                        PduHeaders.CURRENT_MMS_VERSION, tranId);
 
                     // insert the 'from' address per spec
                     String lineNumber = Utils.getMyPhoneNumber(mContext);
                     acknowledgeInd.setFrom(new EncodedStringValue(lineNumber));
 
                     // Pack M-Acknowledge.ind and send it
-                    if(com.android.mms.MmsConfig.getNotifyWapMMSC()) {
+                    if (com.android.mms.MmsConfig.getNotifyWapMMSC()) {
                         sendPdu(new PduComposer(mContext, acknowledgeInd).make(), mContentLocation);
                     } else {
                         sendPdu(new PduComposer(mContext, acknowledgeInd).make());
                     }
-                } catch (MmsException e) {
+        } catch (MmsException e) {
                     Timber.e(e);
-                }
-            }
         }
+            }
+    }
     }
 
-    private static CommonNotificationTask getNotificationTask(Context context, Intent intent, byte[] response) {
+    private static CommonNotificationTask getNotificationTask(Context context, Intent intent,
+        byte[] response) {
         if (response.length == 0) {
             return null;
         }
 
         final GenericPdu pdu =
-                (new PduParser(response, new MmsConfig.Overridden(new MmsConfig(context), null).
-                        getSupportMmsContentDisposition())).parse();
+            (new PduParser(response, new MmsConfig.Overridden(new MmsConfig(context), null).
+                getSupportMmsContentDisposition())).parse();
         if (pdu == null || !(pdu instanceof RetrieveConf)) {
             Timber.e("MmsReceivedReceiver.sendNotification failed to parse pdu");
             return null;
-        }
+    }
 
         try {
             NotificationInd ind = getNotificationInd(context, intent);
@@ -296,7 +303,8 @@ public class MmsReceivedService extends IntentService {
             if (intent.getBooleanExtra(EXTRA_TRIGGER_PUSH, false)) {
                 return new NotifyRespTask(context, ind, transactionSettings);
             } else {
-                return new AcknowledgeIndTask(context, ind, transactionSettings, (RetrieveConf) pdu);
+                return new AcknowledgeIndTask(context, ind, transactionSettings,
+                    (RetrieveConf) pdu);
             }
         } catch (MmsException e) {
             Timber.e(e);

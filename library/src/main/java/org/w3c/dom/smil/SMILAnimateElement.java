@@ -13,8 +13,9 @@
 package org.w3c.dom.smil;
 
 /**
- *  This interface represents the SMIL <code>animate</code> element. 
+ * This interface represents the SMIL <code>animate</code> element.
  */
 public interface SMILAnimateElement extends SMILAnimation {
+
 }
 

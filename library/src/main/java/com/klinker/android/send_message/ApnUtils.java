@@ -11,26 +11,26 @@ import android.telephony.ServiceState;
 import android.telephony.TelephonyManager;
 import android.telephony.cdma.CdmaCellLocation;
 import android.widget.Toast;
-
-import timber.log.Timber;
-
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-
 import java.io.IOException;
 import java.util.ArrayList;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+import timber.log.Timber;
 
 public class ApnUtils {
 
     private static final String TAG = "ApnUtils";
 
-    public static void initDefaultApns(final Context context, final OnApnFinishedListener listener) {
+    public static void initDefaultApns(final Context context,
+        final OnApnFinishedListener listener) {
         loadMmsSettings(context);
         final ArrayList<APN> apns = loadApns(context);
 
         if (apns == null || apns.size() == 0) {
             Timber.v("Found no APNs :( Damn CDMA network probably.");
-            Toast.makeText(context, context.getString(R.string.auto_select_failed), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, context.getString(R.string.auto_select_failed),
+                Toast.LENGTH_SHORT)
+                .show();
             if (listener != null) {
                 listener.onFinished();
             }
@@ -40,25 +40,28 @@ public class ApnUtils {
                 listener.onFinished();
             }
         } else {
-            if (!PreferenceManager.getDefaultSharedPreferences(context).getBoolean("has_seen_select_apns_warning", false)) {
+            if (!PreferenceManager.getDefaultSharedPreferences(context)
+                .getBoolean("has_seen_select_apns_warning", false)) {
                 new AlertDialog.Builder(context)
-                        .setTitle(R.string.auto_select_apn)
-                        .setMessage(R.string.auto_select_multiple_apns)
-                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int num) {
-                                showApnChooser(context, apns, listener);
-                            }
-                        })
-                        .show();
-                PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean("has_seen_select_apns_warning", true).commit();
+                    .setTitle(R.string.auto_select_apn)
+                    .setMessage(R.string.auto_select_multiple_apns)
+                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int num) {
+                showApnChooser(context, apns, listener);
+                        }
+                    })
+                    .show();
+                PreferenceManager.getDefaultSharedPreferences(context).edit()
+                    .putBoolean("has_seen_select_apns_warning", true).commit();
             } else {
                 showApnChooser(context, apns, listener);
             }
-        }
+    }
     }
 
-    private static void showApnChooser(final Context context, final ArrayList<APN> apns, final OnApnFinishedListener listener) {
+    private static void showApnChooser(final Context context, final ArrayList<APN> apns,
+        final OnApnFinishedListener listener) {
         CharSequence[] items = new CharSequence[apns.size()];
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
         String curMmsc = sharedPrefs.getString("mmsc_url", "");
@@ -68,36 +71,38 @@ public class ApnUtils {
         int defaultApn = -1;
         for (int i = 0; i < items.length; i++) {
             APN apn = apns.get(i);
-            items[i] = (i+1) + ". " + apn.name;
+            items[i] = (i + 1) + ". " + apn.name;
 
-            if (apn.mmsc.equals(curMmsc) && apn.proxy.equals(curProxy) && apn.port.equals(curPort)) {
+            if (apn.mmsc.equals(curMmsc) && apn.proxy.equals(curProxy) && apn.port
+                .equals(curPort)) {
                 defaultApn = i;
             }
         }
 
         new AlertDialog.Builder(context)
-                .setSingleChoiceItems(items, defaultApn, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        setApns(context, apns.get(i));
-                        if (listener != null) {
-                            listener.onFinished();
-                        }
-                        dialogInterface.dismiss();
+            .setSingleChoiceItems(items, defaultApn, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    setApns(context, apns.get(i));
+                    if (listener != null) {
+                        listener.onFinished();
+            }
+                    dialogInterface.dismiss();
+                }
+            })
+            .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface dialogInterface) {
+                    if (listener != null) {
+                        listener.onFinished();
                     }
-                })
-                .setOnCancelListener(new DialogInterface.OnCancelListener() {
-                    @Override
-                    public void onCancel(DialogInterface dialogInterface) {
-                        if (listener != null) {
-                            listener.onFinished();
-                        }
-                    }
-                })
-                .show();
+                }
+            })
+            .show();
     }
 
     public interface OnApnFinishedListener {
+
         public abstract void onFinished();
     }
 
@@ -126,7 +131,7 @@ public class ApnUtils {
                 }
 
                 Timber.v("tag: " + tag + " value: " + value + " - " +
-                        text);
+                    text);
                 if ("name".equalsIgnoreCase(name)) {
                     if ("int".equals(tag)) {
                         // int config tags go here
@@ -136,7 +141,7 @@ public class ApnUtils {
                             maxImageHeight = Integer.parseInt(text);
                         } else if ("maxImageWidth".equalsIgnoreCase(value)) {
                             maxImageWidth = Integer.parseInt(text);
-                        }
+            }
                     } else if ("string".equals(tag)) {
                         // string config tags go here
                         if ("userAgent".equalsIgnoreCase(value)) {
@@ -145,7 +150,7 @@ public class ApnUtils {
                             uaProfUrl = text;
                         }
                     }
-                }
+        }
             }
         } catch (XmlPullParserException | NumberFormatException | IOException e) {
             Timber.e(e);
@@ -157,26 +162,26 @@ public class ApnUtils {
 
         if (errorStr != null) {
             String err =
-                    String.format("MmsConfig.loadMmsSettings mms_config.xml missing %s setting",
-                            errorStr);
+                String.format("MmsConfig.loadMmsSettings mms_config.xml missing %s setting",
+                    errorStr);
             Timber.e(err);
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             final TelephonyManager telephonyManager =
-                    (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+                (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
             userAgent = telephonyManager.getMmsUserAgent();
             uaProfUrl = telephonyManager.getMmsUAProfUrl();
-        }
+    }
 
         PreferenceManager.getDefaultSharedPreferences(context)
-                .edit()
-                .putInt("mms_max_width", maxImageWidth)
-                .putInt("mms_max_height", maxImageHeight)
-                .putString("mms_max_size", maxMessageSize)
-                .putString("mms_agent", userAgent)
-                .putString("mms_user_agent_profile_url", uaProfUrl)
-                .commit();
+            .edit()
+            .putInt("mms_max_width", maxImageWidth)
+            .putInt("mms_max_height", maxImageHeight)
+            .putString("mms_max_size", maxMessageSize)
+            .putString("mms_agent", userAgent)
+            .putString("mms_user_agent_profile_url", uaProfUrl)
+            .commit();
     }
 
     private static ArrayList<APN> loadApns(Context context) {
@@ -186,7 +191,8 @@ public class ApnUtils {
 
         int mcc = -1, mnc = -1;
 
-        TelephonyManager manager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+        TelephonyManager manager = (TelephonyManager) context
+            .getSystemService(Context.TELEPHONY_SERVICE);
         String networkOperator = manager.getNetworkOperator();
 
         if (isValidNetworkOperator(networkOperator)) {
@@ -208,8 +214,8 @@ public class ApnUtils {
             }
 
             if (mnc == -1) {
-                TelephonyManager tm  = (TelephonyManager) context.getSystemService
-                        (Context.TELEPHONY_SERVICE);
+                TelephonyManager tm = (TelephonyManager) context.getSystemService
+                    (Context.TELEPHONY_SERVICE);
                 mnc = ((CdmaCellLocation) tm.getCellLocation()).getSystemId();
             }
         } catch (Exception e) {
@@ -284,17 +290,19 @@ public class ApnUtils {
                         for (int i = 0; i < apns.size(); i++) {
                             APN current = apns.get(i);
 
-                            if (current.mmsc.equals(apn.mmsc) && current.port.equals(apn.port) && current.proxy.equals(apn.proxy)) {
+                            if (current.mmsc.equals(apn.mmsc) && current.port.equals(apn.port)
+                                && current.proxy
+                                .equals(apn.proxy)) {
                                 contains = true;
                                 break;
                             }
-                        }
+            }
 
                         if (!contains) {
                             apns.add(apn);
                         }
                     }
-                }
+        }
             }
         } catch (XmlPullParserException | NumberFormatException | IOException e) {
             Timber.e(e);
@@ -308,10 +316,10 @@ public class ApnUtils {
 
         if (errorStr != null) {
             String err =
-                    String.format("MmsConfig.loadMmsSettings mms_config.xml missing %s setting",
-                            errorStr);
+                String.format("MmsConfig.loadMmsSettings mms_config.xml missing %s setting",
+                    errorStr);
             Timber.e(err);
-        }
+    }
 
         return apns;
     }
@@ -319,51 +327,52 @@ public class ApnUtils {
     /**
      * Checks if the given network operator is valid, i.e. it's not null, empty or contains "null"
      *
-     * @param networkOperator
-     *         The network operator to be checked
-     *
+     * @param networkOperator The network operator to be checked
      * @return True if is a valid operator
      */
     private static boolean isValidNetworkOperator(String networkOperator) {
-      return networkOperator != null && !networkOperator.isEmpty() &&
-              !networkOperator.contains("null");
+        return networkOperator != null && !networkOperator.isEmpty() &&
+            !networkOperator.contains("null");
     }
 
     private static void setApns(Context context, APN apn) {
         PreferenceManager.getDefaultSharedPreferences(context)
-                .edit()
-                .putString("mmsc_url", apn.mmsc)
-                .putString("mms_proxy", apn.proxy)
-                .putString("mms_port", apn.port)
-                .commit();
+            .edit()
+            .putString("mmsc_url", apn.mmsc)
+            .putString("mms_proxy", apn.proxy)
+            .putString("mms_port", apn.port)
+            .commit();
     }
 
-    private static void beginDocument(XmlPullParser parser, String firstElementName) throws XmlPullParserException, IOException {
+    private static void beginDocument(XmlPullParser parser, String firstElementName)
+        throws XmlPullParserException, IOException {
         int type;
-        while ((type=parser.next()) != parser.START_TAG
-                && type != parser.END_DOCUMENT) {
+        while ((type = parser.next()) != parser.START_TAG
+            && type != parser.END_DOCUMENT) {
             ;
         }
 
         if (type != parser.START_TAG) {
             throw new XmlPullParserException("No start tag found");
-        }
+    }
 
         if (!parser.getName().equals(firstElementName)) {
             throw new XmlPullParserException("Unexpected start tag: found " + parser.getName() +
-                    ", expected " + firstElementName);
-        }
+                ", expected " + firstElementName);
+    }
     }
 
-    private static void nextElement(XmlPullParser parser) throws XmlPullParserException, IOException {
+    private static void nextElement(XmlPullParser parser)
+        throws XmlPullParserException, IOException {
         int type;
-        while ((type=parser.next()) != parser.START_TAG
-                && type != parser.END_DOCUMENT) {
+        while ((type = parser.next()) != parser.START_TAG
+            && type != parser.END_DOCUMENT) {
             ;
-        }
+    }
     }
 
     private static class APN {
+
         public String name;
         public String mmsc;
         public String proxy;

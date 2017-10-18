@@ -24,20 +24,18 @@ import android.content.res.Configuration;
 import android.os.Build;
 import android.telephony.SubscriptionInfo;
 import android.telephony.SubscriptionManager;
-import android.telephony.SubscriptionManager.OnSubscriptionsChangedListener;
 import android.util.ArrayMap;
-import timber.log.Timber;
-
 import java.util.List;
 import java.util.Map;
+import timber.log.Timber;
 
 /**
  * This class manages cached copies of all the MMS configuration for each subscription ID.
  * A subscription ID loosely corresponds to a particular SIM. See the
  * {@link SubscriptionManager} for more details.
- *
  */
 public class MmsConfigManager {
+
     private static final String TAG = "MmsConfigManager";
 
     private static volatile MmsConfigManager sInstance = new MmsConfigManager();
@@ -80,7 +78,7 @@ public class MmsConfigManager {
 
             // TODO: When this object "finishes" we should unregister.
             IntentFilter intentFilterLoaded =
-                    new IntentFilter("LOADED");
+                new IntentFilter("LOADED");
 
             try {
                 context.registerReceiver(mReceiver, intentFilterLoaded);
@@ -118,7 +116,7 @@ public class MmsConfigManager {
                 // Always put the mnc/mcc in the log so we can tell which mms_config.xml
                 // was loaded.
                 Timber.i("MmsConfigManager.loadInBackground(): mcc/mnc: " +
-                        configuration.mcc + "/" + configuration.mnc);
+                    configuration.mcc + "/" + configuration.mnc);
                 load(mContext);
             }
         }.start();
@@ -129,15 +127,15 @@ public class MmsConfigManager {
      *
      * @param subId Subscription id of the desired MmsConfig
      * @return MmsConfig for the particular subscription id. This function can return null if
-     *         the MmsConfig cannot be found or if this function is called before the
-     *         TelephonyManager has setup the SIMs or if loadInBackground is still spawning a
-     *         thread after a recent LISTEN_SUBSCRIPTION_INFO_LIST_CHANGED event.
+     * the MmsConfig cannot be found or if this function is called before the
+     * TelephonyManager has setup the SIMs or if loadInBackground is still spawning a
+     * thread after a recent LISTEN_SUBSCRIPTION_INFO_LIST_CHANGED event.
      */
     public MmsConfig getMmsConfigBySubId(int subId) {
         MmsConfig mmsConfig;
-        synchronized(mSubIdConfigMap) {
+        synchronized (mSubIdConfigMap) {
             mmsConfig = mSubIdConfigMap.get(subId);
-        }
+    }
         Timber.i("getMmsConfigBySubId -- for sub: " + subId + " mmsConfig: " + mmsConfig);
         return mmsConfig;
     }
@@ -150,7 +148,6 @@ public class MmsConfigManager {
      * This function goes through all the activated subscription ids (the actual SIMs in the
      * device), builds a context with that SIM's mcc/mnc and loads the appropriate mms_config.xml
      * file via the ResourceManager. With single-SIM devices, there will be a single subId.
-     *
      */
     private void load(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
@@ -169,14 +166,14 @@ public class MmsConfigManager {
                     configuration.mcc = config.mcc;
                     configuration.mnc = config.mnc;
                     Timber.i("MmsConfigManager.load -- no mcc/mnc for sub: " + sub +
-                            " using mcc/mnc from main context: " + configuration.mcc + "/" +
-                            configuration.mnc);
+                        " using mcc/mnc from main context: " + configuration.mcc + "/" +
+                        configuration.mnc);
                 } else {
                     Timber.i("MmsConfigManager.load -- mcc/mnc for sub: " + sub);
 
                     configuration.mcc = sub.getMcc();
                     configuration.mnc = sub.getMnc();
-                }
+        }
                 Context subContext = context.createConfigurationContext(configuration);
 
                 int subId = sub.getSubscriptionId();
@@ -186,7 +183,7 @@ public class MmsConfigManager {
                 mSubIdConfigMap.clear();
                 mSubIdConfigMap.putAll(newConfigMap);
             }
-        }
+    }
     }
 
 }

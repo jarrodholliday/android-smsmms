@@ -27,8 +27,6 @@ import android.provider.Telephony.Mms;
 import android.provider.Telephony.MmsSms;
 import android.provider.Telephony.MmsSms.PendingMessages;
 import android.util.Log;
-import timber.log.Timber;
-
 import com.android.mms.logs.LogTag;
 import com.android.mms.util.SendingProgressTokenManager;
 import com.google.android.mms.InvalidHeaderValueException;
@@ -40,8 +38,10 @@ import com.google.android.mms.pdu_alt.PduPersister;
 import com.google.android.mms.pdu_alt.ReadRecInd;
 import com.google.android.mms.pdu_alt.SendReq;
 import com.google.android.mms.util_alt.SqliteWrapper;
+import timber.log.Timber;
 
 public class MmsMessageSender implements MessageSender {
+
     private static final String TAG = LogTag.TAG;
 
     private final Context mContext;
@@ -49,11 +49,11 @@ public class MmsMessageSender implements MessageSender {
     private final long mMessageSize;
 
     // Default preference values
-    private static final boolean DEFAULT_DELIVERY_REPORT_MODE  = false;
-    private static final boolean DEFAULT_READ_REPORT_MODE      = false;
-    private static final long    DEFAULT_EXPIRY_TIME     = 7 * 24 * 60 * 60;
-    private static final int     DEFAULT_PRIORITY        = PduHeaders.PRIORITY_NORMAL;
-    private static final String  DEFAULT_MESSAGE_CLASS   = PduHeaders.MESSAGE_CLASS_PERSONAL_STR;
+    private static final boolean DEFAULT_DELIVERY_REPORT_MODE = false;
+    private static final boolean DEFAULT_READ_REPORT_MODE = false;
+    private static final long DEFAULT_EXPIRY_TIME = 7 * 24 * 60 * 60;
+    private static final int DEFAULT_PRIORITY = PduHeaders.PRIORITY_NORMAL;
+    private static final String DEFAULT_MESSAGE_CLASS = PduHeaders.MESSAGE_CLASS_PERSONAL_STR;
 
     private static final String DELIVERY_REPORT_PREFERENCE = "delivery_reports";
     private static final String READ_REPORT_PREFERENCE = "read_reports";
@@ -65,7 +65,7 @@ public class MmsMessageSender implements MessageSender {
 
         if (mMessageUri == null) {
             throw new IllegalArgumentException("Null message URI.");
-        }
+    }
     }
 
     public boolean sendMessage(long token) throws MmsException {
@@ -115,7 +115,7 @@ public class MmsMessageSender implements MessageSender {
             values.put(PendingMessages.DUE_TIME, 0);
 
             SqliteWrapper.insert(mContext, mContext.getContentResolver(),
-                    PendingMessages.CONTENT_URI, values);
+                PendingMessages.CONTENT_URI, values);
         } else {
             p.move(mMessageUri, Mms.Outbox.CONTENT_URI);
         }
@@ -126,7 +126,7 @@ public class MmsMessageSender implements MessageSender {
             mContext.startService(new Intent(mContext, TransactionService.class));
         } catch (Exception e) {
             throw new MmsException("transaction service not registered in manifest");
-        }
+    }
 
         return true;
     }
@@ -143,15 +143,15 @@ public class MmsMessageSender implements MessageSender {
 
         // Delivery report.
         boolean dr = prefs.getBoolean(DELIVERY_REPORT_PREFERENCE,
-                        DEFAULT_DELIVERY_REPORT_MODE);
-        sendReq.setDeliveryReport(dr?PduHeaders.VALUE_YES:PduHeaders.VALUE_NO);
+            DEFAULT_DELIVERY_REPORT_MODE);
+        sendReq.setDeliveryReport(dr ? PduHeaders.VALUE_YES : PduHeaders.VALUE_NO);
 
         // Read report.
         boolean rr = prefs.getBoolean(READ_REPORT_PREFERENCE,
-                // default to delivery report value if read report not available
-                prefs.getBoolean(DELIVERY_REPORT_PREFERENCE,
-                        DEFAULT_READ_REPORT_MODE));
-        sendReq.setReadReport(rr?PduHeaders.VALUE_YES:PduHeaders.VALUE_NO);
+            // default to delivery report value if read report not available
+            prefs.getBoolean(DELIVERY_REPORT_PREFERENCE,
+                DEFAULT_READ_REPORT_MODE));
+        sendReq.setReadReport(rr ? PduHeaders.VALUE_YES : PduHeaders.VALUE_NO);
     }
 
     public static void sendReadRec(Context context, String to, String messageId, int status) {
@@ -160,11 +160,11 @@ public class MmsMessageSender implements MessageSender {
 
         try {
             final ReadRecInd readRec = new ReadRecInd(
-                    new EncodedStringValue(PduHeaders.FROM_INSERT_ADDRESS_TOKEN_STR.getBytes()),
-                    messageId.getBytes(),
-                    PduHeaders.CURRENT_MMS_VERSION,
-                    status,
-                    sender);
+                new EncodedStringValue(PduHeaders.FROM_INSERT_ADDRESS_TOKEN_STR.getBytes()),
+                messageId.getBytes(),
+                PduHeaders.CURRENT_MMS_VERSION,
+                status,
+                sender);
 
             readRec.setDate(System.currentTimeMillis() / 1000);
 
@@ -173,15 +173,16 @@ public class MmsMessageSender implements MessageSender {
             try {
                 group = com.klinker.android.send_message.Transaction.settings.getGroup();
             } catch (Exception e) {
-                group = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("group_message", true);
+                group = PreferenceManager.getDefaultSharedPreferences(context)
+                    .getBoolean("group_message", true);
             }
             PduPersister.getPduPersister(context).persist(readRec, Mms.Outbox.CONTENT_URI, true,
-                    group, null);
+                group, null);
             context.startService(new Intent(context, TransactionService.class));
         } catch (InvalidHeaderValueException e) {
             Timber.e(e);
         } catch (MmsException e) {
             Timber.e(e);
-        }
+    }
     }
 }

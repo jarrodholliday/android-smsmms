@@ -16,11 +16,11 @@
 
 package com.google.android.mms.pdu_alt;
 
+import com.google.android.mms.InvalidHeaderValueException;
 import timber.log.Timber;
 
-import com.google.android.mms.InvalidHeaderValueException;
-
 public class SendReq extends MultimediaMessagePdu {
+
     private static final String TAG = "SendReq";
 
     public SendReq() {
@@ -38,7 +38,7 @@ public class SendReq extends MultimediaMessagePdu {
             // Impossible to reach here since all headers we set above are valid.
             Timber.e(e);
             throw new RuntimeException(e);
-        }
+    }
     }
 
     private byte[] generateTransactionId() {
@@ -54,12 +54,12 @@ public class SendReq extends MultimediaMessagePdu {
      * @param mmsVersion current viersion of mms
      * @param transactionId the transaction-id value
      * @throws InvalidHeaderValueException if parameters are invalid.
-     *         NullPointerException if contentType, form or transactionId is null.
+     * NullPointerException if contentType, form or transactionId is null.
      */
     public SendReq(byte[] contentType,
-                   EncodedStringValue from,
-                   int mmsVersion,
-                   byte[] transactionId) throws InvalidHeaderValueException {
+        EncodedStringValue from,
+        int mmsVersion,
+        byte[] transactionId) throws InvalidHeaderValueException {
         super();
         setMessageType(PduHeaders.MESSAGE_TYPE_SEND_REQ);
         setContentType(contentType);
@@ -187,7 +187,7 @@ public class SendReq extends MultimediaMessagePdu {
      * Get X-Mms-Expiry value.
      *
      * Expiry-value = Value-length
-     *      (Absolute-token Date-value | Relative-token Delta-seconds-value)
+     * (Absolute-token Date-value | Relative-token Delta-seconds-value)
      *
      * @return the value
      */

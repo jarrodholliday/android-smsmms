@@ -21,14 +21,11 @@ import android.net.NetworkUtilsHelper;
 import android.provider.Telephony;
 import android.text.TextUtils;
 import android.util.Log;
-import com.android.mms.logs.LogTag;
-import timber.log.Timber;
-
 import com.android.mms.MmsConfig;
+import com.android.mms.logs.LogTag;
 import com.klinker.android.send_message.Transaction;
 import com.klinker.android.send_message.Utils;
-
-import com.android.mms.logs.LogTag;
+import timber.log.Timber;
 
 /**
  * Container of transaction settings. Instances of this class are contained
@@ -36,6 +33,7 @@ import com.android.mms.logs.LogTag;
  * settings or of the MMS Client.
  */
 public class TransactionSettings {
+
     private static final String TAG = LogTag.TAG;
     private static final boolean DEBUG = true;
     private static final boolean LOCAL_LOGV = false;
@@ -45,15 +43,15 @@ public class TransactionSettings {
     private int mProxyPort = -1;
 
     private static final String[] APN_PROJECTION = {
-            Telephony.Carriers.TYPE,            // 0
-            Telephony.Carriers.MMSC,            // 1
-            Telephony.Carriers.MMSPROXY,        // 2
-            Telephony.Carriers.MMSPORT          // 3
+        Telephony.Carriers.TYPE,            // 0
+        Telephony.Carriers.MMSC,            // 1
+        Telephony.Carriers.MMSPROXY,        // 2
+        Telephony.Carriers.MMSPORT          // 3
     };
-    private static final int COLUMN_TYPE         = 0;
-    private static final int COLUMN_MMSC         = 1;
-    private static final int COLUMN_MMSPROXY     = 2;
-    private static final int COLUMN_MMSPORT      = 3;
+    private static final int COLUMN_TYPE = 0;
+    private static final int COLUMN_MMSC = 1;
+    private static final int COLUMN_MMSPROXY = 2;
+    private static final int COLUMN_MMSPORT = 3;
 
     /**
      * Constructor that uses the default settings of the MMS Client.
@@ -115,7 +113,8 @@ public class TransactionSettings {
             try {
                 mProxyPort = Integer.parseInt(Transaction.settings.getPort());
             } catch (NumberFormatException e) {
-                Timber.e("could not get proxy: %s %s", Transaction.settings.getPort(), e.getMessage());
+                Timber.e("could not get proxy: %s %s", Transaction.settings.getPort(),
+                    e.getMessage());
             }
         }
 //        }
@@ -176,10 +175,10 @@ public class TransactionSettings {
 
         if (Log.isLoggable(LogTag.TRANSACTION, Log.VERBOSE)) {
             Log.v(TAG, "TransactionSettings: " + mServiceCenter +
-                    " proxyAddress: " + mProxyAddress +
-                    " proxyPort: " + mProxyPort);
-        }
-   }
+                " proxyAddress: " + mProxyAddress +
+                " proxyPort: " + mProxyPort);
+    }
+    }
 
     public String getMmscUrl() {
         return mServiceCenter;
@@ -201,7 +200,7 @@ public class TransactionSettings {
         // If APN type is unspecified, assume APN_TYPE_ALL.
         if (TextUtils.isEmpty(types)) {
             return true;
-        }
+    }
 
         for (String t : types.split(",")) {
             if (t.equals(requestType) || t.equals("*")) {

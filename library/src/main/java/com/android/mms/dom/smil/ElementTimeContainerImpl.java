@@ -21,13 +21,13 @@ import org.w3c.dom.smil.ElementTimeContainer;
 import org.w3c.dom.smil.SMILElement;
 
 public abstract class ElementTimeContainerImpl extends ElementTimeImpl implements
-        ElementTimeContainer {
+    ElementTimeContainer {
 
     /*
      * Internal Interface
      */
 
-    ElementTimeContainerImpl(SMILElement element) {
-        super(element);
-    }
+  ElementTimeContainerImpl(SMILElement element) {
+    super(element);
+  }
 }

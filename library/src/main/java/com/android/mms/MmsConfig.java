@@ -18,7 +18,6 @@ package com.android.mms;
 
 import android.content.Context;
 import android.content.res.XmlResourceParser;
-import timber.log.Timber;
 import com.klinker.android.send_message.R;
 import java.io.IOException;
 import org.xmlpull.v1.XmlPullParser;
@@ -26,6 +25,7 @@ import org.xmlpull.v1.XmlPullParserException;
 import timber.log.Timber;
 
 public class MmsConfig {
+
     private static final String TAG = "MmsConfig";
     private static final boolean DEBUG = true;
     private static final boolean LOCAL_LOGV = false;
@@ -60,7 +60,7 @@ public class MmsConfig {
     private static int mDefaultMMSMessagesPerThread = 1000;     // default value
     private static int mMinMessageCountPerThread = 2;           // default value
     private static int mMaxMessageCountPerThread = 5000;        // default value
-    private static int mHttpSocketTimeout = 60*1000;            // default to 1 min
+    private static int mHttpSocketTimeout = 60 * 1000;            // default to 1 min
     private static int mMinimumSlideElementDuration = 7;        // default to 7 sec
     private static boolean mNotifyWapMMSC = false;
     private static boolean mAllowAttachAudio = true;
@@ -71,7 +71,7 @@ public class MmsConfig {
     // than a single segment (i.e. 140 chars), then the message will turn into and be sent
     // as an mms message. This feature exists for carriers that don't support multi-part sms's.
     private static boolean mEnableMultipartSMS = true;
-    
+
     // By default, the radio splits multipart sms, not the application. If the carrier or radio
     // does not support this, and the recipient gets garbled text, set this to true. If this is
     // true and mEnableMultipartSMS is false, the mSmsToMmsTextThreshold will be observed,
@@ -101,7 +101,7 @@ public class MmsConfig {
     private static int mAliasRuleMaxChars = 48;
 
     private static int mMaxSubjectLength = 40;  // maximum number of characters allowed for mms
-                                                // subject
+    // subject
 
     // If mEnableGroupMms is true, a message with multiple recipients, regardless of contents,
     // will be sent as a single MMS message with multiple "TO" fields set for each recipient.
@@ -112,7 +112,7 @@ public class MmsConfig {
     public static void init(Context context) {
         if (LOCAL_LOGV) {
             Timber.v("MmsConfig.init()");
-        }
+    }
         // Always put the mnc/mcc in the log so we can tell which mms_config.xml was loaded.
 
         loadMmsSettings(context);
@@ -125,8 +125,8 @@ public class MmsConfig {
     public static int getMaxMessageSize() {
         if (LOCAL_LOGV) {
             Timber.v("MmsConfig.getMaxMessageSize(): " + mMaxMessageSize);
-        }
-       return mMaxMessageSize;
+    }
+        return mMaxMessageSize;
     }
 
     /**
@@ -166,29 +166,29 @@ public class MmsConfig {
         return mNotifyWapMMSC;
     }
 
-    public static final void beginDocument(XmlPullParser parser, String firstElementName) throws XmlPullParserException, IOException
-    {
+    public static final void beginDocument(XmlPullParser parser, String firstElementName)
+        throws XmlPullParserException, IOException {
         int type;
-        while ((type=parser.next()) != parser.START_TAG
-                   && type != parser.END_DOCUMENT) {
+        while ((type = parser.next()) != parser.START_TAG
+            && type != parser.END_DOCUMENT) {
             ;
-        }
+    }
 
         if (type != parser.START_TAG) {
             throw new XmlPullParserException("No start tag found");
-        }
+    }
 
         if (!parser.getName().equals(firstElementName)) {
             throw new XmlPullParserException("Unexpected start tag: found " + parser.getName() +
-                    ", expected " + firstElementName);
+                ", expected " + firstElementName);
         }
     }
 
-    public static final void nextElement(XmlPullParser parser) throws XmlPullParserException, IOException
-    {
+    public static final void nextElement(XmlPullParser parser)
+        throws XmlPullParserException, IOException {
         int type;
-        while ((type=parser.next()) != parser.START_TAG
-                   && type != parser.END_DOCUMENT) {
+        while ((type = parser.next()) != parser.START_TAG
+            && type != parser.END_DOCUMENT) {
             ;
         }
     }
@@ -204,7 +204,7 @@ public class MmsConfig {
                 String tag = parser.getName();
                 if (tag == null) {
                     break;
-                }
+        }
                 String name = parser.getAttributeName(0);
                 String value = parser.getAttributeValue(0);
                 String text = null;
@@ -214,8 +214,8 @@ public class MmsConfig {
 
                 if (DEBUG) {
                     Timber.v("tag: " + tag + " value: " + value + " - " +
-                            text);
-                }
+                        text);
+        }
                 if ("name".equalsIgnoreCase(name)) {
                     if ("bool".equals(tag)) {
                         // bool config tags go here
@@ -304,20 +304,20 @@ public class MmsConfig {
             Timber.e(e);
         } finally {
             parser.close();
-        }
+    }
 
         String errorStr = null;
 
         if (getMmsEnabled() && mUaProfUrl == null) {
             errorStr = "uaProfUrl";
-        }
+    }
 
         if (errorStr != null) {
             String err =
                 String.format("MmsConfig.loadMmsSettings mms_config.xml missing %s setting",
-                        errorStr);
+                    errorStr);
             Timber.e(err);
-        }
+    }
     }
 
     public static void setUserAgent(String userAgent) {

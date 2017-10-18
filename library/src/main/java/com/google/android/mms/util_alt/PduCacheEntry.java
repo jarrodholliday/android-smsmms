@@ -19,25 +19,26 @@ package com.google.android.mms.util_alt;
 import com.google.android.mms.pdu_alt.GenericPdu;
 
 public final class PduCacheEntry {
-    private final GenericPdu mPdu;
-    private final int mMessageBox;
-    private final long mThreadId;
 
-    public PduCacheEntry(GenericPdu pdu, int msgBox, long threadId) {
-        mPdu = pdu;
-        mMessageBox = msgBox;
-        mThreadId = threadId;
-    }
+  private final GenericPdu mPdu;
+  private final int mMessageBox;
+  private final long mThreadId;
 
-    public GenericPdu getPdu() {
-        return mPdu;
-    }
+  public PduCacheEntry(GenericPdu pdu, int msgBox, long threadId) {
+    mPdu = pdu;
+    mMessageBox = msgBox;
+    mThreadId = threadId;
+  }
 
-    public int getMessageBox() {
-        return mMessageBox;
-    }
+  public GenericPdu getPdu() {
+    return mPdu;
+  }
 
-    public long getThreadId() {
-        return mThreadId;
-    }
+  public int getMessageBox() {
+    return mMessageBox;
+  }
+
+  public long getThreadId() {
+    return mThreadId;
+  }
 }

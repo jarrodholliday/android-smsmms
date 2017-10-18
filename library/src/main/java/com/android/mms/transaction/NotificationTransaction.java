@@ -16,6 +16,14 @@
 
 package com.android.mms.transaction;
 
+import static com.android.mms.transaction.TransactionState.FAILED;
+import static com.android.mms.transaction.TransactionState.INITIALIZED;
+import static com.android.mms.transaction.TransactionState.SUCCESS;
+import static com.google.android.mms.pdu_alt.PduHeaders.MESSAGE_TYPE_RETRIEVE_CONF;
+import static com.google.android.mms.pdu_alt.PduHeaders.STATUS_DEFERRED;
+import static com.google.android.mms.pdu_alt.PduHeaders.STATUS_RETRIEVED;
+import static com.google.android.mms.pdu_alt.PduHeaders.STATUS_UNRECOGNIZED;
+
 import android.app.Service;
 import android.content.ContentValues;
 import android.content.Context;
@@ -28,9 +36,8 @@ import android.provider.Telephony.Mms;
 import android.provider.Telephony.Mms.Inbox;
 import android.provider.Telephony.Threads;
 import android.telephony.TelephonyManager;
-
-import com.android.mms.logs.LogTag;
 import com.android.mms.MmsConfig;
+import com.android.mms.logs.LogTag;
 import com.android.mms.util.DownloadManager;
 import com.google.android.mms.MmsException;
 import com.google.android.mms.pdu_alt.GenericPdu;
@@ -40,18 +47,9 @@ import com.google.android.mms.pdu_alt.PduComposer;
 import com.google.android.mms.pdu_alt.PduHeaders;
 import com.google.android.mms.pdu_alt.PduParser;
 import com.google.android.mms.pdu_alt.PduPersister;
-import timber.log.Timber;
 import com.klinker.android.send_message.BroadcastUtils;
-
 import java.io.IOException;
-
-import static com.android.mms.transaction.TransactionState.FAILED;
-import static com.android.mms.transaction.TransactionState.INITIALIZED;
-import static com.android.mms.transaction.TransactionState.SUCCESS;
-import static com.google.android.mms.pdu_alt.PduHeaders.MESSAGE_TYPE_RETRIEVE_CONF;
-import static com.google.android.mms.pdu_alt.PduHeaders.STATUS_DEFERRED;
-import static com.google.android.mms.pdu_alt.PduHeaders.STATUS_RETRIEVED;
-import static com.google.android.mms.pdu_alt.PduHeaders.STATUS_UNRECOGNIZED;
+import timber.log.Timber;
 
 /**
  * The NotificationTransaction is responsible for handling multimedia
@@ -70,6 +68,7 @@ import static com.google.android.mms.pdu_alt.PduHeaders.STATUS_UNRECOGNIZED;
  * in case the client is in immediate retrieve mode.
  */
 public class NotificationTransaction extends Transaction implements Runnable {
+
     private static final String TAG = LogTag.TAG;
     private static final boolean DEBUG = false;
     private static final boolean LOCAL_LOGV = false;
@@ -79,19 +78,19 @@ public class NotificationTransaction extends Transaction implements Runnable {
     private String mContentLocation;
 
     public NotificationTransaction(
-            Context context, int serviceId,
-            TransactionSettings connectionSettings, String uriString) {
+        Context context, int serviceId,
+        TransactionSettings connectionSettings, String uriString) {
         super(context, serviceId, connectionSettings);
 
         mUri = Uri.parse(uriString);
 
         try {
             mNotificationInd = (NotificationInd)
-                    PduPersister.getPduPersister(context).load(mUri);
+                PduPersister.getPduPersister(context).load(mUri);
         } catch (MmsException e) {
             Timber.e("Failed to load NotificationInd from: %s %s", uriString, e.getMessage());
             throw new IllegalArgumentException();
-        }
+    }
 
         mContentLocation = new String(mNotificationInd.getContentLocation());
         mId = mContentLocation;
@@ -104,8 +103,8 @@ public class NotificationTransaction extends Transaction implements Runnable {
      * This constructor is only used for test purposes.
      */
     public NotificationTransaction(
-            Context context, int serviceId,
-            TransactionSettings connectionSettings, NotificationInd ind) {
+        Context context, int serviceId,
+        TransactionSettings connectionSettings, NotificationInd ind) {
         super(context, serviceId, connectionSettings);
 
         try {
@@ -116,15 +115,16 @@ public class NotificationTransaction extends Transaction implements Runnable {
             try {
                 group = com.klinker.android.send_message.Transaction.settings.getGroup();
             } catch (Exception e) {
-                group = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("group_message", true);
+                group = PreferenceManager.getDefaultSharedPreferences(context)
+                    .getBoolean("group_message", true);
             }
             mUri = PduPersister.getPduPersister(context).persist(
-                        ind, Inbox.CONTENT_URI, !allowAutoDownload(mContext),
-                        group, null);
+                ind, Inbox.CONTENT_URI, !allowAutoDownload(mContext),
+                group, null);
         } catch (MmsException e) {
             Timber.e("Failed to save NotificationInd in constructor. %s", e.getMessage());
             throw new IllegalArgumentException();
-        }
+    }
 
         mNotificationInd = ind;
         mId = new String(mNotificationInd.getContentLocation());
@@ -140,15 +140,24 @@ public class NotificationTransaction extends Transaction implements Runnable {
     }
 
     public static boolean allowAutoDownload(Context context) {
-        try { Looper.prepare(); } catch (Exception e) { }
-        boolean autoDownload = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("auto_download_mms", true);
-        boolean dataSuspended = (((TelephonyManager) context.getSystemService(Service.TELEPHONY_SERVICE)).getDataState() ==
+        try {
+            Looper.prepare();
+        } catch (Exception e) {
+    }
+        boolean autoDownload = PreferenceManager.getDefaultSharedPreferences(context)
+            .getBoolean("auto_download_mms", true);
+        boolean dataSuspended = (
+            ((TelephonyManager) context.getSystemService(Service.TELEPHONY_SERVICE)).getDataState()
+                ==
                 TelephonyManager.DATA_SUSPENDED);
         return autoDownload && !dataSuspended;
     }
 
     public void run() {
-        try { Looper.prepare(); } catch (Exception e) {}
+        try {
+            Looper.prepare();
+        } catch (Exception e) {
+    }
         DownloadManager.init(mContext);
         DownloadManager downloadManager = DownloadManager.getInstance();
         boolean autoDownload = allowAutoDownload(mContext);
@@ -187,37 +196,37 @@ public class NotificationTransaction extends Transaction implements Runnable {
                 GenericPdu pdu = new PduParser(retrieveConfData).parse();
                 if ((pdu == null) || (pdu.getMessageType() != MESSAGE_TYPE_RETRIEVE_CONF)) {
                     Timber.e("Invalid M-RETRIEVE.CONF PDU. " +
-                            (pdu != null ? "message type: " + pdu.getMessageType() : "null pdu"));
+                        (pdu != null ? "message type: " + pdu.getMessageType() : "null pdu"));
                     mTransactionState.setState(FAILED);
                     status = STATUS_UNRECOGNIZED;
                 } else {
                     // Save the received PDU (must be a M-RETRIEVE.CONF).
                     PduPersister p = PduPersister.getPduPersister(mContext);
                     Uri uri = p.persist(pdu, Inbox.CONTENT_URI, true,
-                            com.klinker.android.send_message.Transaction.settings.getGroup(), null);
+                        com.klinker.android.send_message.Transaction.settings.getGroup(), null);
 
                     // Use local time instead of PDU time
                     ContentValues values = new ContentValues(1);
                     values.put(Mms.DATE, System.currentTimeMillis() / 1000L);
                     SqliteWrapper.update(mContext, mContext.getContentResolver(),
-                            uri, values, null, null);
+                        uri, values, null, null);
 
                     // We have successfully downloaded the new MM. Delete the
                     // M-NotifyResp.ind from Inbox.
                     SqliteWrapper.delete(mContext, mContext.getContentResolver(),
-                                         mUri, null, null);
+                        mUri, null, null);
                     Timber.v("NotificationTransaction received new mms message: " + uri);
                     // Delete obsolete threads
                     SqliteWrapper.delete(mContext, mContext.getContentResolver(),
-                            Threads.OBSOLETE_THREADS_URI, null, null);
+                        Threads.OBSOLETE_THREADS_URI, null, null);
 
                     // Notify observers with newly received MM.
                     mUri = uri;
                     status = STATUS_RETRIEVED;
                     BroadcastUtils.sendExplicitBroadcast(
-                            mContext,
-                            new Intent(),
-                            com.klinker.android.send_message.Transaction.NOTIFY_OF_MMS);
+                        mContext,
+                        new Intent(),
+                        com.klinker.android.send_message.Transaction.NOTIFY_OF_MMS);
                 }
             }
 
@@ -253,22 +262,22 @@ public class NotificationTransaction extends Transaction implements Runnable {
                 Timber.e("NotificationTransaction failed.");
             }
             notifyObservers();
-        }
+    }
     }
 
     private void sendNotifyRespInd(int status) throws MmsException, IOException {
         // Create the M-NotifyResp.ind
         NotifyRespInd notifyRespInd = new NotifyRespInd(
-                PduHeaders.CURRENT_MMS_VERSION,
-                mNotificationInd.getTransactionId(),
-                status);
+            PduHeaders.CURRENT_MMS_VERSION,
+            mNotificationInd.getTransactionId(),
+            status);
 
         // Pack M-NotifyResp.ind and send it
-        if(MmsConfig.getNotifyWapMMSC()) {
+        if (MmsConfig.getNotifyWapMMSC()) {
             sendPdu(new PduComposer(mContext, notifyRespInd).make(), mContentLocation);
         } else {
             sendPdu(new PduComposer(mContext, notifyRespInd).make());
-        }
+    }
     }
 
     @Override

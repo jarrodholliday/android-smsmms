@@ -23,16 +23,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Binder;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.Telephony;
 import android.telephony.SmsManager;
 import android.text.TextUtils;
-import timber.log.Timber;
-
 import com.android.mms.service_alt.exception.MmsHttpException;
-
-import com.google.android.mms.MmsException;
 import com.google.android.mms.pdu_alt.GenericPdu;
 import com.google.android.mms.pdu_alt.PduHeaders;
 import com.google.android.mms.pdu_alt.PduParser;
@@ -40,11 +35,13 @@ import com.google.android.mms.pdu_alt.PduPersister;
 import com.google.android.mms.pdu_alt.SendConf;
 import com.google.android.mms.pdu_alt.SendReq;
 import com.google.android.mms.util_alt.SqliteWrapper;
+import timber.log.Timber;
 
 /**
  * Request to send an MMS
  */
 public class SendRequest extends MmsRequest {
+
     private static final String TAG = "SendRequest";
 
     private final Uri mPduUri;
@@ -53,7 +50,7 @@ public class SendRequest extends MmsRequest {
     private final PendingIntent mSentIntent;
 
     public SendRequest(RequestManager manager, int subId, Uri contentUri, String locationUrl,
-            PendingIntent sentIntent, String creator, Bundle configOverrides) {
+        PendingIntent sentIntent, String creator, Bundle configOverrides) {
         super(manager, subId, creator, configOverrides);
         mPduUri = contentUri;
         mPduData = null;
@@ -63,20 +60,20 @@ public class SendRequest extends MmsRequest {
 
     @Override
     protected byte[] doHttp(Context context, MmsNetworkManager netMgr, ApnSettings apn)
-            throws MmsHttpException {
+        throws MmsHttpException {
         final MmsHttpClient mmsHttpClient = netMgr.getOrCreateHttpClient();
         if (mmsHttpClient == null) {
             Timber.e("MMS network is not ready!");
             throw new MmsHttpException(0/*statusCode*/, "MMS network is not ready");
-        }
+    }
         return mmsHttpClient.execute(
-                mLocationUrl != null ? mLocationUrl : apn.getMmscUrl(),
-                mPduData,
-                MmsHttpClient.METHOD_POST,
-                apn.isProxySet(),
-                apn.getProxyAddress(),
-                apn.getProxyPort(),
-                mMmsConfig);
+            mLocationUrl != null ? mLocationUrl : apn.getMmscUrl(),
+            mPduData,
+            MmsHttpClient.METHOD_POST,
+            apn.isProxySet(),
+            apn.getProxyAddress(),
+            apn.getProxyPort(),
+            mMmsConfig);
     }
 
     @Override
@@ -130,8 +127,8 @@ public class SendRequest extends MmsRequest {
                 }
             }
             if (result != Activity.RESULT_OK
-                    || sendConf == null
-                    || sendConf.getResponseStatus() != PduHeaders.RESPONSE_STATUS_OK) {
+                || sendConf == null
+                || sendConf.getResponseStatus() != PduHeaders.RESPONSE_STATUS_OK) {
                 // Since we can't persist a message directly into FAILED box,
                 // we have to update the column after we persist it into SENT box.
                 // The gap between the state change is tiny so I would not expect
@@ -145,7 +142,7 @@ public class SendRequest extends MmsRequest {
                 values.put(Telephony.Mms.RESPONSE_STATUS, sendConf.getResponseStatus());
                 Timber.v("response status: " + sendConf.getResponseStatus());
                 values.put(Telephony.Mms.MESSAGE_ID,
-                        PduPersister.toIsoString(sendConf.getMessageId()));
+                    PduPersister.toIsoString(sendConf.getMessageId()));
             }
             values.put(Telephony.Mms.DATE, System.currentTimeMillis() / 1000L);
             values.put(Telephony.Mms.READ, 1);
@@ -157,7 +154,7 @@ public class SendRequest extends MmsRequest {
                 values.put(Telephony.Mms.SUBSCRIPTION_ID, mSubId);
             }
             if (SqliteWrapper.update(context, context.getContentResolver(), mPduUri, values,
-                    null/*where*/, null/*selectionArg*/) != 1) {
+                null/*where*/, null/*selectionArg*/) != 1) {
                 Timber.e("SendRequest.persistIfRequired: failed to update message");
             }
             return mPduUri;
@@ -167,18 +164,19 @@ public class SendRequest extends MmsRequest {
             Timber.e(e);
         } finally {
             Binder.restoreCallingIdentity(identity);
-        }
+    }
         return null;
     }
 
     /**
      * Read the pdu from the file descriptor and cache pdu bytes in request
+     *
      * @return true if pdu read successfully
      */
     private boolean readPduFromContentUri() {
         if (mPduData != null) {
             return true;
-        }
+    }
         final int bytesTobeRead = mMmsConfig.getMaxMessageSize();
         mPduData = mRequestManager.readPduFromContentUri(mPduUri, bytesTobeRead);
         return (mPduData != null);
@@ -186,7 +184,7 @@ public class SendRequest extends MmsRequest {
 
     /**
      * Transfer the received response to the caller (for send requests the pdu is small and can
-     *  just include bytes as extra in the "returned" intent).
+     * just include bytes as extra in the "returned" intent).
      *
      * @param fillIn the intent that will be returned to the caller
      * @param response the pdu to transfer
@@ -196,12 +194,13 @@ public class SendRequest extends MmsRequest {
         // SendConf pdus are always small and can be included in the intent
         if (response != null) {
             fillIn.putExtra(SmsManager.EXTRA_MMS_DATA, response);
-        }
+    }
         return true;
     }
 
     /**
      * Read the data from the file descriptor if not yet done
+     *
      * @return whether data successfully read
      */
     @Override
@@ -228,6 +227,6 @@ public class SendRequest extends MmsRequest {
             context.revokeUriPermission(mPduUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
         } catch (NullPointerException e) {
             Timber.e(e);
-        }
+    }
     }
 }

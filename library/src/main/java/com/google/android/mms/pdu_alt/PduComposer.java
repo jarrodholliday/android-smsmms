@@ -19,16 +19,16 @@ package com.google.android.mms.pdu_alt;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.text.TextUtils;
-import timber.log.Timber;
-
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
+import timber.log.Timber;
 
 public class PduComposer {
+
     /**
      * Address type.
      */
@@ -43,13 +43,13 @@ public class PduComposer {
      */
     static final String REGEXP_PHONE_NUMBER_ADDRESS_TYPE = "\\+?[0-9|\\.|\\-]+";
     static final String REGEXP_EMAIL_ADDRESS_TYPE = "[a-zA-Z| ]*\\<{0,1}[a-zA-Z| ]+@{1}" +
-            "[a-zA-Z| ]+\\.{1}[a-zA-Z| ]+\\>{0,1}";
+        "[a-zA-Z| ]+\\.{1}[a-zA-Z| ]+\\>{0,1}";
     static final String REGEXP_IPV6_ADDRESS_TYPE =
         "[a-fA-F]{4}\\:{1}[a-fA-F0-9]{4}\\:{1}[a-fA-F0-9]{4}\\:{1}" +
-        "[a-fA-F0-9]{4}\\:{1}[a-fA-F0-9]{4}\\:{1}[a-fA-F0-9]{4}\\:{1}" +
-        "[a-fA-F0-9]{4}\\:{1}[a-fA-F0-9]{4}";
+            "[a-fA-F0-9]{4}\\:{1}[a-fA-F0-9]{4}\\:{1}[a-fA-F0-9]{4}\\:{1}" +
+            "[a-fA-F0-9]{4}\\:{1}[a-fA-F0-9]{4}";
     static final String REGEXP_IPV4_ADDRESS_TYPE = "[0-9]{1,3}\\.{1}[0-9]{1,3}\\.{1}" +
-            "[0-9]{1,3}\\.{1}[0-9]{1,3}";
+        "[0-9]{1,3}\\.{1}[0-9]{1,3}";
 
     /**
      * The postfix strings of address.
@@ -123,7 +123,7 @@ public class PduComposer {
         int i;
         for (i = 0; i < PduContentTypes.contentTypes.length; i++) {
             mContentTypeMap.put(PduContentTypes.contentTypes[i], i);
-        }
+    }
     }
 
     /**
@@ -146,7 +146,7 @@ public class PduComposer {
      * because the constructors of outgoing pdus are taking care of this.
      *
      * @return OutputStream of maked message. Return null if
-     *         the PDU is invalid.
+     * the PDU is invalid.
      */
     public byte[] make() {
         // Get Message-type.
@@ -157,7 +157,7 @@ public class PduComposer {
             case PduHeaders.MESSAGE_TYPE_SEND_REQ:
                 if (makeSendReqPdu() != PDU_COMPOSE_SUCCESS) {
                     return null;
-                }
+        }
                 break;
             case PduHeaders.MESSAGE_TYPE_NOTIFYRESP_IND:
                 if (makeNotifyResp() != PDU_COMPOSE_SUCCESS) {
@@ -176,13 +176,13 @@ public class PduComposer {
                 break;
             default:
                 return null;
-        }
+    }
 
         return mMessage.toByteArray();
     }
 
     /**
-     *  Copy buf to mMessage.
+     * Copy buf to mMessage.
      */
     protected void arraycopy(byte[] buf, int pos, int length) {
         mMessage.write(buf, pos, length);
@@ -194,7 +194,7 @@ public class PduComposer {
      */
     protected void append(int value) {
         mMessage.write(value);
-        mPosition ++;
+        mPosition++;
     }
 
     /**
@@ -258,7 +258,7 @@ public class PduComposer {
         long temp = longInt;
 
         // Count the length of the long integer.
-        for(size = 0; (temp != 0) && (size < LONG_INTEGER_LENGTH_MAX); size++) {
+        for (size = 0; (temp != 0) && (size < LONG_INTEGER_LENGTH_MAX); size++) {
             temp = (temp >>> 8);
         }
 
@@ -267,12 +267,12 @@ public class PduComposer {
 
         // Count and set the long integer.
         int i;
-        int shift = (size -1) * 8;
+        int shift = (size - 1) * 8;
 
         for (i = 0; i < size; i++) {
-            append((int)((longInt >>> shift) & 0xff));
+            append((int) ((longInt >>> shift) & 0xff));
             shift = shift - 8;
-        }
+    }
     }
 
     /**
@@ -288,9 +288,9 @@ public class PduComposer {
          * ; a Quote character must precede it. Otherwise the Quote character
          * ;must be omitted. The Quote is not part of the contents.
          */
-        if (((text[0])&0xff) > TEXT_MAX) { // No need to check for <= 255
+        if (((text[0]) & 0xff) > TEXT_MAX) { // No need to check for <= 255
             append(TEXT_MAX);
-        }
+    }
 
         arraycopy(text, 0, text.length);
         append(0);
@@ -322,7 +322,7 @@ public class PduComposer {
          * From OMA-TS-MMS-ENC-V1_3-20050927-C:
          * Encoded-string-value = Text-string | Value-length Char-set Text-string
          */
-        assert(enStr != null);
+        assert (enStr != null);
 
         int charset = enStr.getCharacterSet();
         byte[] textString = enStr.getTextString();
@@ -372,16 +372,16 @@ public class PduComposer {
             max = (max << 7) | 0x7fl;
         }
 
-        while(i > 0) {
+        while (i > 0) {
             long temp = value >>> (i * 7);
             temp = temp & 0x7f;
 
-            append((int)((temp | 0x80) & 0xff));
+            append((int) ((temp | 0x80) & 0xff));
 
             i--;
-        }
+    }
 
-        append((int)(value & 0x7f));
+        append((int) (value & 0x7f));
     }
 
     /**
@@ -414,7 +414,7 @@ public class PduComposer {
         if (value < LENGTH_QUOTE) {
             appendShortLength((int) value);
             return;
-        }
+    }
 
         append(LENGTH_QUOTE);
         appendUintvarInteger(value);
@@ -470,7 +470,7 @@ public class PduComposer {
             }
         } catch (NullPointerException e) {
             return null;
-        }
+    }
 
         return temp;
     }
@@ -530,9 +530,9 @@ public class PduComposer {
 
                 EncodedStringValue from = mPduHeader.getEncodedStringValue(field);
                 if ((from == null)
-                        || TextUtils.isEmpty(from.getString())
-                        || new String(from.getTextString()).equals(
-                                PduHeaders.FROM_INSERT_ADDRESS_TOKEN_STR)) {
+                    || TextUtils.isEmpty(from.getString())
+                    || new String(from.getTextString()).equals(
+                    PduHeaders.FROM_INSERT_ADDRESS_TOKEN_STR)) {
                     // Length of from = 1
                     append(1);
                     // Insert-address-token = <Octet 129>
@@ -602,16 +602,16 @@ public class PduComposer {
 
                 appendOctet(field);
                 if (Arrays.equals(messageClass,
-                        PduHeaders.MESSAGE_CLASS_ADVERTISEMENT_STR.getBytes())) {
+                    PduHeaders.MESSAGE_CLASS_ADVERTISEMENT_STR.getBytes())) {
                     appendOctet(PduHeaders.MESSAGE_CLASS_ADVERTISEMENT);
                 } else if (Arrays.equals(messageClass,
-                        PduHeaders.MESSAGE_CLASS_AUTO_STR.getBytes())) {
+                    PduHeaders.MESSAGE_CLASS_AUTO_STR.getBytes())) {
                     appendOctet(PduHeaders.MESSAGE_CLASS_AUTO);
                 } else if (Arrays.equals(messageClass,
-                        PduHeaders.MESSAGE_CLASS_PERSONAL_STR.getBytes())) {
+                    PduHeaders.MESSAGE_CLASS_PERSONAL_STR.getBytes())) {
                     appendOctet(PduHeaders.MESSAGE_CLASS_PERSONAL);
                 } else if (Arrays.equals(messageClass,
-                        PduHeaders.MESSAGE_CLASS_INFORMATIONAL_STR.getBytes())) {
+                    PduHeaders.MESSAGE_CLASS_INFORMATIONAL_STR.getBytes())) {
                     appendOctet(PduHeaders.MESSAGE_CLASS_INFORMATIONAL);
                 } else {
                     appendTextString(messageClass);
@@ -640,7 +640,7 @@ public class PduComposer {
 
             default:
                 return PDU_COMPOSE_FIELD_NOT_SUPPORTED;
-        }
+    }
 
         return PDU_COMPOSE_SUCCESS;
     }
@@ -684,7 +684,7 @@ public class PduComposer {
         // X-Mms-Read-Status
         if (appendHeader(PduHeaders.READ_STATUS) != PDU_COMPOSE_SUCCESS) {
             return PDU_COMPOSE_CONTENT_ERROR;
-        }
+    }
 
         // X-Mms-Applic-ID Optional(not support)
         // X-Mms-Reply-Applic-ID Optional(not support)
@@ -714,7 +714,7 @@ public class PduComposer {
         // X-Mms-MMS-Version
         if (appendHeader(PduHeaders.MMS_VERSION) != PDU_COMPOSE_SUCCESS) {
             return PDU_COMPOSE_CONTENT_ERROR;
-        }
+    }
 
         //  X-Mms-Status
         if (appendHeader(PduHeaders.STATUS) != PDU_COMPOSE_SUCCESS) {
@@ -746,7 +746,7 @@ public class PduComposer {
         //     X-Mms-MMS-Version
         if (appendHeader(PduHeaders.MMS_VERSION) != PDU_COMPOSE_SUCCESS) {
             return PDU_COMPOSE_CONTENT_ERROR;
-        }
+    }
 
         // X-Mms-Report-Allowed Optional
         appendHeader(PduHeaders.REPORT_ALLOWED);
@@ -878,14 +878,13 @@ public class PduComposer {
                     appendTextString(start);
                 } else {
                     appendTextString("<" + new String(start) + ">");
-                }
+        }
             }
 
             // content-type parameter: type
             appendOctet(PduPart.P_CT_MR_TYPE);
             appendTextString(part.getContentType());
-        }
-        catch (ArrayIndexOutOfBoundsException e){
+        } catch (ArrayIndexOutOfBoundsException e) {
             Timber.e(e);
             e.printStackTrace();
         }
@@ -972,8 +971,8 @@ public class PduComposer {
             // content-location
             byte[] contentLocation = part.getContentLocation();
             if (null != contentLocation) {
-            	appendOctet(PduPart.P_CONTENT_LOCATION);
-            	appendTextString(contentLocation);
+                appendOctet(PduPart.P_CONTENT_LOCATION);
+                appendTextString(contentLocation);
             }
 
             // content
@@ -1007,9 +1006,9 @@ public class PduComposer {
                         try {
                             cr.close();
                         } catch (IOException e) {
-                        }
+            }
                     }
-                }
+        }
             }
 
             if (dataLength != (attachment.getLength() - headerLength)) {
@@ -1020,15 +1019,16 @@ public class PduComposer {
             appendUintvarInteger(headerLength);
             appendUintvarInteger(dataLength);
             mStack.copy();
-        }
+    }
 
         return PDU_COMPOSE_SUCCESS;
     }
 
     /**
-     *  Record current message informations.
+     * Record current message informations.
      */
     static private class LengthRecordNode {
+
         ByteArrayOutputStream currentMessage = null;
         public int currentPosition = 0;
 
@@ -1039,6 +1039,7 @@ public class PduComposer {
      * Mark current message position and stact size.
      */
     private class PositionMarker {
+
         private int c_pos;   // Current position
         private int currentStackSize;  // Current stack size
 
@@ -1051,7 +1052,7 @@ public class PduComposer {
             }
 
             return mPosition - c_pos;
-        }
+    }
     }
 
     /**
@@ -1060,13 +1061,14 @@ public class PduComposer {
      * only... Its usage (interface) will not change.
      */
     private class BufferStack {
+
         private LengthRecordNode stack = null;
         private LengthRecordNode toCopy = null;
 
         int stackSize = 0;
 
         /**
-         *  Create a new message buffer and push it into the stack.
+         * Create a new message buffer and push it into the stack.
          */
         void newbuf() {
             // You can't create a new buff when toCopy != null
@@ -1091,7 +1093,7 @@ public class PduComposer {
         }
 
         /**
-         *  Pop the message before and record current message in the stack.
+         * Pop the message before and record current message in the stack.
          */
         void pop() {
             ByteArrayOutputStream currentMessage = mMessage;
@@ -1111,17 +1113,17 @@ public class PduComposer {
         }
 
         /**
-         *  Append current message to the message before.
+         * Append current message to the message before.
          */
         void copy() {
             arraycopy(toCopy.currentMessage.toByteArray(), 0,
-                    toCopy.currentPosition);
+                toCopy.currentPosition);
 
             toCopy = null;
         }
 
         /**
-         *  Mark current message position
+         * Mark current message position
          */
         PositionMarker mark() {
             PositionMarker m = new PositionMarker();
@@ -1130,38 +1132,38 @@ public class PduComposer {
             m.currentStackSize = stackSize;
 
             return m;
-        }
+    }
     }
 
     /**
      * Check address type.
      *
      * @param address address string without the postfix stinng type,
-     *        such as "/TYPE=PLMN", "/TYPE=IPv6" and "/TYPE=IPv4"
+     * such as "/TYPE=PLMN", "/TYPE=IPv6" and "/TYPE=IPv4"
      * @return PDU_PHONE_NUMBER_ADDRESS_TYPE if it is phone number,
-     *         PDU_EMAIL_ADDRESS_TYPE if it is email address,
-     *         PDU_IPV4_ADDRESS_TYPE if it is ipv4 address,
-     *         PDU_IPV6_ADDRESS_TYPE if it is ipv6 address,
-     *         PDU_UNKNOWN_ADDRESS_TYPE if it is unknown.
+     * PDU_EMAIL_ADDRESS_TYPE if it is email address,
+     * PDU_IPV4_ADDRESS_TYPE if it is ipv4 address,
+     * PDU_IPV6_ADDRESS_TYPE if it is ipv6 address,
+     * PDU_UNKNOWN_ADDRESS_TYPE if it is unknown.
      */
     protected static int checkAddressType(String address) {
-        /**
-         * From OMA-TS-MMS-ENC-V1_3-20050927-C.pdf, section 8.
-         * address = ( e-mail / device-address / alphanum-shortcode / num-shortcode)
-         * e-mail = mailbox; to the definition of mailbox as described in
-         * section 3.4 of [RFC2822], but excluding the
-         * obsolete definitions as indicated by the "obs-" prefix.
-         * device-address = ( global-phone-number "/TYPE=PLMN" )
-         * / ( ipv4 "/TYPE=IPv4" ) / ( ipv6 "/TYPE=IPv6" )
-         * / ( escaped-value "/TYPE=" address-type )
-         *
-         * global-phone-number = ["+"] 1*( DIGIT / written-sep )
-         * written-sep =("-"/".")
-         *
-         * ipv4 = 1*3DIGIT 3( "." 1*3DIGIT ) ; IPv4 address value
-         *
-         * ipv6 = 4HEXDIG 7( ":" 4HEXDIG ) ; IPv6 address per RFC 2373
-         */
+    /**
+     * From OMA-TS-MMS-ENC-V1_3-20050927-C.pdf, section 8.
+     * address = ( e-mail / device-address / alphanum-shortcode / num-shortcode)
+     * e-mail = mailbox; to the definition of mailbox as described in
+     * section 3.4 of [RFC2822], but excluding the
+     * obsolete definitions as indicated by the "obs-" prefix.
+     * device-address = ( global-phone-number "/TYPE=PLMN" )
+     * / ( ipv4 "/TYPE=IPv4" ) / ( ipv6 "/TYPE=IPv6" )
+     * / ( escaped-value "/TYPE=" address-type )
+     *
+     * global-phone-number = ["+"] 1*( DIGIT / written-sep )
+     * written-sep =("-"/".")
+     *
+     * ipv4 = 1*3DIGIT 3( "." 1*3DIGIT ) ; IPv4 address value
+     *
+     * ipv6 = 4HEXDIG 7( ":" 4HEXDIG ) ; IPv6 address per RFC 2373
+     */
 
         if (null == address) {
             return PDU_UNKNOWN_ADDRESS_TYPE;
@@ -1170,7 +1172,7 @@ public class PduComposer {
         if (address.matches(REGEXP_IPV4_ADDRESS_TYPE)) {
             // Ipv4 address.
             return PDU_IPV4_ADDRESS_TYPE;
-        }else if (address.matches(REGEXP_PHONE_NUMBER_ADDRESS_TYPE)) {
+        } else if (address.matches(REGEXP_PHONE_NUMBER_ADDRESS_TYPE)) {
             // Phone number.
             return PDU_PHONE_NUMBER_ADDRESS_TYPE;
         } else if (address.matches(REGEXP_EMAIL_ADDRESS_TYPE)) {
@@ -1182,6 +1184,6 @@ public class PduComposer {
         } else {
             // Unknown address.
             return PDU_UNKNOWN_ADDRESS_TYPE;
-        }
+    }
     }
 }
