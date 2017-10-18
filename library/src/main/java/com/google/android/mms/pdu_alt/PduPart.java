@@ -118,6 +118,11 @@ public class PduPart {
    */
   private byte[] mPartData = null;
 
+  /**
+   * Data size of uri.
+   */
+  private long mUriSize = 0;
+
   private static final String TAG = "PduPart";
 
   /**
@@ -142,8 +147,7 @@ public class PduPart {
   }
 
   /**
-   * @return A copy of the part data or null if the data wasn't set or
-   * the data is stored as Uri.
+   * @return A copy of the part data or null if the data wasn't set or the data is stored as Uri.
    * @see #getDataUri
    */
   public byte[] getData() {
@@ -159,11 +163,11 @@ public class PduPart {
   /**
    * @return The length of the data, if this object have data, else 0.
    */
-  public int getDataLength() {
+  public long getDataLength() {
     if (mPartData != null) {
       return mPartData.length;
     } else {
-      return 0;
+      return mUriSize;
     }
   }
 
@@ -178,12 +182,21 @@ public class PduPart {
   }
 
   /**
-   * @return The Uri of the part data or null if the data wasn't set or
-   * the data is stored as byte array.
+   * @return The Uri of the part data or null if the data wasn't set or the data is stored as byte
+   * array.
    * @see #getData
    */
   public Uri getDataUri() {
     return mUri;
+  }
+
+  /**
+   * Set size of the data of given uri.
+   *
+   * @param dataSize the data size
+   */
+  public void setDataUriSize(long dataSize) {
+    this.mUriSize = dataSize;
   }
 
   /**
@@ -262,10 +275,9 @@ public class PduPart {
   /**
    * Get Content-Location value.
    *
-   * @return the value
-   * return PduPart.disposition[0] instead of <Octet 128> (Form-data).
-   * return PduPart.disposition[1] instead of <Octet 129> (Attachment).
-   * return PduPart.disposition[2] instead of <Octet 130> (Inline).
+   * @return the value return PduPart.disposition[0] instead of <Octet 128> (Form-data). return
+   * PduPart.disposition[1] instead of <Octet 129> (Attachment). return PduPart.disposition[2]
+   * instead of <Octet 130> (Inline).
    */
   public byte[] getContentLocation() {
     return (byte[]) mPartHeader.get(P_CONTENT_LOCATION);
