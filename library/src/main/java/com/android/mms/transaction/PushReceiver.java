@@ -164,7 +164,8 @@ public class PushReceiver extends BroadcastReceiver {
                             }
 
                             Uri uri = p.persist(pdu, Inbox.CONTENT_URI,
-                                    !NotificationTransaction.allowAutoDownload(mContext),
+                                // TODO: replace, test forcing creating threadId if new conversation
+                                    true /*!NotificationTransaction.allowAutoDownload(mContext)*/,
                                     group,
                                     null);
 
@@ -230,8 +231,9 @@ public class PushReceiver extends BroadcastReceiver {
                 }
             } catch (MmsException e) {
                 Timber.e("Failed to save the data from PUSH: type=" + type, e);
+                Timber.e(e);
             } catch (RuntimeException e) {
-                Timber.e("Unexpected RuntimeException.", e);
+                Timber.e(e);
             }
 
             if (LOCAL_LOGV) {

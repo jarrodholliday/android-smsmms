@@ -57,6 +57,10 @@ public class Utils {
         return mTelephonyMgr.getLine1Number();
     }
 
+    public static boolean isAtLeastMarshmallow() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
+    }
+
     public interface Task<T> {
         T run() throws IOException;
     }
