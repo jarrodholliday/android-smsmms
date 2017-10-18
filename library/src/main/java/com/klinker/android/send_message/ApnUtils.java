@@ -147,12 +147,8 @@ public class ApnUtils {
                     }
                 }
             }
-        } catch (XmlPullParserException e) {
-            Timber.e("loadMmsSettings caught ", e);
-        } catch (NumberFormatException e) {
-            Timber.e("loadMmsSettings caught ", e);
-        } catch (IOException e) {
-            Timber.e("loadMmsSettings caught ", e);
+        } catch (XmlPullParserException | NumberFormatException | IOException e) {
+            Timber.e(e);
         } finally {
             parser.close();
         }
@@ -300,12 +296,8 @@ public class ApnUtils {
                     }
                 }
             }
-        } catch (XmlPullParserException e) {
-            Timber.e("loadApns caught ", e);
-        } catch (NumberFormatException e) {
-            Timber.e("loadApns caught ", e);
-        } catch (IOException e) {
-            Timber.e("loadApns caught ", e);
+        } catch (XmlPullParserException | NumberFormatException | IOException e) {
+            Timber.e(e);
         } finally {
             parser.close();
         }

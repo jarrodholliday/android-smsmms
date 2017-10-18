@@ -81,15 +81,15 @@ public class MmsReceivedService extends IntentService {
             Timber.v("response length: " + response.length);
             mDownloadFile.delete();
         } catch (FileNotFoundException e) {
-            Timber.e("MMS received, file not found exception", e);
+            Timber.e("MMS received, file not found exception: %s", e.getMessage());
         } catch (IOException e) {
-            Timber.e("MMS received, io exception", e);
+            Timber.e("MMS received, io exception: %s", e.getMessage());
         } finally {
             if (reader != null) {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    Timber.e("MMS received, io exception", e);
+                    Timber.e("MMS received, io exception: %s", e.getMessage());
                 }
             }
 
@@ -270,10 +270,8 @@ public class MmsReceivedService extends IntentService {
                     } else {
                         sendPdu(new PduComposer(mContext, acknowledgeInd).make());
                     }
-                } catch (InvalidHeaderValueException e) {
-                    Timber.e("error", e);
                 } catch (MmsException e) {
-                    Timber.e("error", e);
+                    Timber.e(e);
                 }
             }
         }
@@ -301,7 +299,7 @@ public class MmsReceivedService extends IntentService {
                 return new AcknowledgeIndTask(context, ind, transactionSettings, (RetrieveConf) pdu);
             }
         } catch (MmsException e) {
-            Timber.e("error", e);
+            Timber.e(e);
             return null;
         }
     }
@@ -315,7 +313,7 @@ public class MmsReceivedService extends IntentService {
             // need retry ?
             task.run();
         } catch (IOException e) {
-            Timber.e("MMS send received notification, io exception", e);
+            Timber.e("MMS send received notification, io exception: %s", e.getMessage());
             throw e;
         }
     }

@@ -54,14 +54,14 @@ public class RouteInfo implements Parcelable {
                         destination = new LinkAddress(Inet4Address.getLocalHost(), 0);
                     } catch (UnknownHostException e) {
                         // TODO Auto-generated catch block
-                        Timber.e("exception thrown", e);
+                        Timber.e(e);
                     }
                 } else {
                     try {
                         destination = new LinkAddress(Inet6Address.getLocalHost(), 0);
                     } catch (UnknownHostException e) {
                         // TODO Auto-generated catch block
-                        Timber.e("exception thrown", e);
+                        Timber.e(e);
                     }
                 }
             } else {
@@ -75,14 +75,14 @@ public class RouteInfo implements Parcelable {
                     gateway = Inet4Address.getLocalHost();
                 } catch (UnknownHostException e) {
                     // TODO Auto-generated catch block
-                    Timber.e("exception thrown", e);
+                    Timber.e(e);
                 }
             } else {
                 try {
                     gateway = Inet6Address.getLocalHost();
                 } catch (UnknownHostException e) {
                     // TODO Auto-generated catch block
-                    Timber.e("exception thrown", e);
+                    Timber.e(e);
                 }
             }
         }

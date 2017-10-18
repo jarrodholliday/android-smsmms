@@ -100,7 +100,7 @@ public class ReadRecTransaction extends Transaction implements Runnable{
             }
         } catch (RuntimeException e) {
             if (LOCAL_LOGV) {
-                Timber.e("Unexpected RuntimeException.", e);
+                Timber.e(e);
             }
         } finally {
             if (mTransactionState.getState() != TransactionState.SUCCESS) {

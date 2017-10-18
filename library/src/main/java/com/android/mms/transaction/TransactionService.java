@@ -893,7 +893,7 @@ public class TransactionService extends Service implements Observer {
                                     }
                                 }
                             } catch (Throwable t) {
-                                Timber.e("Unexpected Throwable.", t);
+                                Timber.e(t);
                             } finally {
                                 // Set transaction to null to allow stopping the
                                 // transaction service.

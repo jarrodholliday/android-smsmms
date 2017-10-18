@@ -89,7 +89,7 @@ public class NotificationTransaction extends Transaction implements Runnable {
             mNotificationInd = (NotificationInd)
                     PduPersister.getPduPersister(context).load(mUri);
         } catch (MmsException e) {
-            Timber.e("Failed to load NotificationInd from: " + uriString, e);
+            Timber.e("Failed to load NotificationInd from: %s %s", uriString, e.getMessage());
             throw new IllegalArgumentException();
         }
 
@@ -122,7 +122,7 @@ public class NotificationTransaction extends Transaction implements Runnable {
                         ind, Inbox.CONTENT_URI, !allowAutoDownload(mContext),
                         group, null);
         } catch (MmsException e) {
-            Timber.e("Failed to save NotificationInd in constructor.", e);
+            Timber.e("Failed to save NotificationInd in constructor. %s", e.getMessage());
             throw new IllegalArgumentException();
         }
 
@@ -240,7 +240,7 @@ public class NotificationTransaction extends Transaction implements Runnable {
 
             sendNotifyRespInd(status);
         } catch (Throwable t) {
-            Timber.e("error", t);
+            Timber.e(t);
         } finally {
             mTransactionState.setContentUri(mUri);
             if (!autoDownload) {

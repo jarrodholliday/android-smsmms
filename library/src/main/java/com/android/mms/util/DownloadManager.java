@@ -147,7 +147,7 @@ public class DownloadManager {
                 return;
             }
         } catch(MmsException e) {
-            Timber.e(e.getMessage(), e);
+            Timber.e(e);
             return;
         }
 
@@ -159,7 +159,7 @@ public class DownloadManager {
                         Toast.makeText(mContext, getMessage(uri),
                                 Toast.LENGTH_LONG).show();
                     } catch (MmsException e) {
-                        Timber.e(e.getMessage(), e);
+                        Timber.e(e);
                     }
                 }
             });
@@ -182,7 +182,7 @@ public class DownloadManager {
                 try {
                     Toast.makeText(mContext, errStr, Toast.LENGTH_LONG).show();
                 } catch (Exception e) {
-                    Timber.e(TAG,"Caught an exception in showErrorCodeToast");
+                    Timber.e(e);
                 }
             }
         });

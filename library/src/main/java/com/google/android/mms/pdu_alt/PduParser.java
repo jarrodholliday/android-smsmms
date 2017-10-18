@@ -1476,7 +1476,8 @@ public class PduParser {
                             map.put(PduPart.P_CHARSET, charsetInt);
                         } catch (UnsupportedEncodingException e) {
                             // Not a well-known charset, use "*".
-                            Timber.e(Arrays.toString(charsetStr), e);
+                            Timber.e(Arrays.toString(charsetStr));
+                            Timber.e(e);
                             map.put(PduPart.P_CHARSET, CharacterSets.ANY_CHARSET);
                         }
                     } else {

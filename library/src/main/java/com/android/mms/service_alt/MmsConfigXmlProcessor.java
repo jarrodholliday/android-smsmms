@@ -92,10 +92,8 @@ public class MmsConfigXmlProcessor {
                 // mms_config.xml resource
                 processMmsConfig();
             }
-        } catch (IOException e) {
-            Timber.e("MmsConfigXmlProcessor: I/O failure " + e, e);
-        } catch (XmlPullParserException e) {
-            Timber.e("MmsConfigXmlProcessor: parsing failure " + e, e);
+        } catch (IOException | XmlPullParserException e) {
+            Timber.e(e);
         }
     }
 

@@ -112,15 +112,15 @@ public class MmsReceivedReceiver extends BroadcastReceiver {
                     task.executeOnExecutor(RECEIVE_NOTIFICATION_EXECUTOR);
             }
         } catch (FileNotFoundException e) {
-            Timber.e("MMS received, file not found exception", e);
+            Timber.e("MMS received, file not found exception: %s", e.getMessage());
         } catch (IOException e) {
-            Timber.e("MMS received, io exception", e);
+            Timber.e("MMS received, io exception: %s", e.getMessage());
         } finally {
             if (reader != null) {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    Timber.e("MMS received, io exception", e);
+                    Timber.e("MMS received, io exception: %s", e.getMessage());
                 }
             }
         }
@@ -254,10 +254,8 @@ public class MmsReceivedReceiver extends BroadcastReceiver {
                 } else {
                     sendPdu(new PduComposer(mContext, notifyRespInd).make());
                 }
-            } catch (MmsException e) {
-                Timber.e("error", e);
-            } catch (IOException e) {
-                Timber.e("error", e);
+            } catch (MmsException | IOException e) {
+                Timber.e(e);
             }
             return null;
         }
@@ -296,12 +294,8 @@ public class MmsReceivedReceiver extends BroadcastReceiver {
                     } else {
                         sendPdu(new PduComposer(mContext, acknowledgeInd).make());
                     }
-                } catch (InvalidHeaderValueException e) {
-                    Timber.e("error", e);
-                } catch (MmsException e) {
-                    Timber.e("error", e);
-                } catch (IOException e) {
-                    Timber.e("error", e);
+                } catch (MmsException | IOException e) {
+                    Timber.e(e);
                 }
             }
             return null;
@@ -338,7 +332,7 @@ public class MmsReceivedReceiver extends BroadcastReceiver {
 
             return responseTasks;
         } catch (MmsException e) {
-            Timber.e("error", e);
+            Timber.e(e);
             return null;
         }
     }

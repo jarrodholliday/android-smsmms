@@ -230,7 +230,7 @@ public class PushReceiver extends BroadcastReceiver {
                         Timber.e("Received unrecognized PDU.");
                 }
             } catch (MmsException e) {
-                Timber.e("Failed to save the data from PUSH: type=" + type, e);
+                Timber.e("Failed to save the data from PUSH: type= %d, %s", type, e.getMessage());
                 Timber.e(e);
             } catch (RuntimeException e) {
                 Timber.e(e);

@@ -164,7 +164,7 @@ public class SendRequest extends MmsRequest {
 //        } catch (MmsException e) {
 //            Timber.e("SendRequest.persistIfRequired: can not persist message", e);
         } catch (RuntimeException e) {
-            Timber.e("SendRequest.persistIfRequired: unexpected parsing failure", e);
+            Timber.e(e);
         } finally {
             Binder.restoreCallingIdentity(identity);
         }
@@ -227,7 +227,7 @@ public class SendRequest extends MmsRequest {
         try {
             context.revokeUriPermission(mPduUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
         } catch (NullPointerException e) {
-            Timber.e("error revoking permissions", e);
+            Timber.e(e);
         }
     }
 }

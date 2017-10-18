@@ -255,7 +255,7 @@ public class NetworkUtilsHelper {
                     addrHexString.substring(16, 20), addrHexString.substring(20, 24),
                     addrHexString.substring(24, 28), addrHexString.substring(28, 32)));
         } catch (Exception e) {
-            Timber.e("NetworkUtils", "error in hexToInet6Address(" + addrHexString + "): " + e);
+            Timber.e("error in hexToInet6Address(" + addrHexString + "): " + e.getMessage());
             throw new IllegalArgumentException(e);
         }
     }

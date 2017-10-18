@@ -115,7 +115,7 @@ public class TransactionSettings {
             try {
                 mProxyPort = Integer.parseInt(Transaction.settings.getPort());
             } catch (NumberFormatException e) {
-                Timber.e("could not get proxy: " + Transaction.settings.getPort(), e);
+                Timber.e("could not get proxy: %s %s", Transaction.settings.getPort(), e.getMessage());
             }
         }
 //        }

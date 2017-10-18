@@ -205,7 +205,7 @@ public class MmsNetworkManager implements com.squareup.okhttp.internal.Network {
             connectivityManager.requestNetwork(
                     mNetworkRequest, mNetworkCallback);
         } catch (SecurityException e) {
-            Timber.e("permission exception... skipping it for testing purposes", e);
+            Timber.e(e);
             permissionError = true;
         }
     }
@@ -222,7 +222,7 @@ public class MmsNetworkManager implements com.squareup.okhttp.internal.Network {
             try {
                 connectivityManager.unregisterNetworkCallback(callback);
             } catch (Exception e) {
-                Timber.e("couldn't unregister", e);
+                Timber.e(e);
             }
         }
         resetLocked();

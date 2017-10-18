@@ -168,7 +168,7 @@ public class SendTransaction extends Transaction implements Runnable {
             mTransactionState.setState(TransactionState.SUCCESS);
             mTransactionState.setContentUri(uri);
         } catch (Throwable t) {
-            Timber.e("error", t);
+            Timber.e(t);
         } finally {
             if (mTransactionState.getState() != TransactionState.SUCCESS) {
                 mTransactionState.setState(TransactionState.FAILED);

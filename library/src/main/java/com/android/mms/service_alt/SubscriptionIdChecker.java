@@ -29,7 +29,7 @@ class SubscriptionIdChecker {
                     mCanUseSubscriptionId = true;
                 }
             } catch (SQLiteException e) {
-                Timber.e("SubscriptionIdChecker.check() fail");
+                Timber.e(e);
             } finally {
                 if (c != null) {
                     c.close();

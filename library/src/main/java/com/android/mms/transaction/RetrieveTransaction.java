@@ -193,7 +193,7 @@ public class RetrieveTransaction extends Transaction implements Runnable {
                 // Don't mark the transaction as failed if we failed to send it.
                 sendAcknowledgeInd(retrieveConf);
             } catch (Throwable t) {
-                Timber.e("error", t);
+                Timber.e(t);
                 if ("HTTP error: Not Found".equals(t.getMessage())) {
                     // Delete the expired M-Notification.ind.
                     SqliteWrapper.delete(mContext, mContext.getContentResolver(),

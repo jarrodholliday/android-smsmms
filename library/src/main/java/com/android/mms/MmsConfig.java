@@ -300,12 +300,8 @@ public class MmsConfig {
                     }
                 }
             }
-        } catch (XmlPullParserException e) {
-            Timber.e("loadMmsSettings caught ", e);
-        } catch (NumberFormatException e) {
-            Timber.e("loadMmsSettings caught ", e);
-        } catch (IOException e) {
-            Timber.e("loadMmsSettings caught ", e);
+        } catch (XmlPullParserException | NumberFormatException | IOException e) {
+            Timber.e(e);
         } finally {
             parser.close();
         }

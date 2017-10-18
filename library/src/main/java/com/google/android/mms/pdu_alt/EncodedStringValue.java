@@ -74,7 +74,7 @@ public class EncodedStringValue implements Cloneable {
             mData = data.getBytes(CharacterSets.DEFAULT_CHARSET_NAME);
             mCharacterSet = CharacterSets.DEFAULT_CHARSET;
         } catch (UnsupportedEncodingException e) {
-            Timber.e("Default encoding must be supported.", e);
+            Timber.e(e);
         }
     }
 
@@ -172,7 +172,7 @@ public class EncodedStringValue implements Cloneable {
                 newTextString.write(mData);
                 newTextString.write(textString);
             } catch (IOException e) {
-                Timber.e("logging error", e);
+                Timber.e(e);
                 e.printStackTrace();
                 throw new NullPointerException(
                         "appendTextString: failed when write a new Text-string");
@@ -196,7 +196,7 @@ public class EncodedStringValue implements Cloneable {
         try {
             return new EncodedStringValue(mCharacterSet, dstBytes);
         } catch (Exception e) {
-            Timber.e("logging error", e);
+            Timber.e(e);
             e.printStackTrace();
             throw new CloneNotSupportedException(e.getMessage());
         }

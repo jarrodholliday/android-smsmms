@@ -532,7 +532,7 @@ public class GsmAlphabet {
                 }
             }
         } catch (RuntimeException ex) {
-            Timber.e("Error GSM 7 bit packed: ", ex);
+            Timber.e("Error GSM 7 bit packed: %s", ex.getMessage());
             return null;
         }
 

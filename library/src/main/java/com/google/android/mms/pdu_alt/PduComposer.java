@@ -886,7 +886,7 @@ public class PduComposer {
             appendTextString(part.getContentType());
         }
         catch (ArrayIndexOutOfBoundsException e){
-            Timber.e("logging error", e);
+            Timber.e(e);
             e.printStackTrace();
         }
 

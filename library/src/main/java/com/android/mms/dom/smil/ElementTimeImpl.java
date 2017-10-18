@@ -133,7 +133,7 @@ public abstract class ElementTimeImpl implements ElementTime {
                             getEndConstraints()));
                 } catch (IllegalArgumentException e) {
                     // Ignore badly formatted times
-                    Timber.e("Malformed time value.", e);
+                    Timber.e(e);
                 }
             }
         }

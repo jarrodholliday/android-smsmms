@@ -215,12 +215,8 @@ public class DownloadRequest extends MmsRequest {
                     });
 
             return messageUri;
-        } catch (MmsException e) {
-            Timber.e("DownloadRequest.persistIfRequired: can not persist message", e);
-        } catch (SQLiteException e) {
-            Timber.e("DownloadRequest.persistIfRequired: can not update message", e);
-        } catch (RuntimeException e) {
-            Timber.e("DownloadRequest.persistIfRequired: can not parse response", e);
+        } catch (MmsException | RuntimeException e) {
+            Timber.e(e);
         } finally {
             Binder.restoreCallingIdentity(identity);
         }

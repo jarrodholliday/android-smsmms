@@ -101,7 +101,7 @@ public class MmsRequestManager implements MmsRequest.RequestManager {
             // Don't mark the transaction as failed if we failed to send it.
             // sendAcknowledgeInd(retrieveConf);
         } catch (Throwable t) {
-            timber.log.Timber.e("error", t);
+            timber.log.Timber.e(t);
         }
 
         return false;

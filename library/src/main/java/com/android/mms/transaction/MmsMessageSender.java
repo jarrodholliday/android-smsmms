@@ -179,9 +179,9 @@ public class MmsMessageSender implements MessageSender {
                     group, null);
             context.startService(new Intent(context, TransactionService.class));
         } catch (InvalidHeaderValueException e) {
-            Timber.e("Invalide header value", e);
+            Timber.e(e);
         } catch (MmsException e) {
-            Timber.e("Persist message failed", e);
+            Timber.e(e);
         }
     }
 }

@@ -69,7 +69,7 @@ public final class SqliteWrapper {
         try {
             return resolver.query(uri, projection, selection, selectionArgs, sortOrder);
         } catch (SQLiteException e) {
-            Timber.e("Catch a SQLiteException when query: ", e);
+            Timber.e(e);
             checkSQLiteException(context, e);
             return null;
         }
@@ -79,7 +79,7 @@ public final class SqliteWrapper {
         try {
             return cursor.requery();
         } catch (SQLiteException e) {
-            Timber.e("Catch a SQLiteException when requery: ", e);
+            Timber.e(e);
             checkSQLiteException(context, e);
             return false;
         }
@@ -89,7 +89,7 @@ public final class SqliteWrapper {
         try {
             return resolver.update(uri, values, where, selectionArgs);
         } catch (SQLiteException e) {
-            Timber.e("Catch a SQLiteException when update: ", e);
+            Timber.e(e);
             checkSQLiteException(context, e);
             return -1;
         }
@@ -100,7 +100,7 @@ public final class SqliteWrapper {
         try {
             return resolver.delete(uri, where, selectionArgs);
         } catch (SQLiteException e) {
-            Timber.e("Catch a SQLiteException when delete: ", e);
+            Timber.e(e);
             checkSQLiteException(context, e);
             return -1;
         }
@@ -111,7 +111,7 @@ public final class SqliteWrapper {
         try {
             return resolver.insert(uri, values);
         } catch (SQLiteException e) {
-            Timber.e("Catch a SQLiteException when insert: ", e);
+            Timber.e(e);
             checkSQLiteException(context, e);
             return null;
         }

@@ -36,7 +36,7 @@ public class SendReq extends MultimediaMessagePdu {
             setTransactionId(generateTransactionId());
         } catch (InvalidHeaderValueException e) {
             // Impossible to reach here since all headers we set above are valid.
-            Timber.e("Unexpected InvalidHeaderValueException.", e);
+            Timber.e(e);
             throw new RuntimeException(e);
         }
     }

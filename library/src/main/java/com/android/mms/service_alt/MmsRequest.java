@@ -182,7 +182,7 @@ public abstract class MmsRequest {
                     try {
                         networkManager.acquireNetwork();
                     } catch (Exception e) {
-                        Timber.e("error acquiring network", e);
+                        Timber.e(e);
                     }
 
                     final String apnName = networkManager.getApnName();
@@ -209,7 +209,7 @@ public abstract class MmsRequest {
                         networkManager.releaseNetwork();
                     }
                 } catch (ApnException e) {
-                    Timber.e("MmsRequest: APN failure", e);
+                    Timber.e(e);
                     result = SmsManager.MMS_ERROR_INVALID_APN;
                     break;
 //                    } catch (MmsNetworkException e) {
@@ -217,12 +217,12 @@ public abstract class MmsRequest {
 //                        result = SmsManager.MMS_ERROR_UNABLE_CONNECT_MMS;
 //                        // Retry
                 } catch (MmsHttpException e) {
-                    Timber.e("MmsRequest: HTTP or network I/O failure", e);
+                    Timber.e(e);
                     result = SmsManager.MMS_ERROR_HTTP_FAILURE;
                     httpStatusCode = e.getStatusCode();
                     // Retry
                 } catch (Exception e) {
-                    Timber.e("MmsRequest: unexpected failure", e);
+                    Timber.e(e);
                     result = SmsManager.MMS_ERROR_UNSPECIFIED;
                     break;
                 }
@@ -282,7 +282,7 @@ public abstract class MmsRequest {
                 }
                 pendingIntent.send(context, result, fillIn);
             } catch (PendingIntent.CanceledException e) {
-                Timber.e("MmsRequest: sending pending intent canceled", e);
+                Timber.e(e);
             }
         }
 
