@@ -455,4 +455,8 @@ public class Utils {
       return DEFAULT_SUBSCRIPTION_ID;
     }
   }
+
+  public static void throwException(Exception e) {
+
+  }
 }

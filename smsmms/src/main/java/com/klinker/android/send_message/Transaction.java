@@ -704,7 +704,7 @@ public class Transaction {
                 }
             }
         } catch (Exception e) {
-            //TODO: Mikhail it needs to deliver the exception to the app
+            ExceptionUtils.sendException(context, e);
             Timber.e("error using system sending method", e);
         }
     }
