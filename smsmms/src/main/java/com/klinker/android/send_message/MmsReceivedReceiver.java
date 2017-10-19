@@ -111,6 +111,7 @@ public class MmsReceivedReceiver extends BroadcastReceiver {
                 }
             }
         } catch (FileNotFoundException e) {
+            ExceptionUtils.sendException(context, e);
             Timber.e("MMS received, file not found exception: %s", e.getMessage());
         } catch (IOException e) {
             Timber.e("MMS received, io exception: %s", e.getMessage());
