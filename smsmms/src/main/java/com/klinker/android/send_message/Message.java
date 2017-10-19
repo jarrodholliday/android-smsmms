@@ -18,12 +18,11 @@ package com.klinker.android.send_message;
 
 import android.graphics.Bitmap;
 import android.net.Uri;
-import timber.log.Timber;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import timber.log.Timber;
 
 /**
  * Class to hold all relevant message information to send
