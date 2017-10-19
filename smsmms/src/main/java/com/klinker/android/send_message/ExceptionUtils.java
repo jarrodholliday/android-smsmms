@@ -19,13 +19,12 @@ public class ExceptionUtils {
     BroadcastUtils.sendExplicitBroadcast(context, intent, SMSMMS_EXCEPTION_ACTION);
   }
 
-  public static Exception unpackBroadcastIntent(Intent intent) {
+  public static ExceptionContainer unpackBroadcastIntent(Intent intent) {
     if (!SMSMMS_EXCEPTION_ACTION.equals(intent.getAction()) ||
         !intent.hasExtra(SMSMMS_EXCEPTION_EXTRA)) {
       return null;
     }
 
-    ExceptionContainer container = intent.getParcelableExtra(SMSMMS_EXCEPTION_EXTRA);
-    return container.getException();
+    return intent.getParcelableExtra(SMSMMS_EXCEPTION_EXTRA);
   }
 }
