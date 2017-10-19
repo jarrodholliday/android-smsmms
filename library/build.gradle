@@ -24,7 +24,7 @@ android {
         minSdkVersion 19
         targetSdkVersion 25
         versionCode 201710170
-        versionName "4.2.2.5"
+        versionName "4.2.2.6"
     }
 
     lintOptions {
@@ -40,7 +40,7 @@ android {
 //    userOrg = properties.getProperty("bintray.userOrg")
 //    groupId = properties.getProperty("bintray.groupId")
 //    artifactId = 'android-smsmms'
-//    publishVersion = '4.2.2.5'
+//    publishVersion = '4.2.2.6'
 //    description = 'Library for easily sending SMS and MMS for Android devices'
 //    website = properties.getProperty("bintray.website")
 //    bintrayUser = properties.getProperty("bintray.user")
